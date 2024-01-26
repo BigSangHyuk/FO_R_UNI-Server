@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.entity;
+package bigsanghyuk.four_uni.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -12,21 +12,19 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Scrapped {
+public class LikedComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "scrapped_id")
+    @Column(name = "liked_comment_id")
     private Long id;
 
     private Long userId;
-    private Long postId;
-    private Long categoryId;
+    private Long commentId;
 
     @CreatedDate
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
-    private LocalDateTime scrappedAt;
 
     @LastModifiedDate
     private LocalDateTime updatedAt;

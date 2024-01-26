@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.entity;
+package bigsanghyuk.four_uni.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -8,12 +8,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Department {
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "dept_id")
+    @Column(name = "category_id")
     private Long id;
 
-    private String deptName;
+    private String categoryName;
+    private Long deptId;
 }

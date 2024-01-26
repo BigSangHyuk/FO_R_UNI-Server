@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.entity;
+package bigsanghyuk.four_uni.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
