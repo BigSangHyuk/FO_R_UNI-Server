@@ -17,9 +17,10 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/v1/user-register")
+    @PostMapping("/v1/register")
     public ResponseEntity<CommonResponse> register(@Valid @RequestBody UserRegisterRequest request) {
         userService.register(request.toDomain());
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
     }
+
 }

@@ -6,7 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class UserRegisterInfo {
-    private Long id;
     private String email;
     private String password;
     private String name;
@@ -14,4 +13,3 @@ public class UserRegisterInfo {
     private String nickName;
     private String image;
 }
-

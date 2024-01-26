@@ -2,14 +2,12 @@ package bigsanghyuk.four_uni.controller.request;
 
 
 import bigsanghyuk.four_uni.domain.UserRegisterInfo;
-import lombok.Data;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 
-@Data
+@AllArgsConstructor
 public class UserRegisterRequest {
 
-    @NotNull
-    private Long id;
     @NotNull
     private String email;
     @NotNull
@@ -24,6 +22,6 @@ public class UserRegisterRequest {
     private String image;
 
     public UserRegisterInfo toDomain() {
-        return new UserRegisterInfo(id, email, password, name, dept, nickName, image);
+        return new UserRegisterInfo(email, password, name, dept, nickName, image);
     }
 }
