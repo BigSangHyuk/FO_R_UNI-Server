@@ -47,7 +47,7 @@ class ScrappedRepositoryTest {
         for (int i = 0; i < scrappedListUser.size(); i++) {
             Scrapped scrapped = scrappedListUser.get(i);
             Optional<Post> post = postRepository.findById(scrapped.getPostId());
-            System.out.println("scrapped" + (i + 1) + " | title=" + post.get().getTitle() + ", scrap Id=" + scrapped.getId() + ", scrap PostId=" + scrapped.getPostId());
+            log.info("Scrapped{} -> title={}, scrapId={}, scrapPostId={}", i + 1, post.get().getTitle(), scrapped.getId(), scrapped.getPostId());
             //출력: scrapped1 | title=hello, scrap Id=71, scrap PostId=239
         }
     }
@@ -55,9 +55,12 @@ class ScrappedRepositoryTest {
     @DisplayName("스크랩 제거 테스트")
     @Test
     void removeScrapTest() {
-        System.out.println("before deletion : " + scrappedRepository.findByUserId(userId2).size());
-        scrappedRepository.deleteScrappedByUserIdAndPostId(userId2, 352L);  //postId 수동으로 +10씩 수정 해야됨: 마지막 테스트 352L
-        System.out.println("after deletion  : " + scrappedRepository.findByUserId(userId2).size());
+        log.info("before deletion={}", scrappedRepository.findByUserId(userId2).size());
+        log.info("delete column twice");
+        for (int i = 0; i < 2; i++) {
+            scrappedRepository.deleteScrappedByUserIdAndPostId(userId2, scrappedRepository.findByUserId(userId2).get(0).getPostId());   //postId 파라미터는 userId2의 제일 첫 글 -> 첫 글 삭제후 결과가 텍스트 결과
+        }
+        log.info("after deletion={}", scrappedRepository.findByUserId(userId2).size());
     }
 
     @DisplayName("스크랩된 게시물이 없는 테스트")
@@ -69,6 +72,7 @@ class ScrappedRepositoryTest {
 
     @BeforeEach
     void beforeEach() {
+        log.info("[beforeEach] 테스트 데이터 추가");
         Post save1 = postRepository.save(new Post(1L, false, "hello", "hello kim", null, 0, 0, true, LocalDate.parse("2020-01-08"), LocalDateTime.of(2020, 1, 8, 00, 00, 00)));
         Post save2 = postRepository.save(new Post(2L, false, "ollasdf", "hello kim", null, 0, 0, true, LocalDate.parse("2020-01-08"), LocalDateTime.of(2025, 1, 8, 00, 00, 00)));
         Post save3 = postRepository.save(new Post(3L, false, "jfajg", "egrkjk han", null, 0, 0, true, LocalDate.parse("2023-01-08"), LocalDateTime.of(2024, 1, 8, 00, 00, 00)));
@@ -95,6 +99,7 @@ class ScrappedRepositoryTest {
 
     @AfterEach
     void afterEach() {
+        log.info("[afterEach]  테스트 데이터 삭제");
         postRepository.deleteAll();
         scrappedRepository.deleteAll();
     }
