@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +21,7 @@ public class PostService {
         return null;
     }
 
-    public Optional<List<Post>> getUnClassifiedLists() {
-        List<Post> unClassifiedList = postRepository.findByIsClassifiedFalse();
-        return Optional.ofNullable(unClassifiedList);
+    public List<Post> getUnClassifiedLists() {
+        return postRepository.findByIsClassifiedFalse();
     }
 }
