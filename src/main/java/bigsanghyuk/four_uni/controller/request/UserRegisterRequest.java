@@ -2,10 +2,10 @@ package bigsanghyuk.four_uni.controller.request;
 
 
 import bigsanghyuk.four_uni.domain.UserRegisterInfo;
-import lombok.Data;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 
-@Data
+@AllArgsConstructor
 public class UserRegisterRequest {
 
     @NotNull
