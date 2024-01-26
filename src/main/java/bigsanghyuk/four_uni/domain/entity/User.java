@@ -32,6 +32,18 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    public User(Long id, String email, String password, String name, int dept, String nickName, String image, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.dept = dept;
+        this.nickName = nickName;
+        this.image = image;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     public User(String email, String password, String name, int dept, String nickName, String image) {
         this.email = email;
         this.password = password;
