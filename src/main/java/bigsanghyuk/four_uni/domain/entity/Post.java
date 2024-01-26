@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Post {
 
     @Id
@@ -39,8 +41,18 @@ public class Post {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    /* 원글 게시일
-    private LocalDateTime postedAt;
-     */
-
+    public Post(Long categoryId, boolean report, String title, String content, String imageUrl, int views, int postReport, boolean isClassified, LocalDate postedAt, LocalDateTime deadline) {
+        this.categoryId = categoryId;
+        this.report = report;
+        this.title = title;
+        this.content = content;
+        this.imageUrl = imageUrl;
+        this.views = views;
+        this.postReport = postReport;
+        this.isClassified = isClassified;
+        this.postedAt = postedAt;
+        this.deadline = deadline;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 }
