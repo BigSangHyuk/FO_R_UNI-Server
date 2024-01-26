@@ -9,8 +9,6 @@ import jakarta.validation.constraints.NotNull;
 public class UserRegisterRequest {
 
     @NotNull
-    private Long id;
-    @NotNull
     private String email;
     @NotNull
     private String password;
@@ -24,6 +22,6 @@ public class UserRegisterRequest {
     private String image;
 
     public UserRegisterInfo toDomain() {
-        return new UserRegisterInfo(id, email, password, name, dept, nickName, image);
+        return new UserRegisterInfo(email, password, name, dept, nickName, image);
     }
 }
