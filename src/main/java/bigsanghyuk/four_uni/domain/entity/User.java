@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
@@ -39,5 +40,6 @@ public class User {
         this.dept = dept;
         this.nickName = nickName;
         this.image = image;
+        this.createdAt = LocalDateTime.now();
     }
 }
