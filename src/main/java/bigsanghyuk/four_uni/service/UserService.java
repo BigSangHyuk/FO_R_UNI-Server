@@ -1,5 +1,6 @@
 package bigsanghyuk.four_uni.service;
 
+import bigsanghyuk.four_uni.domain.UpdateUserInfo;
 import bigsanghyuk.four_uni.domain.UserRegisterInfo;
 import bigsanghyuk.four_uni.domain.entity.User;
 import bigsanghyuk.four_uni.repository.UserRepository;
@@ -36,6 +37,15 @@ public class UserService {
                         userRegisterInfo.getImage()
                 )
         );
+    }
+
+    public void updateUser(UpdateUserInfo updateUserInfo) {
+
+        User user = userRepository.findById(updateUserInfo.getId())
+                .orElseThrow(() -> new IllegalStateException("등록되지 않은 유저입니다. 다시 로그인 시도하세요."));
+
+        user.edit(updateUserInfo);
+        userRepository.save(user);
     }
 
     //회원 전체 조회

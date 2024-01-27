@@ -1,6 +1,8 @@
 package bigsanghyuk.four_uni.domain.entity;
 
+import bigsanghyuk.four_uni.domain.UpdateUserInfo;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,5 +55,18 @@ public class User {
         this.nickName = nickName;
         this.image = image;
         this.createdAt = LocalDateTime.now();
+    }
+
+    public User(Long id, String password, String nickName, String image) {
+        this.id = id;
+        this.password = password;
+        this.nickName =nickName;
+        this.image = image;
+    }
+
+    public void edit(@Valid UpdateUserInfo updateUserInfo) {
+        this.password = password;
+        this.nickName = nickName;
+        this.image = image;
     }
 }
