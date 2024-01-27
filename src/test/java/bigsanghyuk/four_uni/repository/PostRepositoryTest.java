@@ -1,10 +1,8 @@
 package bigsanghyuk.four_uni.repository;
 
-import bigsanghyuk.four_uni.domain.entity.Post;
-import bigsanghyuk.four_uni.service.PostService;
-import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.annotation.After;
-import org.assertj.core.api.Assertions;
+import bigsanghyuk.four_uni.post.domain.entity.Post;
+import bigsanghyuk.four_uni.post.repository.PostRepository;
+import bigsanghyuk.four_uni.post.service.PostService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class PostRepositoryTest {

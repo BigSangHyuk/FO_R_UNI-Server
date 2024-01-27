@@ -1,7 +1,9 @@
 package bigsanghyuk.four_uni.repository;
 
-import bigsanghyuk.four_uni.domain.entity.Post;
-import bigsanghyuk.four_uni.domain.entity.Scrapped;
+import bigsanghyuk.four_uni.post.domain.entity.Post;
+import bigsanghyuk.four_uni.post.repository.PostRepository;
+import bigsanghyuk.four_uni.scrapped.domain.entity.Scrapped;
+import bigsanghyuk.four_uni.scrapped.repository.ScrappedRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
