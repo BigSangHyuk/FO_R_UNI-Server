@@ -1,14 +1,15 @@
 package bigsanghyuk.four_uni.controller.request;
 
-
 import bigsanghyuk.four_uni.domain.UserRegisterInfo;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
-@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 public class UserRegisterRequest {
 
-    @NotNull
+    @NotNull @Email
     private String email;
     @NotNull
     private String password;

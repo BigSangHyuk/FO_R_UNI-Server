@@ -6,6 +6,8 @@ import bigsanghyuk.four_uni.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -14,8 +16,15 @@ public class UserService {
 
     public void register(UserRegisterInfo userRegisterInfo) {
 
+//        Optional<User> result = userRepository.findByEmail(userRegisterInfo.getEmail());
+//        if (result.isPresent()) {
+//            throw new IllegalStateException("이미 존재하는 이메일입니다.");
+//        }
+
         userRepository.findByEmail(userRegisterInfo.getEmail())
-                .orElseThrow(() -> new IllegalStateException("이미 존재하는 이메일입니다."));
+                .ifPresent(user -> {
+                    throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+                });
 
         userRepository.save(
                 new User(
