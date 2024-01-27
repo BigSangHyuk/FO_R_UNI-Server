@@ -43,7 +43,7 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
 
         if (comment.CommentRemove(postId, commentId)) {
-            commentRepository.delete(postId, commentId);
+            commentRepository.deleteCommentByPostIdAndId(postId, commentId);
         } else {
             throw new IllegalArgumentException("삭제를 실패했습니다.");
         }
