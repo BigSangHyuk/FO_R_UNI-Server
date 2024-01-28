@@ -1,17 +1,25 @@
 package bigsanghyuk.four_uni.user.service;
 
+import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
 import bigsanghyuk.four_uni.user.domain.UpdateUserInfo;
 import bigsanghyuk.four_uni.user.domain.RegisterUserInfo;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder encoder;
 
     public void register(RegisterUserInfo registerUserInfo) {
 
@@ -25,16 +33,19 @@ public class UserService {
                     throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
                 });
 
+        String encodedPassword = encoder.encode(registerUserInfo.getPassword());
         userRepository.save(
                 new User(
                         registerUserInfo.getEmail(),
-                        registerUserInfo.getPassword(),
+                        encodedPassword,
                         registerUserInfo.getName(),
                         registerUserInfo.getDept(),
                         registerUserInfo.getNickName(),
                         registerUserInfo.getImage()
                 )
         );
+//        log.info("originalPassword={}", registerUserInfo.getPassword());
+//        log.info("encodedPassword={}", encodedPassword);
     }
 
     public void updateUser(UpdateUserInfo updateUserInfo) {
