@@ -57,6 +57,16 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public boolean login(LoginUserInfo loginUserInfo) {
+        Optional<User> user = userRepository.findByEmail(loginUserInfo.getEmail());
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException("존재하지 않는 이메일입니다.");
+        }
+        log.info("original password={}", loginUserInfo.getPassword());
+        log.info("encoded password={}", user.get().getPassword());
+        return encoder.matches(loginUserInfo.getPassword(), user.get().getPassword());
+    }
+
     //회원 전체 조회
 //    public List<User> findUsers() {
 //        return userRepository.findAll();
