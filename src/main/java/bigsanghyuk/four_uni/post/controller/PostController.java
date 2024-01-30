@@ -2,7 +2,7 @@ package bigsanghyuk.four_uni.post.controller;
 
 import bigsanghyuk.four_uni.CommonResponse;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
-import bigsanghyuk.four_uni.post.dto.GetPostResponse;
+import bigsanghyuk.four_uni.post.dto.response.GetPostResponse;
 import bigsanghyuk.four_uni.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
