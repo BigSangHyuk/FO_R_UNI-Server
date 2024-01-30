@@ -1,18 +1,22 @@
 package bigsanghyuk.four_uni.comment.domain.entity;
 
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
+import bigsanghyuk.four_uni.comment.dto.request.ReportCommentRequest;
+import bigsanghyuk.four_uni.exception.ReportReason;
+import bigsanghyuk.four_uni.user.domain.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
+@Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment {
 
@@ -26,7 +30,10 @@ public class Comment {
     private Long parentCommentId;
     private int commentLike;
     private String content;
-    private Long commentReportId;
+    private int commentReportCount;
+
+    @Enumerated(EnumType.STRING)
+    private ReportReason reportReason;
 
     @CreatedDate
     @Column(updatable = false, nullable = false)
@@ -50,4 +57,11 @@ public class Comment {
         return false; // 그렇지 않은 경우 false를 반환
     }
 
+    public void setReportedBy(User user) {
+        this.userId = user.getId();
+    }
+
+    public ReportCommentRequest toDto() {
+        return new ReportCommentRequest(id, userId, reportReason);
+    }
 }
