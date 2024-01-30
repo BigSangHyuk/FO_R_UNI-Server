@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.post.dto;
+package bigsanghyuk.four_uni.post.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
