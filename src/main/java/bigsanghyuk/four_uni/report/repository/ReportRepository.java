@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
-    Optional<Report> findByUserAndComment(User user, Comment comment);
+    Optional<Report> findByUserAndComment(Long user, Long comment);
 }

@@ -21,11 +21,9 @@ public class Report {
 //    private Long targetId; // 신고되는 댓글 or 게시글의 id
 //    private int targetType; // 댓글인지 게시글인지
 
-    @ManyToOne
-    private User user; // 신고하는 유저의 아이디
+    private Long userId; // 신고하는 유저의 아이디
 
-    @ManyToOne
-    private Comment comment;
+    private Long commentId;
 
 
     @Enumerated(EnumType.STRING)
