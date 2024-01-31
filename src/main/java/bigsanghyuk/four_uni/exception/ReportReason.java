@@ -8,4 +8,7 @@ public enum ReportReason {
     사칭_사기가_포함된_내용이에요,
     낚시성_도배성_댓글이에요,
     직접_입력;
+
+    private ReportReason() {
+    }
 }
