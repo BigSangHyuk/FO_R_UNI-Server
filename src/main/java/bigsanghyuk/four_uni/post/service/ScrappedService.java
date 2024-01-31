@@ -1,9 +1,9 @@
-package bigsanghyuk.four_uni.scrapped.service;
+package bigsanghyuk.four_uni.post.service;
 
 import bigsanghyuk.four_uni.post.domain.entity.Post;
-import bigsanghyuk.four_uni.scrapped.domain.entity.Scrapped;
+import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
-import bigsanghyuk.four_uni.scrapped.repository.ScrappedRepository;
+import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

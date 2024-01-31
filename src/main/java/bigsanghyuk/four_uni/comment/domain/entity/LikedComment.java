@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.likedcomment.domain.entity;
+package bigsanghyuk.four_uni.comment.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

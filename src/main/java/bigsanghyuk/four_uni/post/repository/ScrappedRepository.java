@@ -1,6 +1,6 @@
-package bigsanghyuk.four_uni.scrapped.repository;
+package bigsanghyuk.four_uni.post.repository;
 
-import bigsanghyuk.four_uni.scrapped.domain.entity.Scrapped;
+import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
