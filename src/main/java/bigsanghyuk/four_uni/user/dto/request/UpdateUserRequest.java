@@ -10,15 +10,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @NoArgsConstructor
 public class UpdateUserRequest {
 
-    private final PasswordEncoder encoder = new BCryptPasswordEncoder();
-
     private Long id;
     private String password;
     private String nickName;
     private String image;
 
     public UpdateUserInfo toDomain() {
-        return new UpdateUserInfo(id, encoder.encode(password), nickName, image);
+        return new UpdateUserInfo(id, password, nickName, image);
     }
 
 }
