@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.report.controller;
 
 import bigsanghyuk.four_uni.CommonResponse;
 import bigsanghyuk.four_uni.comment.dto.request.ReportCommentRequest;
+import bigsanghyuk.four_uni.post.dto.request.ReportPostRequest;
 import bigsanghyuk.four_uni.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,26 @@ public class ReportController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("댓글 신고에 실패했습니다.");
+        }
+        return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
+    }
+
+    @PostMapping("/posts/report/{userId}/{postId}")
+    public ResponseEntity<String> reportPost(
+            @PathVariable("postId") Long postId,
+            @PathVariable("userId") Long userId,
+            @RequestBody Map<String, String> payload
+    ) {
+        try {
+            String reportReasonString = payload.get("reportReason");
+            ReportPostRequest reportPostDto = reportService.reportPost(postId, userId, reportReasonString);
+
+            if (reportPostDto != null) {
+                return ResponseEntity.ok("게시글이 성공적으로 신고되었습니다!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 신고에 실패했습니다.");
         }
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
     }

@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
     Optional<Report> findByUserIdAndCommentId(Long userId, Long commentId);
+
+    Optional<Report> findByUserIdAndPostId(Long userId, Long postId);
 }
