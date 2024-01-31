@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.user.service;
 
 import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
 import bigsanghyuk.four_uni.user.domain.RegisterUserInfo;
+import bigsanghyuk.four_uni.user.domain.UpdateUserInfo;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.dto.request.LoginUserRequest;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
@@ -19,8 +20,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Slf4j
@@ -55,6 +56,20 @@ class UserServiceTest {
         RegisterUserInfo addUser = new RegisterUserInfo("test@test.com", "test", "test", 10, "test", "test");
         assertThatThrownBy(() -> service.register(addUser))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 성공")
+    void updatePassword() {
+        User originalUser = repository.findByEmail("test@test.com").get();
+        String newPassword = "test1";
+        service.updateUser(new UpdateUserInfo(originalUser.getId(), encoder.encode(newPassword), originalUser.getNickName(), originalUser.getImage()));
+        User updatedUser = repository.findByEmail("test@test.com").get();
+        log.info("original Password={}", originalUser.getPassword());
+        log.info("updated Password={}", updatedUser.getPassword());
+        assertThat(originalUser.getPassword()).isNotEqualTo(updatedUser.getPassword());
+        assertThat(encoder.matches(newPassword, originalUser.getPassword())).isFalse();
+        assertThat(encoder.matches(newPassword, updatedUser.getPassword())).isTrue();
     }
 
     @Test
