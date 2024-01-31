@@ -25,7 +25,7 @@ public class CommentService {
     }
 
     public void edit(Long commentId, @Valid EditCommentInfo editCommentInfo) {
-        commentRepository.findById(editCommentInfo.getUserId())
+        commentRepository.findByUserId(editCommentInfo.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 아닙니다."));
 
         Comment comment = commentRepository.findById(commentId)
