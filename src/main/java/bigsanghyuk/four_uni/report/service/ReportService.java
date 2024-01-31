@@ -34,7 +34,7 @@ public class ReportService {
 
             ReportReason reportReason = ReportReason.valueOf(reportReasonString);
 
-            Optional<Report> report = reportRepository.findByUserAndComment(user.getId(), comment.getId());
+            Optional<Report> report = reportRepository.findByUserIdAndCommentId(user.getId(), comment.getId());
 
             if (report.isPresent()) {
                 report.get().setReason(reportReason);
