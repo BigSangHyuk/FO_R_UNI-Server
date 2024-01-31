@@ -31,7 +31,7 @@ public class UserController {
         return new ResponseEntity(getUserResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/v1/login")
+    @PostMapping("/v1/login")
     public ResponseEntity<CommonResponse> login(@Valid @RequestBody LoginUserRequest request) {
         boolean isLoginSuccess = userService.login(request.toDomain());
         return new ResponseEntity<>(new CommonResponse(isLoginSuccess), HttpStatus.OK);
