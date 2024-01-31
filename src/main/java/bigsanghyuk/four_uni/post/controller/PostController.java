@@ -4,13 +4,11 @@ import bigsanghyuk.four_uni.CommonResponse;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.dto.response.GetPostResponse;
 import bigsanghyuk.four_uni.post.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -38,5 +36,10 @@ public class PostController {
     @GetMapping("/v1/posts")
     public List<Post> getUnclassified(@RequestParam(name = "isClassified", defaultValue = "false") Boolean isClassified) {
         return postService.getUnClassifiedLists();
+    }
+
+    @GetMapping("/v1/posts-filter")
+    public List<Post> getByFiltered(@Valid @RequestBody List<Long> categoryIds) {
+        return postService.getFilteredPosts(categoryIds);
     }
 }
