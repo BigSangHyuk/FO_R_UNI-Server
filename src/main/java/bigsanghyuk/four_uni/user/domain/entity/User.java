@@ -65,8 +65,8 @@ public class User {
     }
 
     public void edit(@Valid UpdateUserInfo updateUserInfo) {
-        this.password = password;
-        this.nickName = nickName;
-        this.image = image;
+        this.password = updateUserInfo.getPassword();
+        this.nickName = updateUserInfo.getNickName();
+        this.image = updateUserInfo.getImage();
     }
 }
