@@ -29,4 +29,8 @@ public class PostService {
     public Post getDetail(Long postId) {
         return postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
     }
+
+    public List<Post> getFilteredPosts(List<Long> categoryIds) {
+        return postRepository.findByCategoryIdIn(categoryIds);
+    }
 }

@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Entity
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Post {
 
@@ -40,8 +39,7 @@ public class Post {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public Post(Long id, Long categoryId, boolean report, String title, String content, String imageUrl, int views, int postReportCount, boolean isClassified, LocalDate postedAt, LocalDateTime deadline) {
-        this.id = id;
+    public Post(Long categoryId, boolean report, String title, String content, String imageUrl, int views, int postReportCount, boolean isClassified, LocalDate postedAt, LocalDateTime deadline) {
         this.categoryId = categoryId;
         this.report = report;
         this.title = title;
@@ -52,6 +50,8 @@ public class Post {
         this.isClassified = isClassified;
         this.postedAt = postedAt;
         this.deadline = deadline;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
 }
