@@ -23,11 +23,26 @@ public class PostController {
     private final PostService postService;
 
     // 게시글 단 건 조회
+//    @GetMapping("/v1/posts/{postId}")
+//    public ResponseEntity<GetPostResponse> getDetail(@PathVariable Long postId) {
+//        Post post = postService.getDetail(postId);
+//
+//        GetPostResponse getPostResponse = GetPostResponse.builder()
+//                .title(post.getTitle())
+//                .content(post.getContent())
+//                .imageUrl(post.getImageUrl())
+//                .views(post.getViews())
+//                .build();
+//
+//        return new ResponseEntity(getPostResponse, HttpStatus.OK);
+//    }
+
     @GetMapping("/v1/posts/{postId}")
-    public ResponseEntity<GetPostResponse> getDetail(@PathVariable Long postId) {
+    public ResponseEntity<GetPostResponse> getDetail(@PathVariable("postId") Long postId) {
         Post post = postService.getDetail(postId);
 
         GetPostResponse getPostResponse = GetPostResponse.builder()
+                .id(postId)
                 .title(post.getTitle())
                 .content(post.getContent())
                 .imageUrl(post.getImageUrl())
