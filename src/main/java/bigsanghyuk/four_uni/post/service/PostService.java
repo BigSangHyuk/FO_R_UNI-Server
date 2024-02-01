@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,7 +31,16 @@ public class PostService {
         return postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
     }
 
-    public List<Post> getFilteredPosts(List<Long> categoryIds) {
+    public List<Post> getFilteredPostsByCategoryIds(List<Long> categoryIds) {
         return postRepository.findByCategoryIdIn(categoryIds);
+    }
+
+    public List<Long> hyphenStringToList(String input, String delimiter) {
+        List<Long> result = new ArrayList<>();
+        String[] tokens = input.split(delimiter);
+        for (String token : tokens) {
+            result.add(Long.parseLong(token));
+        }
+        return result;
     }
 }

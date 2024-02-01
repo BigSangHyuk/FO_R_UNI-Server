@@ -1,10 +1,8 @@
 package bigsanghyuk.four_uni.post.controller;
 
-import bigsanghyuk.four_uni.CommonResponse;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.dto.response.GetPostResponse;
 import bigsanghyuk.four_uni.post.service.PostService;
-import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -12,9 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -54,14 +50,15 @@ public class PostController {
 
     @GetMapping("/v1/posts/unclassified")
     public ResponseEntity<Result<List<Post>>> getUnclassified() {
-        List<Post> unClassified = postService.getUnClassifiedLists();
-        return ResponseEntity.ok().body(new Result<>(unClassified, unClassified.size()));
+        List<Post> unClassifiedPosts = postService.getUnClassifiedLists();
+        return ResponseEntity.ok().body(new Result<>(unClassifiedPosts, unClassifiedPosts.size()));
     }
 
     @GetMapping("/v1/posts/filter")
-    public ResponseEntity<Result<List<Post>>> getByFiltered(@Valid @RequestBody List<Long> categoryIds) {
-        List<Post> filtered = postService.getFilteredPosts(categoryIds);
-        return ResponseEntity.ok().body(new Result<>(filtered, filtered.size()));
+    public ResponseEntity<Result<List<Post>>> getByFiltered(@RequestParam(name = "id") String id) {
+        List<Long> categoryIds = postService.hyphenStringToList(id, "-");
+        List<Post> filteredPosts = postService.getFilteredPostsByCategoryIds(categoryIds);
+        return ResponseEntity.ok().body(new Result<>(filteredPosts, filteredPosts.size()));
     }
 
     @Getter @Setter
