@@ -26,6 +26,7 @@ class PostRepositoryTest {
 
     @BeforeEach
     void beforeEach() {
+        postRepository.deleteAll();
         postRepository.save(new Post(1L, false, "hello", "hello kim", null, 0, 0, false, LocalDate.parse("2020-01-08"), LocalDateTime.of(2020, 1, 8, 00, 00, 00)));
         postRepository.save(new Post(1L, false, "ollasdf", "hello kim", null, 0, 0, false, LocalDate.parse("2020-01-08"), LocalDateTime.of(2025, 1, 8, 00, 00, 00)));
         postRepository.save(new Post(1L, false, "jfajg", "egrkjk han", null, 0, 0, false, LocalDate.parse("2023-01-08"), LocalDateTime.of(2024, 1, 8, 00, 00, 00)));

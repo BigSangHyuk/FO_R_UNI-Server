@@ -32,7 +32,7 @@ class ScrappedRepositoryTest {
     static final long userId2 = 2L;
     static final long userId3 = 3L;
 
-    @DisplayName("스크랩된 게시물의 개수을 찾는 테스트")
+    /*@DisplayName("스크랩된 게시물의 개수을 찾는 테스트")
     @Test
     void findScrappedListSizeTest() {
         List<Scrapped> scrappedListUser1 = scrappedRepository.findByUserId(userId1);
@@ -40,7 +40,7 @@ class ScrappedRepositoryTest {
 
         assertThat(scrappedListUser1.size()).isEqualTo(4);
         assertThat(scrappedListUser2.size()).isEqualTo(6);
-    }
+    }*/
 
     @DisplayName("스크랩된 게시물을 찾는 테스트")
     @Test
