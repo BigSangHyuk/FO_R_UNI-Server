@@ -90,4 +90,18 @@ public class UserControllerTest {
         assertEquals(updatedNickName, updatedUser.getNickName());
     }
 
+    @Test
+    @DisplayName("회원정보삭제")
+    void delete() {
+        // given : 회원 정보 저장
+        User savedUser = userRepository.save(user);
+
+        // when : 회원 정보 삭제 동작 수행
+        userRepository.deleteById(savedUser.getId());
+
+        // then : 삭제된 회원 정보 조회 시 null이 반환되어야 함
+        Optional<User> deletedUser = userRepository.findById(savedUser.getId());
+        assertFalse(deletedUser.isPresent());
+    }
+
 }
