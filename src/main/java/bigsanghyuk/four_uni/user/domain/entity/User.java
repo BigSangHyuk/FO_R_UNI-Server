@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter @Setter
 @Table(name = "users")
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
@@ -34,18 +35,6 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public User(Long id, String email, String password, String name, int dept, String nickName, String image, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.dept = dept;
-        this.nickName = nickName;
-        this.image = image;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
     public User(String email, String password, String name, int dept, String nickName, String image) {
         this.email = email;
         this.password = password;
@@ -54,13 +43,6 @@ public class User {
         this.nickName = nickName;
         this.image = image;
         this.createdAt = LocalDateTime.now();
-    }
-
-    public User(Long id, String password, String nickName, String image) {
-        this.id = id;
-        this.password = password;
-        this.nickName =nickName;
-        this.image = image;
     }
 
     public void edit(@Valid UpdateUserInfo updateUserInfo) {
