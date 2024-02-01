@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.post.controller;
+package bigsanghyuk.four_uni.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;

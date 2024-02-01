@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.user.controller;
+package bigsanghyuk.four_uni.controller;
 
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
