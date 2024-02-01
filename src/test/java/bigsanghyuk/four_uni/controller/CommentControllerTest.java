@@ -94,4 +94,18 @@ public class CommentControllerTest {
         assertEquals(updatedContent, updatedComment.getContent());
     }
 
+    @Test
+    @DisplayName("댓글 삭제")
+    void deleteComment() {
+        // given : 댓글 등록
+        Comment savedComment = commentRepository.save(comment);
+
+        // when : 댓글 삭제 동작 수행
+        commentRepository.delete(savedComment);
+
+        // then : 삭제된 댓글 정보 조회 시 null이 반환되어야 함
+        Optional<Comment> deletedComment = commentRepository.findById(savedComment.getId());
+        assertFalse(deletedComment.isPresent());
+    }
+
 }
