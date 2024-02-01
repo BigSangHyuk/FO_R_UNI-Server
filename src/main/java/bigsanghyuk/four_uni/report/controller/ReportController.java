@@ -4,6 +4,8 @@ import bigsanghyuk.four_uni.CommonResponse;
 import bigsanghyuk.four_uni.comment.dto.request.ReportCommentRequest;
 import bigsanghyuk.four_uni.post.dto.request.ReportPostRequest;
 import bigsanghyuk.four_uni.report.service.ReportService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +18,13 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "reports", description = "신고 API")
 public class ReportController {
 
     private final ReportService reportService;
 
-    @PostMapping("/comments/report/{userId}/{commentId}")
+    @Operation(summary = "댓글 신고", description = "userId와 commentId 전달")
+    @PostMapping("/v1/comments/report/{userId}/{commentId}")
     public ResponseEntity<String> reportComment(
             @PathVariable("commentId") Long commentId,
             @PathVariable("userId") Long userId,
@@ -40,7 +44,8 @@ public class ReportController {
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
     }
 
-    @PostMapping("/posts/report/{userId}/{postId}")
+    @Operation(summary = "게시글 신고", description = "userId와 postId 전달")
+    @PostMapping("/v1/posts/report/{userId}/{postId}")
     public ResponseEntity<String> reportPost(
             @PathVariable("postId") Long postId,
             @PathVariable("userId") Long userId,
