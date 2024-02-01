@@ -12,9 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class UserControllerTest {
@@ -25,20 +26,20 @@ public class UserControllerTest {
     @Autowired
     UserRepository userRepository;
 
-    @BeforeEach
-    public void registerSetUp(){ //테스트 실행할땨마다 수행시킴
-
+    @BeforeEach // 테스트 실행할때마다 수행
+    public void registerSetUp() {
+        // given : 회원 가입 테스트를 위한 초기 설정
         String randomCode = RandomStringUtils.randomAlphanumeric(15);
 
         Random random = new Random();
         Long randomNum = random.nextLong();
-        user = User
-                .builder()
+        user = User.builder()
                 .id(randomNum)
                 .name("test_name")
                 .email("test_email")
                 .password(randomCode)
                 .dept(1)
+                .image("test_image_url")
                 .nickName("test_nickname")
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -46,18 +47,47 @@ public class UserControllerTest {
 
     @AfterEach
     void afterEach() {
+        // 테스트 종료 후 데이터 정리
         userRepository.deleteAll();
     }
 
     @Test
     @DisplayName("회원가입")
     void register() {
+        // when : 회원 가입 동작 수행
         User savedUser = userRepository.save(user);
 
+        // then : 회원 가입 후에는 ID가 존재해야 하고 저장된 회원 정보를 조회하여 존재해야 함
         assertNotNull(savedUser.getId());
 
         User retrievedUser = userRepository.findById(savedUser.getId()).orElse(null);
         assertNotNull(retrievedUser);
+    }
+
+    @Test
+    @DisplayName("회원정보수정")
+    void update() {
+        // given : 회원 정보 저장
+        User savedUser = userRepository.save(user);
+
+        // and : 수정할 정보
+        String updatedName = "updated_name";
+        String updatedEmail = "updated_email";
+        String updatedNickName = "updated_nickname";
+
+        // when : 회원 정보 업데이트 동작 수행
+        savedUser.setName(updatedName);
+        savedUser.setEmail(updatedEmail);
+        savedUser.setNickName(updatedNickName);
+
+        userRepository.save(savedUser);
+
+        // then : 업데이트된 회원 정보 확인
+        User updatedUser = userRepository.findById(savedUser.getId()).orElse(null);
+        assertNotNull(updatedUser);
+        assertEquals(updatedName, updatedUser.getName());
+        assertEquals(updatedEmail, updatedUser.getEmail());
+        assertEquals(updatedNickName, updatedUser.getNickName());
     }
 
 }

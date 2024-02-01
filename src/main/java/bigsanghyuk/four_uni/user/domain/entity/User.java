@@ -3,10 +3,7 @@ package bigsanghyuk.four_uni.user.domain.entity;
 import bigsanghyuk.four_uni.user.domain.UpdateUserInfo;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -14,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Builder
-@Getter
+@Getter @Setter
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
