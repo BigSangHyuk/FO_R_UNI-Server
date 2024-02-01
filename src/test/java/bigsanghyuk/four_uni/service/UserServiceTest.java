@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.user.service;
+package bigsanghyuk.four_uni.service;
 
 import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
 import bigsanghyuk.four_uni.user.domain.RegisterUserInfo;
@@ -6,6 +6,7 @@ import bigsanghyuk.four_uni.user.domain.UpdateUserInfo;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.dto.request.LoginUserRequest;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
+import bigsanghyuk.four_uni.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Before;
 import org.assertj.core.api.Assertions;

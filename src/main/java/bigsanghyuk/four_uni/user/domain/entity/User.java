@@ -3,17 +3,17 @@ package bigsanghyuk.four_uni.user.domain.entity;
 import bigsanghyuk.four_uni.user.domain.UpdateUserInfo;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
+@Builder
+@Getter @Setter
 @Table(name = "users")
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
@@ -35,18 +35,6 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public User(Long id, String email, String password, String name, int dept, String nickName, String image, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.dept = dept;
-        this.nickName = nickName;
-        this.image = image;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
     public User(String email, String password, String name, int dept, String nickName, String image) {
         this.email = email;
         this.password = password;
@@ -55,13 +43,6 @@ public class User {
         this.nickName = nickName;
         this.image = image;
         this.createdAt = LocalDateTime.now();
-    }
-
-    public User(Long id, String password, String nickName, String image) {
-        this.id = id;
-        this.password = password;
-        this.nickName =nickName;
-        this.image = image;
     }
 
     public void edit(@Valid UpdateUserInfo updateUserInfo) {

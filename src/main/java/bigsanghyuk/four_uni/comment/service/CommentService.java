@@ -24,7 +24,7 @@ public class CommentService {
         );
     }
 
-    public void edit(Long commentId, @Valid EditCommentInfo editCommentInfo) {
+    public Comment edit(Long commentId, @Valid EditCommentInfo editCommentInfo) {
         commentRepository.findByUserId(editCommentInfo.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 아닙니다."));
 
@@ -33,6 +33,7 @@ public class CommentService {
 
         comment.CommentEdit(editCommentInfo);
         commentRepository.save(comment);
+        return comment;
     }
 
     public void remove(Long postId, Long commentId) {

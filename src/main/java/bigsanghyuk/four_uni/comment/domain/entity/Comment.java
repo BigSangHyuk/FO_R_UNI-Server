@@ -3,17 +3,17 @@ package bigsanghyuk.four_uni.comment.domain.entity;
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Builder
 @Getter @Setter
+@Table(name = "comment")
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment {
 
