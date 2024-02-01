@@ -1,7 +1,6 @@
 package bigsanghyuk.four_uni.controller;
 
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
-import bigsanghyuk.four_uni.comment.domain.RegisterCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.comment.service.CommentService;
@@ -27,7 +26,6 @@ public class CommentControllerTest {
     CommentService commentService;
     @Autowired
     CommentRepository commentRepository;
-    RegisterCommentInfo registerCommentInfo;
     EditCommentInfo editCommentInfo;
 
     @BeforeEach // 테스트 실행할때마다 수행
