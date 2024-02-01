@@ -70,4 +70,28 @@ public class CommentControllerTest {
         assertEquals(comment.getContent(), retrievedComment.getContent());
     }
 
+    @Test
+    @DisplayName("댓글 수정")
+    void editComment() {
+        // given : 댓글 등록 및 수정할 내용을 set
+        Comment savedComment = commentRepository.save(comment);
+
+        editCommentInfo = new EditCommentInfo();
+
+        editCommentInfo.setUserId(savedComment.getUserId());
+        editCommentInfo.setContent(savedComment.getContent());
+
+        // and : 수정할 정보
+        String updatedContent = "updated_content";
+
+        // when : 댓글 수정 동작 수행
+        editCommentInfo.setContent(updatedContent);
+        Comment updatedComment = commentService.edit(savedComment.getId(), editCommentInfo);
+
+        // then : 업데이트된 댓글 정보 확인
+        assertNotNull(updatedComment);
+        assertEquals(savedComment.getId(), updatedComment.getId());
+        assertEquals(updatedContent, updatedComment.getContent());
+    }
+
 }
