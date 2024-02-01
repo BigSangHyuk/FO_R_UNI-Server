@@ -33,12 +33,12 @@ public class PostController {
         return new ResponseEntity(getPostResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/v1/posts")
-    public List<Post> getUnclassified(@RequestParam(name = "isClassified", defaultValue = "false") Boolean isClassified) {
+    @GetMapping("/v1/posts/unclassified")
+    public List<Post> getUnclassified() {
         return postService.getUnClassifiedLists();
     }
 
-    @GetMapping("/v1/posts-filter")
+    @GetMapping("/v1/posts/filter")
     public List<Post> getByFiltered(@Valid @RequestBody List<Long> categoryIds) {
         return postService.getFilteredPosts(categoryIds);
     }
