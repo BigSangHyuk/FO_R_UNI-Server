@@ -13,11 +13,13 @@ public class RegisterCommentRequest {
     private Long userId;
     @NotNull
     private Long postId;
+
     private Long parentCommentId;
     @NotNull
     private int commentLike;
     @NotNull
     private String content;
+
     private Long commentReportId;
 
     public RegisterCommentInfo toDomain() {
