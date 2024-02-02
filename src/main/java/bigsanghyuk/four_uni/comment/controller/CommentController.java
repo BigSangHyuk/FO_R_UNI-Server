@@ -1,9 +1,11 @@
 package bigsanghyuk.four_uni.comment.controller;
 
-import bigsanghyuk.four_uni.comment.dto.request.RegisterCommentRequest;
 import bigsanghyuk.four_uni.CommonResponse;
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
+import bigsanghyuk.four_uni.comment.dto.request.LikeCommentRequest;
+import bigsanghyuk.four_uni.comment.dto.request.RegisterCommentRequest;
 import bigsanghyuk.four_uni.comment.service.CommentService;
+import bigsanghyuk.four_uni.comment.service.LikeCommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
+    private final LikeCommentService likeCommentService;
 
     @Operation(summary = "댓글 등록", description = "URL 경로에 postId 전달")
     @PostMapping("/posts/{postId}/comment")
@@ -40,5 +43,11 @@ public class CommentController {
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
     }
 
+    @Operation(summary = "댓글 좋아요", description = "Body 에 값 넣어서 전달")
+    @PostMapping("/comments/like")
+    public ResponseEntity<CommonResponse> likedComment(@Valid @RequestBody LikeCommentRequest request) {
+        likeCommentService.likeComment(request.toDomain());
+        return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
+    }
 
 }
