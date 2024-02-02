@@ -20,24 +20,25 @@ public class CommentController {
     private final CommentService commentService;
 
     @Operation(summary = "댓글 등록", description = "URL 경로에 postId 전달")
-    @PostMapping("/v1/posts/{postId}/comment")
+    @PostMapping("/posts/{postId}/comment")
     public ResponseEntity<CommonResponse> register(@Valid @RequestBody RegisterCommentRequest request) {
         commentService.register(request.toDomain());
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
     }
 
     @Operation(summary = "댓글 수정", description = "URL 경로에 postId와 commentId 전달")
-    @PutMapping("/v1/posts/{postId}/{commentId}")
+    @PutMapping("/posts/{postId}/{commentId}")
     public ResponseEntity<CommonResponse> edit(@PathVariable Long commentId, @Valid @RequestBody EditCommentInfo request) {
         commentService.edit(commentId, request);
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
     }
 
     @Operation(summary = "댓글 삭제", description = "URL 경로에 postId와 commentId 전달")
-    @DeleteMapping("/v1/posts/{postId}/{commentId}")
+    @DeleteMapping("/posts/{postId}/{commentId}")
     public ResponseEntity<CommonResponse> remove(@PathVariable Long postId, @PathVariable Long commentId) {
         commentService.remove(postId, commentId);
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
     }
+
 
 }
