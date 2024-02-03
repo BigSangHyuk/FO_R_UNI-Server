@@ -1,12 +1,12 @@
 package bigsanghyuk.four_uni.comment.service;
 
 import bigsanghyuk.four_uni.comment.domain.LikeCommentInfo;
-import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.domain.entity.LikeComment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.comment.repository.LikeCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +15,7 @@ public class LikeCommentService {
     private final CommentRepository commentRepository;
     private final LikeCommentRepository likeCommentRepository;
 
+    @Transactional
     public void likeComment(LikeCommentInfo domain) {
 
         Long userId = domain.getUserId();
