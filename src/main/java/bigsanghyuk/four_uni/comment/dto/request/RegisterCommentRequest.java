@@ -23,7 +23,7 @@ public class RegisterCommentRequest {
     private Long commentReportId;
 
     public RegisterCommentInfo toDomain() {
-        return new RegisterCommentInfo(userId, content);
+        return new RegisterCommentInfo(userId, postId, content, parentCommentId, commentLike, commentReportId);
     }
 
 }
