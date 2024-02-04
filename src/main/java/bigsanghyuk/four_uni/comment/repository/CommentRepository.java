@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -19,4 +20,14 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     void incrementLikesByCommentId(@Param("commentId") Long commentId);
 
     Optional<Comment> findByUserId(Long userId);
+
+    @Query("SELECT c FROM Comment c " +
+            "WHERE c.postId = :postId AND c.parentCommentId = :parentCommentId " +
+            "ORDER BY c.createdAt ASC")
+    List<Comment> findChildComments(@Param("postId") Long postId, @Param("parentCommentId") Long parentCommentId);
+
+    @Query("SELECT c FROM Comment c " +
+            "WHERE c.postId = :postId " +
+            "ORDER BY c.createdAt ASC")
+    List<Comment> findParentComments(@Param("postId") Long postId);
 }
