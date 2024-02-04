@@ -8,6 +8,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -15,13 +18,19 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     public void register(RegisterCommentInfo registerCommentInfo) {
-
-        commentRepository.save(
-                new Comment(
-                        registerCommentInfo.getUserId(),
-                        registerCommentInfo.getContent()
-                )
+        Long parentCommentId = registerCommentInfo.getParentCommentId();
+        Comment comment = new Comment(
+                registerCommentInfo.getUserId(),
+                registerCommentInfo.getPostId(),
+                registerCommentInfo.getParentCommentId(),
+                registerCommentInfo.getCommentLike(),
+                registerCommentInfo.getContent()
         );
+        //원댓글 존재 - 대댓글
+        if (parentCommentId != null) {
+            comment.updateParent(parentCommentId);
+        }
+        commentRepository.save(comment);
     }
 
     public Comment edit(Long commentId, @Valid EditCommentInfo editCommentInfo) {
@@ -48,5 +57,21 @@ public class CommentService {
         } else {
             throw new IllegalArgumentException("삭제를 실패했습니다.");
         }
+    }
+
+    public List<Comment> getAllComments(Long postId) {
+        commentRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
+
+        List<Comment> comments;
+        List<Comment> childComments = new ArrayList<>();
+        comments = commentRepository.findParentComments(postId);
+
+        for (Comment parentComment : comments) {
+            childComments.addAll(commentRepository.findChildComments(postId, parentComment.getId()));
+        }
+
+        comments.addAll(childComments);
+        return comments;
     }
 }

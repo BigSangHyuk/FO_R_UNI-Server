@@ -11,6 +11,9 @@ import lombok.Setter;
 public class RegisterCommentInfo {
 
     private Long userId;
+    private Long postId;
     private String content;
-
+    private Long parentCommentId;
+    private int commentLike;
+    private Long commentReportId;
 }
