@@ -2,17 +2,24 @@ package bigsanghyuk.four_uni.comment.controller;
 
 import bigsanghyuk.four_uni.CommonResponse;
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
+import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.dto.request.LikeCommentRequest;
 import bigsanghyuk.four_uni.comment.dto.request.RegisterCommentRequest;
 import bigsanghyuk.four_uni.comment.service.CommentService;
 import bigsanghyuk.four_uni.comment.service.LikeCommentService;
+import bigsanghyuk.four_uni.post.controller.PostController;
+import bigsanghyuk.four_uni.post.domain.entity.Post;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,6 +55,25 @@ public class CommentController {
     public ResponseEntity<CommonResponse> likedComment(@Valid @RequestBody LikeCommentRequest request) {
         likeCommentService.likeComment(request.toDomain());
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
+    }
+
+    @Operation(summary = "댓글 전체 조회", description = "postId 전달")
+    @GetMapping("/posts/{postId}")
+    public ResponseEntity<CommentController.Result<List<Comment>>> getAllComments(@PathVariable Long postId) {
+        List<Comment> comments = commentService.getAllComments(postId);
+        return ResponseEntity.ok().body(new CommentController.Result<>(comments, comments.size()));
+    }
+
+    @Getter
+    @Setter
+    public static class Result<T> {
+        private T data;
+        private int count;
+
+        public Result(T data, int count) {
+            this.data = data;
+            this.count = count;
+        }
     }
 
 }
