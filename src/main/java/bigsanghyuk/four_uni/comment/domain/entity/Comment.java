@@ -59,12 +59,6 @@ public class Comment {
         this.content = editCommentInfo.getContent();
     }
 
-
-    public boolean CommentRemove(Long postId, Long commentId) {
-        if (this.postId.equals(postId) && this.id.equals(commentId)) return true; // 게시글 id도 같고, 댓글의 id도 같으면 true
-        return false; // 그렇지 않은 경우 false를 반환
-    }
-
     public void updateParent(Long parentCommentId) {
         this.parentCommentId = parentCommentId;
     }
