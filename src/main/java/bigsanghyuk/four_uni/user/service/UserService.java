@@ -51,7 +51,7 @@ public class UserService {
     public void updateUser(UpdateUserInfo updateUserInfo) {
 
         User user = userRepository.findById(updateUserInfo.getId())
-                .orElseThrow(() -> new IllegalStateException("등록되지 않은 유저입니다. 다시 로그인 시도하세요."));
+                .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 유저입니다. 다시 로그인 시도하세요."));
         UpdateUserInfo encodedUpdateUser = new UpdateUserInfo(updateUserInfo.getId(), encoder.encode(updateUserInfo.getPassword()), updateUserInfo.getNickName(), updateUserInfo.getImage());
         user.edit(encodedUpdateUser);
         userRepository.save(user);
