@@ -22,14 +22,14 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "회원 등록")
-    @PostMapping("/v1/register")
+    @PostMapping("/register")
     public ResponseEntity<CommonResponse> register(@Valid @RequestBody RegisterUserRequest request) {
         userService.register(request.toDomain());
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
     }
 
     @Operation(summary = "회원 정보 수정")
-    @PatchMapping("/v1/mypage/edit")
+    @PatchMapping("/mypage/edit")
     public ResponseEntity<GetUserResponse> updateUser(@Valid @RequestBody UpdateUserRequest updateUserRequest) {
         userService.updateUser(updateUserRequest.toDomain());
         GetUserResponse getUserResponse = new GetUserResponse(updateUserRequest.getPassword(), updateUserRequest.getNickName(), updateUserRequest.getImage());
@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @Operation(summary = "로그인")
-    @PostMapping("/v1/login")
+    @PostMapping("/login")
     public ResponseEntity<CommonResponse> login(@Valid @RequestBody LoginUserRequest request) {
         boolean isLoginSuccess = userService.login(request.toDomain());
         return new ResponseEntity<>(new CommonResponse(isLoginSuccess), HttpStatus.OK);

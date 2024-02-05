@@ -5,15 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterCommentInfo {
+public class LikeCommentInfo {
 
     private Long userId;
-    private Long postId;
-    private String content;
-    private Long parentCommentId;
-    private int commentLike;
-    private Long commentReportId;
+    private Long commentId;
+
 }

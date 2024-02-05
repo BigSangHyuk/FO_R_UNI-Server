@@ -24,7 +24,7 @@ public class ReportController {
     private final ReportService reportService;
 
     @Operation(summary = "댓글 신고", description = "userId와 commentId 전달")
-    @PostMapping("/v1/comments/report/{userId}/{commentId}")
+    @PostMapping("/comments/report/{userId}/{commentId}")
     public ResponseEntity<String> reportComment(
             @PathVariable("commentId") Long commentId,
             @PathVariable("userId") Long userId,
@@ -45,7 +45,7 @@ public class ReportController {
     }
 
     @Operation(summary = "게시글 신고", description = "userId와 postId 전달")
-    @PostMapping("/v1/posts/report/{userId}/{postId}")
+    @PostMapping("/posts/report/{userId}/{postId}")
     public ResponseEntity<String> reportPost(
             @PathVariable("postId") Long postId,
             @PathVariable("userId") Long userId,
