@@ -30,6 +30,7 @@ public class Comment {
     private int commentLike;
     private String content;
     @ColumnDefault("0")
+    @Setter
     private int commentReportCount;
 
     @CreatedDate
@@ -56,12 +57,6 @@ public class Comment {
 
     public void CommentEdit(@Valid EditCommentInfo editCommentInfo) {
         this.content = editCommentInfo.getContent();
-    }
-
-
-    public boolean CommentRemove(Long postId, Long commentId) {
-        if (this.postId.equals(postId) && this.id.equals(commentId)) return true; // 게시글 id도 같고, 댓글의 id도 같으면 true
-        return false; // 그렇지 않은 경우 false를 반환
     }
 
     public void updateParent(Long parentCommentId) {

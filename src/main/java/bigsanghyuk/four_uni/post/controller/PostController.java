@@ -21,21 +21,6 @@ public class PostController {
 
     private final PostService postService;
 
-    // 게시글 단 건 조회
-//    @GetMapping("/posts/{postId}")
-//    public ResponseEntity<GetPostResponse> getDetail(@PathVariable Long postId) {
-//        Post post = postService.getDetail(postId);
-//
-//        GetPostResponse getPostResponse = GetPostResponse.builder()
-//                .title(post.getTitle())
-//                .content(post.getContent())
-//                .imageUrl(post.getImageUrl())
-//                .views(post.getViews())
-//                .build();
-//
-//        return new ResponseEntity(getPostResponse, HttpStatus.OK);
-//    }
-
     @Operation(summary = "게시글 단건 조회", description = "해당 게시글 아이디만 경로 변수로 전달")
     @GetMapping("/posts/{postId}")
     public ResponseEntity<GetPostResponse> getDetail(@PathVariable("postId") Long postId) {

@@ -4,6 +4,7 @@ import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.RegisterCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
+import bigsanghyuk.four_uni.post.repository.PostRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,9 +17,9 @@ import java.util.List;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
 
     public void register(RegisterCommentInfo registerCommentInfo) {
-        Long parentCommentId = registerCommentInfo.getParentCommentId();
         Comment comment = new Comment(
                 registerCommentInfo.getUserId(),
                 registerCommentInfo.getPostId(),
@@ -26,10 +27,7 @@ public class CommentService {
                 registerCommentInfo.getCommentLike(),
                 registerCommentInfo.getContent()
         );
-        //원댓글 존재 - 대댓글
-        if (parentCommentId != null) {
-            comment.updateParent(parentCommentId);
-        }
+
         commentRepository.save(comment);
     }
 
@@ -46,17 +44,13 @@ public class CommentService {
     }
 
     public void remove(Long postId, Long commentId) {
-        commentRepository.findById(postId)
+        postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
 
-        Comment comment = commentRepository.findById(commentId)
+        commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
 
-        if (comment.CommentRemove(postId, commentId)) {
-            commentRepository.deleteCommentByPostIdAndId(postId, commentId);
-        } else {
-            throw new IllegalArgumentException("삭제를 실패했습니다.");
-        }
+        commentRepository.deleteCommentByPostIdAndId(postId, commentId);
     }
 
     public List<Comment> getAllComments(Long postId) {

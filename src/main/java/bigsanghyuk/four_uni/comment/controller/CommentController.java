@@ -58,7 +58,7 @@ public class CommentController {
     }
 
     @Operation(summary = "댓글 전체 조회", description = "postId 전달")
-    @GetMapping("/posts/{postId}")
+    @GetMapping("/posts/{postId}/comment")
     public ResponseEntity<CommentController.Result<List<Comment>>> getAllComments(@PathVariable Long postId) {
         List<Comment> comments = commentService.getAllComments(postId);
         return ResponseEntity.ok().body(new CommentController.Result<>(comments, comments.size()));
