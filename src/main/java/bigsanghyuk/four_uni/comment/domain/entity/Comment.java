@@ -30,6 +30,7 @@ public class Comment {
     private int commentLike;
     private String content;
     @ColumnDefault("0")
+    @Setter
     private int commentReportCount;
 
     @CreatedDate
