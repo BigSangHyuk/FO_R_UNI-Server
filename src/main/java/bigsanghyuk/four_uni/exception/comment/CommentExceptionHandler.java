@@ -19,4 +19,10 @@ public class CommentExceptionHandler {
         final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(CommentEditOtherUserException.class)
+    public ResponseEntity<ExceptionMessage> handle(CommentEditOtherUserException e) {
+        final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
+    }
 }

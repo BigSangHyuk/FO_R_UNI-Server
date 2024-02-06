@@ -11,7 +11,8 @@ public enum StatusEnum {
     COMMENT_NOT_FOUND(404,"COMMENT_NOT_FOUND"),
     ALREADY_LIKE(403, "ALREADY_LIKE"),
     REASON_NOT_FOUND(404, "REASON_NOT_FOUND"),
-    BAD_REQUEST(400, "BAD_REQUEST");
+    BAD_REQUEST(400, "BAD_REQUEST"),
+    RESTRICTED(403, "RESTRICTED");
 
     private final int statusCode;
     private final String code;
