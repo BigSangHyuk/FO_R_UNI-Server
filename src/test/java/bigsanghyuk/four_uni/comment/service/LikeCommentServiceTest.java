@@ -46,7 +46,7 @@ class LikeCommentServiceTest {
         log.info("likeCount={}", comment.getCommentLike());
         likeCommentService.likeComment(new LikeCommentInfo(1L, commentId));
 
-        Comment findComment = commentRepository.findByUserId(comment.getUserId()).get();
+        Comment findComment = commentRepository.findById(comment.getId()).get();
         log.info("likeCount={}", findComment.getCommentLike());
 
         assertThat(findComment.getCommentLike()).isEqualTo(1);
