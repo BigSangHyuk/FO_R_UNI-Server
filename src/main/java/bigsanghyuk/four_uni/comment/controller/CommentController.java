@@ -38,14 +38,14 @@ public class CommentController {
 
     @Operation(summary = "댓글 수정", description = "URL 경로에 postId와 commentId 전달")
     @PutMapping("/posts/{postId}/{commentId}")
-    public ResponseEntity<CommonResponse> edit(@PathVariable Long commentId, @Valid @RequestBody EditCommentInfo request) {
+    public ResponseEntity<CommonResponse> edit(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId, @Valid @RequestBody EditCommentInfo request) {
         commentService.edit(commentId, request);
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
     }
 
     @Operation(summary = "댓글 삭제", description = "URL 경로에 postId와 commentId 전달")
     @DeleteMapping("/posts/{postId}/{commentId}")
-    public ResponseEntity<CommonResponse> remove(@PathVariable Long postId, @PathVariable Long commentId) {
+    public ResponseEntity<CommonResponse> remove(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId) {
         commentService.remove(postId, commentId);
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
     }
@@ -59,7 +59,7 @@ public class CommentController {
 
     @Operation(summary = "댓글 전체 조회", description = "postId 전달")
     @GetMapping("/posts/{postId}/comment")
-    public ResponseEntity<CommentController.Result<List<Comment>>> getAllComments(@PathVariable Long postId) {
+    public ResponseEntity<CommentController.Result<List<Comment>>> getAllComments(@PathVariable("postId") Long postId) {
         List<Comment> comments = commentService.getAllComments(postId);
         return ResponseEntity.ok().body(new CommentController.Result<>(comments, comments.size()));
     }
