@@ -4,6 +4,7 @@ import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.RegisterCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
+import bigsanghyuk.four_uni.exception.comment.CommentEditOtherUserException;
 import bigsanghyuk.four_uni.exception.comment.CommentNotFoundException;
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
@@ -41,6 +42,10 @@ public class CommentService {
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(CommentNotFoundException::new);
+
+        if (!editCommentInfo.getUserId().equals(comment.getUserId())) {
+            throw new CommentEditOtherUserException();
+        }
 
         comment.CommentEdit(editCommentInfo);
         commentRepository.save(comment);
