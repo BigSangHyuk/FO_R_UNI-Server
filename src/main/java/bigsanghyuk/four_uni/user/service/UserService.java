@@ -1,5 +1,7 @@
 package bigsanghyuk.four_uni.user.service;
 
+import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
+import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
 import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
 import bigsanghyuk.four_uni.user.domain.UpdateUserInfo;
 import bigsanghyuk.four_uni.user.domain.RegisterUserInfo;
@@ -22,15 +24,9 @@ public class UserService {
     private final PasswordEncoder encoder;
 
     public void register(RegisterUserInfo registerUserInfo) {
-
-//        Optional<User> result = userRepository.findByEmail(userRegisterInfo.getEmail());
-//        if (result.isPresent()) {
-//            throw new IllegalStateException("이미 존재하는 이메일입니다.");
-//        }
-
         userRepository.findByEmail(registerUserInfo.getEmail())
                 .ifPresent(user -> {
-                    throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+                    throw new EmailDuplicateException();
                 });
 
         String encodedPassword = encoder.encode(registerUserInfo.getPassword());
@@ -44,14 +40,12 @@ public class UserService {
                         registerUserInfo.getImage()
                 )
         );
-//        log.info("originalPassword={}", registerUserInfo.getPassword());
-//        log.info("encodedPassword={}", encodedPassword);
     }
 
     public void updateUser(UpdateUserInfo updateUserInfo) {
 
         User user = userRepository.findById(updateUserInfo.getId())
-                .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 유저입니다. 다시 로그인 시도하세요."));
+                .orElseThrow(UserNotFoundException::new);
         UpdateUserInfo encodedUpdateUser = new UpdateUserInfo(updateUserInfo.getId(), encoder.encode(updateUserInfo.getPassword()), updateUserInfo.getNickName(), updateUserInfo.getImage());
         user.edit(encodedUpdateUser);
         userRepository.save(user);

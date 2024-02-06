@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.exception;
+package bigsanghyuk.four_uni.report.domain.entity;
 
 public enum ReportReason {
 

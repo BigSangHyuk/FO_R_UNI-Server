@@ -1,8 +1,5 @@
 package bigsanghyuk.four_uni.report.domain.entity;
 
-import bigsanghyuk.four_uni.comment.domain.entity.Comment;
-import bigsanghyuk.four_uni.exception.ReportReason;
-import bigsanghyuk.four_uni.user.domain.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -33,7 +30,7 @@ public class Report {
     @Enumerated(EnumType.STRING)
     private ReportReason reason; // 신고 사유
 
-//    private String detail; // 상세 사유
+    private String detail; // 상세 사유
 
     @CreatedDate
     @Column(updatable = false, nullable = false)

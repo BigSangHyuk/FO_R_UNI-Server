@@ -2,12 +2,14 @@ package bigsanghyuk.four_uni.report.service;
 
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
-import bigsanghyuk.four_uni.exception.ReportReason;
+import bigsanghyuk.four_uni.exception.comment.CommentNotFoundException;
+import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
+import bigsanghyuk.four_uni.exception.report.ReportReasonNotFoundException;
+import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
+import bigsanghyuk.four_uni.report.domain.entity.ReportReason;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
-import bigsanghyuk.four_uni.post.dto.request.ReportPostRequest;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.report.domain.entity.Report;
-import bigsanghyuk.four_uni.comment.dto.request.ReportCommentRequest;
 import bigsanghyuk.four_uni.report.repository.ReportRepository;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
@@ -25,73 +27,61 @@ public class ReportService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
-
     private final ReportRepository reportRepository;
 
-    public ReportCommentRequest reportComment(Long id, Long userId, String reportReasonString) {
+    public void reportComment(Long id, Long userId, String reportReasonString) {
 
-        try {
-            Comment comment = commentRepository.findById(id).orElse(null);
-            User user = userRepository.findById(userId).orElse(null);
+        Comment comment = commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-            ReportReason reportReason = ReportReason.valueOf(reportReasonString);
-
-            Optional<Report> report = reportRepository.findByUserIdAndCommentId(user.getId(), comment.getId());
-
-            if (report.isPresent()) {
-                report.get().setReason(reportReason);
-                reportRepository.save(report.get());
-            } else {
-                comment.setCommentReportCount(comment.getCommentReportCount() + 1);
-                commentRepository.save(comment);
-
-                Report newReport = new Report();
-                newReport.setUserId(user.getId());
-                newReport.setCommentId(comment.getId());
-                newReport.setReason(reportReason);
-                reportRepository.save(newReport);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (reportReasonString == null) {
+            throw new ReportReasonNotFoundException();
         }
 
-        log.info("댓글이 성공적으로 신고되었습니다!");
-        return null;
+        ReportReason reportReason = ReportReason.valueOf(reportReasonString);
 
+        Optional<Report> report = reportRepository.findByUserIdAndCommentId(user.getId(), comment.getId());
+
+        if (report.isPresent()) {
+            report.get().setReason(reportReason);
+            reportRepository.save(report.get());
+        } else {
+            comment.setCommentReportCount(comment.getCommentReportCount() + 1);
+            commentRepository.save(comment);
+
+            Report newReport = new Report();
+            newReport.setUserId(user.getId());
+            newReport.setCommentId(comment.getId());
+            newReport.setReason(reportReason);
+            reportRepository.save(newReport);
+        }
     }
 
-    public ReportPostRequest reportPost(Long id, Long userId, String reportReasonString) {
+    public void reportPost(Long postId, Long userId, String reportReasonString) {
 
-        try {
-            Post post = postRepository.findById(id).orElse(null);
-            User user = userRepository.findById(userId).orElse(null);
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-            ReportReason reportReason = ReportReason.valueOf(reportReasonString);
-
-            Optional<Report> report = reportRepository.findByUserIdAndPostId(user.getId(), post.getId());
-
-            if (report.isPresent()) {
-                report.get().setReason(reportReason);
-                reportRepository.save(report.get());
-            } else {
-                post.setPostReportCount(post.getPostReportCount() + 1);
-                postRepository.save(post);
-
-                Report newReport = new Report();
-                newReport.setUserId(user.getId());
-                newReport.setCommentId(post.getId());
-                newReport.setReason(reportReason);
-                reportRepository.save(newReport);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (reportReasonString == null) {
+            throw new ReportReasonNotFoundException();
         }
 
-        log.info("게시글이 성공적으로 신고되었습니다!");
+        ReportReason reportReason = ReportReason.valueOf(reportReasonString);
 
-        return null;
+        Optional<Report> report = reportRepository.findByUserIdAndPostId(user.getId(), post.getId());
+
+        if (report.isPresent()) {
+            report.get().setReason(reportReason);
+            reportRepository.save(report.get());
+        } else {
+            post.setPostReportCount(post.getPostReportCount() + 1);
+            postRepository.save(post);
+
+            Report newReport = new Report();
+            newReport.setUserId(user.getId());
+            newReport.setCommentId(post.getId());
+            newReport.setReason(reportReason);
+            reportRepository.save(newReport);
+        }
     }
-
 }

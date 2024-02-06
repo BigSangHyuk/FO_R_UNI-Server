@@ -4,6 +4,8 @@ import bigsanghyuk.four_uni.comment.domain.LikeCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.entity.LikeComment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.comment.repository.LikeCommentRepository;
+import bigsanghyuk.four_uni.exception.comment.CommentNotFoundException;
+import bigsanghyuk.four_uni.exception.likecomment.AlreadyLikeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +24,9 @@ public class LikeCommentService {
         Long commentId = domain.getCommentId();
 
         if(commentRepository.findById(commentId).isEmpty()) {
-            throw new IllegalArgumentException("존재하지 않는 댓글입니다.");
+            throw new CommentNotFoundException();
         } else if(likeCommentRepository.findByUserIdAndCommentId(userId, commentId).isPresent()) {
-            throw new IllegalArgumentException("이미 좋아요 누른 댓글입니다.");
+            throw new AlreadyLikeException();
         } else {
             commentRepository.incrementLikesByCommentId(commentId);
             likeCommentRepository.save(new LikeComment(userId, commentId));
