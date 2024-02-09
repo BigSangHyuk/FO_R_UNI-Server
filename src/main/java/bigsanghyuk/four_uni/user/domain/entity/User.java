@@ -36,6 +36,10 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "authUser", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Authority> roles = new ArrayList<>();
+
     public User(String email, String password, String name, int dept, String nickName, String image) {
         this.email = email;
         this.password = password;
@@ -51,4 +55,10 @@ public class User {
         this.nickName = updateUserInfo.getNickName();
         this.image = updateUserInfo.getImage();
     }
+
+    public void setRoles(List<Authority> role) {
+        this.roles = role;
+        role.forEach(o -> o.setUser(this));
+    }
+
 }
