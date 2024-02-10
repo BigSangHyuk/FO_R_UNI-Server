@@ -30,6 +30,7 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .httpBasic(HttpBasicConfigurer::disable)
+                //JWT 기반이므로 쿠키 사용 X
                 .csrf(CsrfConfigurer::disable)
                 .cors(c -> {
                             CorsConfigurationSource source = request -> {
@@ -45,13 +46,17 @@ public class SecurityConfig {
                             c.configurationSource(source);
                         }
                 )
+                // 세션 생성 X, 사용 X
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 조건마다 요청 허용, 제한 설정
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/sign-up", "/sign-in", "/refresh", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/user/**").hasAuthority("ROLE_USER")
                         .anyRequest().denyAll())
+                // 인증 필터
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
+                // 에러 핸들링
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(401);

@@ -192,14 +192,4 @@ public class UserService {
             throw new Exception("로그인이 필요합니다.");
         }
     }
-
-    //회원 전체 조회
-//    public List<User> findUsers() {
-//        return userRepository.findAll();
-//    }
-//
-//    public User findOne(Long userId) {
-//        return userRepository.findOne(userId);
-//    }
-
 }

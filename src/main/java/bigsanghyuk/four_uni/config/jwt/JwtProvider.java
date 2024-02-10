@@ -44,11 +44,13 @@ public class JwtProvider {
                 .compact();
     }
 
+    // 권한 정보 가져오기
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(this.getEmail(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
+    // 토큰에 담겨 있는 유저 Email
     public String getEmail(String token) {
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
@@ -61,10 +63,12 @@ public class JwtProvider {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
+    // authorization 헤더에서 인증
     public String resolveToken(HttpServletRequest request) {
         return request.getHeader("Authorization");
     }
 
+    // 검증
     public boolean validateToken(String token) {
         try {
             if (!token.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER ")) {
