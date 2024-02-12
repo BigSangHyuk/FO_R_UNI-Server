@@ -1,21 +1,26 @@
 package bigsanghyuk.four_uni.user.dto.request;
 
-import bigsanghyuk.four_uni.user.domain.entity.Authority;
+import bigsanghyuk.four_uni.user.domain.EditUserInfo;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 public class EditRequest {
 
     @NotNull
     private Long id;
-    private String email;
+    @NotNull
     private String password;
+    @NotNull
     private String name;
-    private String nickName;
+    @NotNull
     private int dept;
+    @NotNull
+    private String nickName;
+    @NotNull
     private String image;
+
+    public EditUserInfo toDomain() {
+        return new EditUserInfo(id, password, name, dept, nickName, image);
+    }
 }
