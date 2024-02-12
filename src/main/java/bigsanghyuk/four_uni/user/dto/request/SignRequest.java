@@ -1,15 +1,15 @@
 package bigsanghyuk.four_uni.user.dto.request;
 
-import bigsanghyuk.four_uni.user.domain.RegisterUserInfo;
+import bigsanghyuk.four_uni.user.domain.SignUserInfo;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Getter;
 
-@NoArgsConstructor
 @Getter
-public class RegisterUserRequest {
+public class SignRequest {
 
-    @NotNull @Email
+    @NotNull
+    @Email
     private String email;
     @NotNull
     private String password;
@@ -19,10 +19,9 @@ public class RegisterUserRequest {
     private int dept;
     @NotNull
     private String nickName;
-
     private String image;
 
-    public RegisterUserInfo toDomain() {
-        return new RegisterUserInfo(email, password, name, dept, nickName, image);
+    public SignUserInfo toDomain() {
+        return new SignUserInfo(email, password, name, dept, nickName, image);
     }
 }

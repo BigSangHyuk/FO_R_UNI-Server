@@ -5,10 +5,12 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UpdateUserInfo {
+public class EditUserInfo {
 
     private Long id;
     private String password;
+    private String name;
+    private int dept;
     private String nickName;
     private String image;
 }

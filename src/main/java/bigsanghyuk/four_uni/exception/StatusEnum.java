@@ -12,6 +12,7 @@ public enum StatusEnum {
     ALREADY_LIKE(403, "ALREADY_LIKE"),
     REASON_NOT_FOUND(404, "REASON_NOT_FOUND"),
     BAD_REQUEST(400, "BAD_REQUEST"),
+    TOKEN_NOT_FOUND(404, "TOKEN_NOT_FOUND"),
     RESTRICTED(403, "RESTRICTED");
 
     private final int statusCode;
