@@ -7,9 +7,9 @@ import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
 import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
+import bigsanghyuk.four_uni.user.domain.EditUserInfo;
 import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
-import bigsanghyuk.four_uni.user.domain.UpdateUserInfo;
-import bigsanghyuk.four_uni.user.domain.RegisterUserInfo;
+import bigsanghyuk.four_uni.user.domain.SignUserInfo;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.dto.request.EditRequest;
@@ -25,6 +25,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -43,39 +44,20 @@ public class UserService {
 
     private static final int EXPIRATION_IN_MINUTES = 43800;
 
-    public void register(RegisterUserInfo registerUserInfo) {
-        userRepository.findByEmail(registerUserInfo.getEmail())
-                .ifPresent(user -> {
-                    throw new EmailDuplicateException();
-                });
-
-        String encodedPassword = encoder.encode(registerUserInfo.getPassword());
-        userRepository.save(
-                new User(
-                        registerUserInfo.getEmail(),
-                        encodedPassword,
-                        registerUserInfo.getName(),
-                        registerUserInfo.getDept(),
-                        registerUserInfo.getNickName(),
-                        registerUserInfo.getImage()
-                )
-        );
-    }
-
-    public boolean register(SignRequest request) throws Exception {
-        userRepository.findByEmail(request.getEmail())
+    public boolean register(SignUserInfo info) throws Exception {
+        userRepository.findByEmail(info.getEmail())
                 .ifPresent(user -> {
                     throw new EmailDuplicateException();
                 });
         try {
             LocalDateTime now = LocalDateTime.now();
             User user = User.builder()
-                    .email(request.getEmail())
-                    .password(encoder.encode(request.getPassword()))
-                    .name(request.getName())
-                    .dept(request.getDept())
-                    .nickName(request.getNickName())
-                    .image(request.getImage())
+                    .email(info.getEmail())
+                    .password(encoder.encode(info.getPassword()))
+                    .name(info.getName())
+                    .dept(info.getDept())
+                    .nickName(info.getNickName())
+                    .image(info.getImage())
                     .createdAt(now)
                     .updatedAt(now)
                     .build();
@@ -91,48 +73,30 @@ public class UserService {
         return true;
     }
 
-    public void updateUser(UpdateUserInfo updateUserInfo) {
-
-        User user = userRepository.findById(updateUserInfo.getId())
+    @Transactional
+    public EditResponse edit(EditUserInfo info) {
+        User user = userRepository.findById(info.getId())
                 .orElseThrow(UserNotFoundException::new);
-        UpdateUserInfo encodedUpdateUser = new UpdateUserInfo(updateUserInfo.getId(), encoder.encode(updateUserInfo.getPassword()), updateUserInfo.getNickName(), updateUserInfo.getImage());
-        user.edit(encodedUpdateUser);
+        user.edit(encoder.encode(info.getPassword()), info.getName(), info.getDept(), info.getNickName(), info.getImage());
         userRepository.save(user);
-    }
-
-    public EditResponse edit(EditRequest request) {
-        User user = userRepository.findById(request.getId())
-                .orElseThrow(UserNotFoundException::new);
-        User source = userRepository.findById(request.getId()).get();
-        user.edit(encoder.encode(request.getPassword()), request.getName(), request.getDept(), request.getNickName(), request.getImage());
-        userRepository.save(user);
+        User updatedUser = userRepository.findById(info.getId()).get();
         return EditResponse.builder()
-                .email(request.getEmail() == null ? source.getEmail() : request.getEmail())
-                .name(request.getName() == null ? source.getName() : request.getName())
-                .dept(request.getDept() == 0 ? source.getDept() : request.getDept())
-                .nickName(request.getNickName() == null ? source.getNickName() : request.getNickName())
-                .image(request.getImage() == null ? source.getImage() : request.getImage())
-                .roles(source.getRoles())
+                .id(updatedUser.getId())
+                .name(updatedUser.getName())
+                .dept(updatedUser.getDept())
+                .nickName(updatedUser.getNickName())
+                .image(updatedUser.getImage())
+                .roles(updatedUser.getRoles())
                 .build();
     }
 
-    public boolean login(LoginUserInfo loginUserInfo) {
-        Optional<User> user = userRepository.findByEmail(loginUserInfo.getEmail());
-        if (user.isEmpty()) {
-            throw new UsernameNotFoundException("존재하지 않는 이메일입니다.");
-        }
-        log.info("original password={}", loginUserInfo.getPassword());
-        log.info("encoded password={}", user.get().getPassword());
-        return encoder.matches(loginUserInfo.getPassword(), user.get().getPassword());
-    }
-
-    public LoginResponse login(LoginRequest request) throws Exception {
-        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
+    public LoginResponse login(LoginUserInfo info) throws Exception {
+        Optional<User> optionalUser = userRepository.findByEmail(info.getEmail());
         if (optionalUser.isEmpty()) {
             throw new UsernameNotFoundException("존재하지 않는 이메일입니다.");
         }
         User user = optionalUser.get();
-        if (!encoder.matches(request.getPassword(), user.getPassword())) {
+        if (!encoder.matches(info.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("잘못된 계정 정보입니다.");
         }
         user.setRefreshToken(createRefreshToken(user));
