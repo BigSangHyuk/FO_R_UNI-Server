@@ -151,8 +151,8 @@ class CommentServiceTest {
     @Test
     @DisplayName("대댓글 등록")
     void replyComment() {
-        Comment motherComment = commentRepository.findByUserId(parent.getUserId()).get();
-        Comment childComment = commentRepository.findByUserId(child.getUserId()).get();
+        Comment motherComment = commentRepository.findById(parent.getUserId()).get();
+        Comment childComment = commentRepository.findById(child.getUserId()).get();
 
         // then : 댓글 등록 후에는 ID가 존재해야 하고 저장된 댓글 정보를 조회하여 존재해야 함
         assertNotNull(motherComment.getId());

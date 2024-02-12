@@ -18,7 +18,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("UPDATE Comment c SET c.commentLike = c.commentLike + 1 WHERE c.id = :commentId")
     void incrementLikesByCommentId(@Param("commentId") Long commentId);
 
-    Optional<Comment> findByUserId(Long userId);
+    Optional<List<Comment>> findByUserId(Long userId);
 
     @Query("SELECT c FROM Comment c " +
             "WHERE c.postId = :postId AND c.parentCommentId = :parentCommentId AND c.parentCommentId IS NOT NULL " +

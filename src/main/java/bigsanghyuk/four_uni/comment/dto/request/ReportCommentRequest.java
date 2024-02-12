@@ -1,6 +1,6 @@
 package bigsanghyuk.four_uni.comment.dto.request;
 
-import bigsanghyuk.four_uni.exception.ReportReason;
+import bigsanghyuk.four_uni.report.domain.entity.ReportReason;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
