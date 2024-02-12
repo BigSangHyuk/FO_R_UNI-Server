@@ -45,13 +45,13 @@ public class UserController {
     @Operation(summary = "유저 조회")
     @GetMapping("/user/get")
     public ResponseEntity<SignResponse> getUser(@RequestParam(name = "email") String email) throws Exception {
-        return ResponseEntity.ok().body(userService.getMember(email));
+        return ResponseEntity.ok().body(userService.getUser(email));
     }
 
     @Operation(summary = "관리자 권한 유저 조회")
     @GetMapping("/admin/get")
     public ResponseEntity<SignResponse> getUserForAdmin(@RequestParam(name = "email") String email) throws Exception {
-        return ResponseEntity.ok().body(userService.getMember(email));
+        return ResponseEntity.ok().body(userService.getUser(email));
     }
 
     @Operation(summary = "토큰 재발급 요청")

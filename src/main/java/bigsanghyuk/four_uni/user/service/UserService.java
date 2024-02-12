@@ -12,9 +12,6 @@ import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
 import bigsanghyuk.four_uni.user.domain.SignUserInfo;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
-import bigsanghyuk.four_uni.user.dto.request.EditRequest;
-import bigsanghyuk.four_uni.user.dto.request.LoginRequest;
-import bigsanghyuk.four_uni.user.dto.request.SignRequest;
 import bigsanghyuk.four_uni.user.dto.response.EditResponse;
 import bigsanghyuk.four_uni.user.dto.response.LoginResponse;
 import bigsanghyuk.four_uni.user.dto.response.SignResponse;
@@ -115,7 +112,7 @@ public class UserService {
                 .build();
     }
 
-    public SignResponse getMember(String email) throws Exception {
+    public SignResponse getUser(String email) throws Exception {
         User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         return new SignResponse(user);
     }
