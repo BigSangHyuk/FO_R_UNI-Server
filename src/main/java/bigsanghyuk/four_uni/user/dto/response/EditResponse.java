@@ -15,19 +15,10 @@ import java.util.List;
 @NoArgsConstructor
 public class EditResponse {
 
-    private String email;
+    private Long id;
     private String name;
     private int dept;
     private String nickName;
     private String image;
     private List<Authority> roles = new ArrayList<>();
-
-    public EditResponse(User user) {
-        this.email = user.getEmail();
-        this.name = user.getName();
-        this.dept = user.getDept();
-        this.nickName = user.getNickName();
-        this.image = user.getImage();
-        this.roles = user.getRoles();
-    }
 }

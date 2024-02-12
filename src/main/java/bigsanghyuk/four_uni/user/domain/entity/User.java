@@ -1,7 +1,6 @@
 package bigsanghyuk.four_uni.user.domain.entity;
 
-import bigsanghyuk.four_uni.user.domain.UpdateUserInfo;
-import bigsanghyuk.four_uni.user.dto.request.EditRequest;
+import bigsanghyuk.four_uni.user.domain.EditUserInfo;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.*;
@@ -62,12 +61,6 @@ public class User {
         this.dept = dept;
         this.nickName = nickName;
         this.image = image;
-    }
-
-    public void edit(@Valid UpdateUserInfo updateUserInfo) {
-        this.password = updateUserInfo.getPassword();
-        this.nickName = updateUserInfo.getNickName();
-        this.image = updateUserInfo.getImage();
     }
 
     public void setRoles(List<Authority> role) {

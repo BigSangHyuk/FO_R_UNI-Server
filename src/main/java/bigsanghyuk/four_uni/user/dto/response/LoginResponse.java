@@ -24,13 +24,4 @@ public class LoginResponse {
     private String image;
     private List<Authority> roles = new ArrayList<>();
     private TokenDto token;
-
-    public LoginResponse(User user) {
-        this.email = user.getEmail();
-        this.name = user.getName();
-        this.dept = user.getDept();
-        this.nickName = user.getNickName();
-        this.image = user.getImage();
-        this.roles = user.getRoles();
-    }
 }
