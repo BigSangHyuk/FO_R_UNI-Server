@@ -1,0 +1,84 @@
+package bigsanghyuk.four_uni.config.oauth.handler;
+
+import bigsanghyuk.four_uni.config.jwt.JwtProvider;
+import bigsanghyuk.four_uni.config.oauth.CustomAuthorityUtils;
+import bigsanghyuk.four_uni.config.oauth.domain.CustomOAuth2User;
+import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
+import bigsanghyuk.four_uni.user.domain.entity.Authority;
+import bigsanghyuk.four_uni.user.domain.entity.User;
+import bigsanghyuk.four_uni.user.repository.UserRepository;
+import bigsanghyuk.four_uni.user.service.UserService;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.List;
+
+@RequiredArgsConstructor
+@Slf4j
+public class OAuth2UserSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
+    private final JwtProvider jwtProvider;
+    private final CustomAuthorityUtils authorityUtils;
+    private final UserService userService;
+    private final UserRepository userRepository;
+
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+
+        String email = oAuth2User.getEmail();
+        List<Authority> authorities = authorityUtils.createAuthorities(email);
+
+        redirect(request, response, email, authorities);
+    }
+
+    private void redirect(HttpServletRequest request, HttpServletResponse response, String email, List<Authority> authorities) throws IOException {
+        log.info("creating Token");
+
+        String accessToken = createAccessToken(email, authorities);
+        String refreshToken = createRefreshToken(email);
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+
+        user.setRefreshToken(refreshToken);
+
+        String uri = createURI(accessToken, refreshToken, user.getId(), email).toString();
+        getRedirectStrategy().sendRedirect(request, response, uri);
+    }
+
+    private String createAccessToken(String email, List<Authority> authorities) {
+        return jwtProvider.createToken(email, authorities);
+    }
+
+    private String createRefreshToken(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        return userService.createRefreshToken(user);
+    }
+
+    private URI createURI(String accessToken, String refreshToken, Long userId, String email) {
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        queryParams.add("user_id", String.valueOf(userId));
+        queryParams.add("email", email);
+        queryParams.add("access_token", accessToken);
+        queryParams.add("refresh_token", refreshToken);
+
+        return UriComponentsBuilder
+                .newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(8080)
+                .path("/oauth")
+                .queryParams(queryParams)
+                .build()
+                .toUri();
+    }
+}
