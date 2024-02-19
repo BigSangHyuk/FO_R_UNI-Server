@@ -1,6 +1,11 @@
 package bigsanghyuk.four_uni.config;
 
 import bigsanghyuk.four_uni.config.jwt.JwtProvider;
+import bigsanghyuk.four_uni.config.oauth.CustomAuthorityUtils;
+import bigsanghyuk.four_uni.config.oauth.handler.OAuth2UserSuccessHandler;
+import bigsanghyuk.four_uni.config.oauth.service.CustomOAuth2UserService;
+import bigsanghyuk.four_uni.user.repository.UserRepository;
+import bigsanghyuk.four_uni.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +30,10 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomAuthorityUtils authorityUtils;
+    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -54,6 +63,13 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/user/**").hasAuthority("ROLE_USER")
                         .anyRequest().denyAll())
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(new OAuth2UserSuccessHandler(jwtProvider, authorityUtils, userService, userRepository))
+                        .userInfoEndpoint(
+                                userInfoEndpointConfig -> userInfoEndpointConfig
+                                        .userService(customOAuth2UserService)
+                        )
+                )
                 // 인증 필터
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 // 에러 핸들링
