@@ -146,7 +146,7 @@ class UserServiceTest {
         TokenDto tokenDto = loginResponse.getToken();
         log.info("[AccessToken] accessToken={}", tokenDto.getAccessToken());
 
-        Thread.sleep(500);
+        Thread.sleep(3000);
 
         TokenDto refreshedTokenDto = service.refreshAccessToken(tokenDto);
         log.info("[AccessToken] accessToken={}", refreshedTokenDto.getAccessToken());

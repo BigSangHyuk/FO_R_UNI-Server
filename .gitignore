@@ -39,4 +39,6 @@ out/
 ### JWT Secret ###
 /src/main/resources/application-jwt.properties
 
-/src/main/resources/application-local.properties
+/src/main/resources/application-localdb.properties
+/src/main/resources/application-prod.properties
+/src/main/resources/application-oauth.properties
