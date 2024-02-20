@@ -51,7 +51,7 @@ public class OAuth2UserSuccessHandler extends SimpleUrlAuthenticationSuccessHand
 
         user.setRefreshToken(refreshToken);
 
-        String uri = createURI(accessToken, refreshToken, user.getId(), email).toString();
+        String uri = createURI(accessToken, refreshToken, email).toString();
         getRedirectStrategy().sendRedirect(request, response, uri);
     }
 
@@ -64,9 +64,8 @@ public class OAuth2UserSuccessHandler extends SimpleUrlAuthenticationSuccessHand
         return userService.createRefreshToken(user);
     }
 
-    private URI createURI(String accessToken, String refreshToken, Long userId, String email) {
+    private URI createURI(String accessToken, String refreshToken, String email) {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-        queryParams.add("user_id", String.valueOf(userId));
         queryParams.add("email", email);
         queryParams.add("access_token", accessToken);
         queryParams.add("refresh_token", refreshToken);
@@ -74,8 +73,7 @@ public class OAuth2UserSuccessHandler extends SimpleUrlAuthenticationSuccessHand
         return UriComponentsBuilder
                 .newInstance()
                 .scheme("http")
-                .host("localhost")
-                .port(8080)
+                .host("fouruni.app")
                 .path("/oauth")
                 .queryParams(queryParams)
                 .build()
