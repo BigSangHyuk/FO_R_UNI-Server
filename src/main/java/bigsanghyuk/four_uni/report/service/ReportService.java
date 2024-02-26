@@ -29,9 +29,9 @@ public class ReportService {
     private final PostRepository postRepository;
     private final ReportRepository reportRepository;
 
-    public void reportComment(Long id, Long userId, String reportReasonString) {
+    public void reportComment(Long commentId, Long userId, String reportReasonString, String detail) {
 
-        Comment comment = commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         if (reportReasonString == null) {
@@ -43,21 +43,25 @@ public class ReportService {
         Optional<Report> report = reportRepository.findByUserIdAndCommentId(user.getId(), comment.getId());
 
         if (report.isPresent()) {
-            report.get().setReason(reportReason);
-            reportRepository.save(report.get());
+            Report existingReport = report.get();
+            existingReport.setReason(reportReason);
+            reportRepository.save(existingReport);
         } else {
             comment.setCommentReportCount(comment.getCommentReportCount() + 1);
             commentRepository.save(comment);
 
-            Report newReport = new Report();
-            newReport.setUserId(user.getId());
-            newReport.setCommentId(comment.getId());
-            newReport.setReason(reportReason);
+            Report newReport = Report.builder()
+                    .userId(user.getId())
+                    .commentId(comment.getId())
+                    .reason(reportReason)
+                    .detail(detail)
+                    .build();
+
             reportRepository.save(newReport);
         }
     }
 
-    public void reportPost(Long postId, Long userId, String reportReasonString) {
+    public void reportPost(Long postId, Long userId, String reportReasonString, String detail) {
 
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
@@ -71,16 +75,20 @@ public class ReportService {
         Optional<Report> report = reportRepository.findByUserIdAndPostId(user.getId(), post.getId());
 
         if (report.isPresent()) {
-            report.get().setReason(reportReason);
-            reportRepository.save(report.get());
+            Report existingReport = report.get();
+            existingReport.setReason(reportReason);
+            reportRepository.save(existingReport);
         } else {
             post.setPostReportCount(post.getPostReportCount() + 1);
             postRepository.save(post);
 
-            Report newReport = new Report();
-            newReport.setUserId(user.getId());
-            newReport.setCommentId(post.getId());
-            newReport.setReason(reportReason);
+            Report newReport = Report.builder()
+                    .userId(user.getId())
+                    .postId(post.getId())
+                    .reason(reportReason)
+                    .detail(detail)
+                    .build();
+
             reportRepository.save(newReport);
         }
     }
