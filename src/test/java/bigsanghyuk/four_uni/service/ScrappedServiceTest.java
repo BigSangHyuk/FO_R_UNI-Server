@@ -1,6 +1,9 @@
 package bigsanghyuk.four_uni.service;
 
+import bigsanghyuk.four_uni.post.domain.ScrapInfo;
+import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
+import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
 import bigsanghyuk.four_uni.post.service.ScrappedService;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -25,6 +30,8 @@ class ScrappedServiceTest {
     ScrappedService scrappedService;
     @Autowired
     ScrappedRepository scrappedRepository;
+    @Autowired
+    PostRepository postRepository;
 
     @DisplayName("스크랩된 게시물 반환받기 테스트")
     @Test
@@ -38,8 +45,10 @@ class ScrappedServiceTest {
     void scrapTest() {
         List<Scrapped> before = scrappedService.getScrappedList(testUserId);
         log.info("before scrap: {}", before.size());
-        scrappedService.scrap(testUserId, 1L);
-        scrappedService.scrap(testUserId, 2L);
+        ScrapInfo scrapInfo1 = new ScrapInfo(testUserId, 1L);
+        ScrapInfo scrapInfo2 = new ScrapInfo(testUserId, 2L);
+        scrappedService.scrap(scrapInfo1);
+        scrappedService.scrap(scrapInfo2);
         List<Scrapped> after = scrappedService.getScrappedList(testUserId);
         log.info("after scrap:  {}", after.size());
         assertThat(after.size()).isGreaterThan(before.size());
@@ -50,8 +59,10 @@ class ScrappedServiceTest {
     void unScrapTest() {
         List<Scrapped> before = scrappedService.getScrappedList(testUserId);
         log.info("before unScrap: {}", before.size());
-        scrappedService.unScrap(testUserId, 100L);
-        scrappedService.unScrap(testUserId, 200L);
+        ScrapInfo scrapInfo1 = new ScrapInfo(testUserId, 100L);
+        ScrapInfo scrapInfo2 = new ScrapInfo(testUserId, 200L);
+        scrappedService.unScrap(scrapInfo1);
+        scrappedService.unScrap(scrapInfo2);
         List<Scrapped> after = scrappedService.getScrappedList(testUserId);
         log.info("after unScrap:  {}", after.size());
         assertThat(before.size()).isGreaterThan(after.size());
@@ -60,6 +71,8 @@ class ScrappedServiceTest {
     @BeforeEach
     void beforeEach() {
         log.info("[beforeEach] 테스트 데이터 추가");
+        postRepository.save(new Post(1L, false, "test1", "test1", "test1", 0, 0, true, LocalDate.now(), LocalDateTime.now()));
+        postRepository.save(new Post(2L, false, "test2", "test2", "test2", 0, 0, true, LocalDate.now(), LocalDateTime.now()));
         scrappedRepository.save(new Scrapped(testUserId, 100L, 10000L));
         scrappedRepository.save(new Scrapped(testUserId, 200L, 20000L));
         scrappedRepository.save(new Scrapped(testUserId, 300L, 30000L));
