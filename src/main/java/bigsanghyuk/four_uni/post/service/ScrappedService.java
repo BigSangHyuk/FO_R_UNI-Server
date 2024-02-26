@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.post.service;
 
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
+import bigsanghyuk.four_uni.post.domain.ScrapInfo;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
@@ -22,19 +23,15 @@ public class ScrappedService {
         return scrappedRepository.findByUserId(userId);
     }
 
-    public void scrap(@NotNull Long userId, @NotNull Long postId) {
-        Optional<Post> post = postRepository.findById(postId);
+    public void scrap(ScrapInfo scrapInfo) {
+        Post post = postRepository.findById(scrapInfo.getPostId())
+                .orElseThrow(PostNotFoundException::new);
 
-        if (post.isPresent()) {
-            Scrapped scrapped = new Scrapped(userId, postId, post.get().getCategoryId());
-            //categoryId를 파라미터로 받을 지, Scrapped 생성자에서 categoryId를 뺄지 고민해봐야 될 듯
-            scrappedRepository.save(scrapped);
-        } else {
-            throw new PostNotFoundException();
-        }
+        Scrapped scrapped = new Scrapped(scrapInfo.getUserId(), scrapInfo.getPostId(), post.getCategoryId());
+        scrappedRepository.save(scrapped);
     }
 
-    public void unScrap(@NotNull Long userId, @NotNull Long postId) {
-        scrappedRepository.deleteScrappedByUserIdAndPostId(userId, postId);
+    public void unScrap(ScrapInfo scrapInfo) {
+        scrappedRepository.deleteScrappedByUserIdAndPostId(scrapInfo.getUserId(), scrapInfo.getPostId());
     }
 }

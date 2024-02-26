@@ -1,9 +1,11 @@
 package bigsanghyuk.four_uni.post.controller;
 
+import bigsanghyuk.four_uni.CommonResponse;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.dto.request.ScrapRequest;
 import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
 import bigsanghyuk.four_uni.post.service.PostService;
+import bigsanghyuk.four_uni.post.service.ScrappedService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
@@ -20,21 +22,12 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final ScrappedService scrappedService;
 
-    @Operation(summary = "게시글 단건 조회", description = "해당 게시글 아이디만 경로 변수로 전달")
-    @GetMapping("/posts/{postId}")
-    public ResponseEntity<GetPostResponse> getDetail(@PathVariable("postId") Long postId) {
-        Post post = postService.getDetail(postId);
-
-        GetPostResponse getPostResponse = GetPostResponse.builder()
-                .id(postId)
-                .title(post.getTitle())
-                .content(post.getContent())
-                .imageUrl(post.getImageUrl())
-                .views(post.getViews())
-                .build();
-
-        return new ResponseEntity(getPostResponse, HttpStatus.OK);
+    @Operation(summary = "게시글 단건 조회", description = "조회하고자 하는 게시글 아이디를 파라미터로 전달")
+    @GetMapping("/posts")
+    public ResponseEntity<GetDetailResponse> getDetail(@RequestParam(name = "postId") Long postId) {
+        return ResponseEntity.ok().body(postService.getDetail(postId));
     }
 
     @Operation(summary = "미분류 게시글 조회", description = "파라미터 없이 호출")
