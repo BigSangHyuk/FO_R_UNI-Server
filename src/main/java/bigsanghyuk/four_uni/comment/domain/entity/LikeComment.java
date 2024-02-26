@@ -34,7 +34,5 @@ public class LikeComment {
     public LikeComment(Long userId, Long commentId) {
         this.userId = userId;
         this.commentId = commentId;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 }

@@ -7,8 +7,6 @@ import bigsanghyuk.four_uni.comment.dto.request.LikeCommentRequest;
 import bigsanghyuk.four_uni.comment.dto.request.RegisterCommentRequest;
 import bigsanghyuk.four_uni.comment.service.CommentService;
 import bigsanghyuk.four_uni.comment.service.LikeCommentService;
-import bigsanghyuk.four_uni.post.controller.PostController;
-import bigsanghyuk.four_uni.post.domain.entity.Post;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

@@ -25,7 +25,6 @@ public class ReportController {
     @PostMapping("/comments/report/{userId}/{commentId}")
     public ResponseEntity<String> reportComment(
             @PathVariable("commentId") Long commentId,
-            @PathVariable("userId") Long userId,
             @RequestBody Map<String, String> payload
     ) {
         String reportReasonString = payload.get("reportReason");
@@ -38,7 +37,6 @@ public class ReportController {
     @PostMapping("/posts/report/{userId}/{postId}")
     public ResponseEntity<String> reportPost(
             @PathVariable("postId") Long postId,
-            @PathVariable("userId") Long userId,
             @RequestBody Map<String, String> payload
     ) {
         String reportReasonString = payload.get("reportReason");

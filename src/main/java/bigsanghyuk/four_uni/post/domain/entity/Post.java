@@ -50,8 +50,6 @@ public class Post {
         this.isClassified = isClassified;
         this.postedAt = postedAt;
         this.deadline = deadline;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
 }

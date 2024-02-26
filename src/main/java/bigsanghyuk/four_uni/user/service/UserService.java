@@ -19,14 +19,11 @@ import bigsanghyuk.four_uni.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -47,7 +44,6 @@ public class UserService {
                     throw new EmailDuplicateException();
                 });
         try {
-            LocalDateTime now = LocalDateTime.now();
             User user = User.builder()
                     .email(info.getEmail())
                     .password(encoder.encode(info.getPassword()))
@@ -55,8 +51,6 @@ public class UserService {
                     .dept(info.getDept())
                     .nickName(info.getNickName())
                     .image(info.getImage())
-                    .createdAt(now)
-                    .updatedAt(now)
                     .build();
             user.setRoles(Collections.singletonList(
                     Authority.builder()
@@ -96,7 +90,6 @@ public class UserService {
         if (!encoder.matches(info.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("잘못된 계정 정보입니다.");
         }
-        user.setRefreshToken(createRefreshToken(user));
         return LoginResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())

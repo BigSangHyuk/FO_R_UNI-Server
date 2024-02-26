@@ -48,13 +48,6 @@ public class Comment {
         this.parentCommentId = parentCommentId;
         this.commentLike = commentLike;
         this.content = content;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public Comment(Long userId, String content) {
-        this.userId = userId;
-        this.content = content;
     }
 
     public void CommentEdit(@Valid EditCommentInfo editCommentInfo) {

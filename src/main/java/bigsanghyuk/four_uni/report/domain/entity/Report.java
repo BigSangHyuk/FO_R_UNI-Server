@@ -41,7 +41,4 @@ public class Report {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
-
-//    private Long targetId; // 신고되는 댓글 or 게시글의 id
-//    private int targetType; // 댓글인지 게시글인지
 }

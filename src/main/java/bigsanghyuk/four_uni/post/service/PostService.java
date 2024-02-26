@@ -6,8 +6,6 @@ import bigsanghyuk.four_uni.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,12 +14,6 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
-
-    public List<Post> searchArticles(List<Long> categories, String keyword,
-                                     LocalDate startTime, LocalDate endTime,
-                                     LocalDateTime deadline) {
-        return null;
-    }
 
     public List<Post> getUnClassifiedLists() {
         return postRepository.findByIsClassifiedFalse();

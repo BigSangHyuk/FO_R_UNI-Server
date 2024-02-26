@@ -31,9 +31,6 @@ public class User {
     private String nickName;
     private String image;
 
-    @Setter
-    private String refreshToken;
-
     @CreatedDate
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
@@ -52,7 +49,6 @@ public class User {
         this.dept = dept;
         this.nickName = nickName;
         this.image = image;
-        this.createdAt = LocalDateTime.now();
     }
 
     public void edit(String password, String name, int dept, String nickName, String image) {
