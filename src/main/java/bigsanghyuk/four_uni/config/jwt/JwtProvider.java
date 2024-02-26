@@ -22,7 +22,6 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
-//@PropertySource("classpath:/application-jwt.properties")
 public class JwtProvider {
 
     @Value("${jwt.issuer}")

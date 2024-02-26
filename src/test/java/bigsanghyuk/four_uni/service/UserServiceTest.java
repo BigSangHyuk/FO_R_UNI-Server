@@ -4,6 +4,7 @@ import bigsanghyuk.four_uni.config.jwt.domain.Token;
 import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
 import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
+import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
 import bigsanghyuk.four_uni.user.domain.EditUserInfo;
 import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
 import bigsanghyuk.four_uni.user.domain.SignUserInfo;
@@ -90,7 +91,7 @@ class UserServiceTest {
         log.info("[loginUser] email={}, password={}", "test1@test.com", "test1");
         LoginUserInfo loginUser = new LoginUserInfo("test1@test.com", "test");
         assertThatThrownBy(() -> service.login(loginUser))
-                .isInstanceOf(UsernameNotFoundException.class);
+                .isInstanceOf(UserNotFoundException.class);
     }
 
     @Test

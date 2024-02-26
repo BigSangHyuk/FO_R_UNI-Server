@@ -9,14 +9,8 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    /*//제목에 title 키워드를 포함한 글 조회
-    List<Post> findByTitleContaining(String title);*/
-
     //제목이나 내용에 키워드가 포함된 글 조회
     List<Post> findByTitleContainingOrContentContaining(String keywordTitle, String keywordContent);
-
-    /*//categoryId 하나인 경우 조회
-    List<Post> findByCategoryId(Long categoryId);*/
 
     //categoryId가 서로 다른 글들을 동시에 조회 (필터에서 사용)
     List<Post> findByCategoryIdIn(List<Long> categoryIds);

@@ -19,14 +19,11 @@ import bigsanghyuk.four_uni.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -47,7 +44,6 @@ public class UserService {
                     throw new EmailDuplicateException();
                 });
         try {
-            LocalDateTime now = LocalDateTime.now();
             User user = User.builder()
                     .email(info.getEmail())
                     .password(encoder.encode(info.getPassword()))
@@ -55,8 +51,6 @@ public class UserService {
                     .dept(info.getDept())
                     .nickName(info.getNickName())
                     .image(info.getImage())
-                    .createdAt(now)
-                    .updatedAt(now)
                     .build();
             user.setRoles(Collections.singletonList(
                     Authority.builder()
@@ -75,28 +69,23 @@ public class UserService {
         User user = userRepository.findById(info.getId())
                 .orElseThrow(UserNotFoundException::new);
         user.edit(encoder.encode(info.getPassword()), info.getName(), info.getDept(), info.getNickName(), info.getImage());
-        userRepository.save(user);
-        User updatedUser = userRepository.findById(info.getId()).get();
+        User savedUser = userRepository.save(user);
         return EditResponse.builder()
-                .id(updatedUser.getId())
-                .name(updatedUser.getName())
-                .dept(updatedUser.getDept())
-                .nickName(updatedUser.getNickName())
-                .image(updatedUser.getImage())
-                .roles(updatedUser.getRoles())
+                .id(savedUser.getId())
+                .name(savedUser.getName())
+                .dept(savedUser.getDept())
+                .nickName(savedUser.getNickName())
+                .image(savedUser.getImage())
+                .roles(savedUser.getRoles())
                 .build();
     }
 
-    public LoginResponse login(LoginUserInfo info) throws Exception {
-        Optional<User> optionalUser = userRepository.findByEmail(info.getEmail());
-        if (optionalUser.isEmpty()) {
-            throw new UsernameNotFoundException("존재하지 않는 이메일입니다.");
-        }
-        User user = optionalUser.get();
+    public LoginResponse login(LoginUserInfo info) {
+        User user = userRepository.findByEmail(info.getEmail())
+                .orElseThrow(UserNotFoundException::new);
         if (!encoder.matches(info.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("잘못된 계정 정보입니다.");
         }
-        user.setRefreshToken(createRefreshToken(user));
         return LoginResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -107,12 +96,12 @@ public class UserService {
                 .roles(user.getRoles())
                 .token(TokenDto.builder()
                         .accessToken(jwtProvider.createToken(user.getEmail(), user.getRoles()))
-                        .refreshToken(user.getRefreshToken())
+                        .refreshToken(createRefreshToken(user))
                         .build())
                 .build();
     }
 
-    public SignResponse getUser(String email) throws Exception {
+    public SignResponse getUser(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         return new SignResponse(user);
     }

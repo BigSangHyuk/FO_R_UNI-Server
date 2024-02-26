@@ -24,12 +24,13 @@ public class ReportController {
     @Operation(summary = "댓글 신고", description = "userId와 commentId 전달")
     @PostMapping("/comments/report/{userId}/{commentId}")
     public ResponseEntity<String> reportComment(
-            @PathVariable("commentId") Long commentId,
             @PathVariable("userId") Long userId,
+            @PathVariable("commentId") Long commentId,
             @RequestBody Map<String, String> payload
     ) {
         String reportReasonString = payload.get("reportReason");
-        reportService.reportComment(commentId, userId, reportReasonString);
+        String detail = payload.get("detail");
+        reportService.reportComment(commentId, userId, reportReasonString, detail);
 
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
     }
@@ -37,12 +38,13 @@ public class ReportController {
     @Operation(summary = "게시글 신고", description = "userId와 postId 전달")
     @PostMapping("/posts/report/{userId}/{postId}")
     public ResponseEntity<String> reportPost(
-            @PathVariable("postId") Long postId,
             @PathVariable("userId") Long userId,
+            @PathVariable("postId") Long postId,
             @RequestBody Map<String, String> payload
     ) {
         String reportReasonString = payload.get("reportReason");
-        reportService.reportPost(postId, userId, reportReasonString);
+        String detail = payload.get("detail");
+        reportService.reportPost(postId, userId, reportReasonString, detail);
 
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
     }

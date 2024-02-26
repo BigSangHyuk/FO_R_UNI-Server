@@ -4,6 +4,7 @@ import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.RegisterCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
+import bigsanghyuk.four_uni.comment.repository.LikeCommentRepository;
 import bigsanghyuk.four_uni.exception.comment.CommentEditOtherUserException;
 import bigsanghyuk.four_uni.exception.comment.CommentNotFoundException;
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
@@ -23,11 +24,12 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final LikeCommentRepository likeCommentRepository;
 
-    public void register(RegisterCommentInfo registerCommentInfo) {
+    public void register(Long postId, RegisterCommentInfo registerCommentInfo) {
         Comment comment = new Comment(
                 registerCommentInfo.getUserId(),
-                registerCommentInfo.getPostId(),
+                postId,
                 registerCommentInfo.getParentCommentId(),
                 registerCommentInfo.getCommentLike(),
                 registerCommentInfo.getContent()
@@ -36,7 +38,10 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    public Comment edit(Long commentId, @Valid EditCommentInfo editCommentInfo) {
+    public Comment edit(Long postId, Long commentId, @Valid EditCommentInfo editCommentInfo) {
+        postRepository.findById(postId)
+                .orElseThrow(PostNotFoundException::new);
+
         commentRepository.findByUserId(editCommentInfo.getUserId())
                 .orElseThrow(UserNotFoundException::new);
 
@@ -47,7 +52,7 @@ public class CommentService {
             throw new CommentEditOtherUserException();
         }
 
-        comment.CommentEdit(editCommentInfo);
+        comment.edit(editCommentInfo);
         commentRepository.save(comment);
         return comment;
     }
@@ -60,6 +65,7 @@ public class CommentService {
                 .orElseThrow(CommentNotFoundException::new);
 
         commentRepository.deleteCommentByPostIdAndId(postId, commentId);
+        likeCommentRepository.deleteLikeCommentByCommentId(commentId);
     }
 
     public List<Comment> getAllComments(Long postId) {

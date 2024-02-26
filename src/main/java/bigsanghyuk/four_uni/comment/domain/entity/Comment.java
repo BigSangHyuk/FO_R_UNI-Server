@@ -7,15 +7,15 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Builder
-@Getter
-@Table(name = "comment")
+@Entity @Builder
+@Getter @Table(name = "comments")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Comment {
 
     @Id
@@ -27,6 +27,7 @@ public class Comment {
     private Long postId;
     @ColumnDefault("null")
     private Long parentCommentId;
+    @ColumnDefault("0")
     private int commentLike;
     private String content;
     @ColumnDefault("0")
@@ -46,16 +47,9 @@ public class Comment {
         this.parentCommentId = parentCommentId;
         this.commentLike = commentLike;
         this.content = content;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
-    public Comment(Long userId, String content) {
-        this.userId = userId;
-        this.content = content;
-    }
-
-    public void CommentEdit(@Valid EditCommentInfo editCommentInfo) {
+    public void edit(@Valid EditCommentInfo editCommentInfo) {
         this.content = editCommentInfo.getContent();
     }
 

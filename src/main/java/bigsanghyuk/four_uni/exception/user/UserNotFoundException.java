@@ -8,7 +8,7 @@ public class UserNotFoundException extends IllegalArgumentException {
 
     private final StatusEnum status;
 
-    private static final String message = "해당 유저가 더 이상 존재하지 않습니다.";
+    private static final String message = "존재하지 않는 사용자입니다.";
 
     public UserNotFoundException() {
         super(message);

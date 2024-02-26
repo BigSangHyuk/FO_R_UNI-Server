@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
+@Table(name = "posts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class Post {
@@ -50,8 +51,6 @@ public class Post {
         this.isClassified = isClassified;
         this.postedAt = postedAt;
         this.deadline = deadline;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
 }

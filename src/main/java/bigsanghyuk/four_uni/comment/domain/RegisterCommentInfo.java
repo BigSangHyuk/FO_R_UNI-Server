@@ -15,5 +15,4 @@ public class RegisterCommentInfo {
     private String content;
     private Long parentCommentId;
     private int commentLike;
-    private Long commentReportId;
 }

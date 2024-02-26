@@ -3,6 +3,8 @@ package bigsanghyuk.four_uni.comment.service;
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
+import bigsanghyuk.four_uni.post.domain.entity.Post;
+import bigsanghyuk.four_uni.post.repository.PostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +30,8 @@ class CommentServiceTest {
     CommentService commentService;
     @Autowired
     CommentRepository commentRepository;
+    @Autowired
+    PostRepository postRepository;
     EditCommentInfo editCommentInfo;
 
     @Test
@@ -47,7 +53,7 @@ class CommentServiceTest {
     @DisplayName("댓글 수정 성공")
     void editCommentSuccess() {
         // given : 댓글 등록 및 수정할 내용을 set
-        Comment savedComment = commentRepository.save(new Comment(10L, 10L, null, 0, "example"));
+        Comment savedComment = commentRepository.save(new Comment(10L, 1L, null, 0, "example"));
 
         editCommentInfo = new EditCommentInfo();
 
@@ -59,7 +65,7 @@ class CommentServiceTest {
 
         // when : 댓글 수정 동작 수행
         editCommentInfo.setContent(updatedContent);
-        Comment updatedComment = commentService.edit(savedComment.getId(), editCommentInfo);
+        Comment updatedComment = commentService.edit(savedComment.getPostId(), savedComment.getId(), editCommentInfo);
 
         // then : 업데이트된 댓글 정보 확인
         assertNotNull(updatedComment);
@@ -83,7 +89,7 @@ class CommentServiceTest {
         editCommentInfo.setContent(updatedContent);
 
         // then : 업데이트된 댓글 정보 확인
-        assertThrows(IllegalArgumentException.class, () -> commentService.edit(savedComment.getId(), editCommentInfo));
+        assertThrows(IllegalArgumentException.class, () -> commentService.edit(savedComment.getPostId(), savedComment.getId(), editCommentInfo));
     }
 
     @Test
@@ -103,7 +109,7 @@ class CommentServiceTest {
         editCommentInfo.setContent(updatedContent);
 
         // then : 업데이트된 댓글 정보 확인
-        assertThrows(IllegalArgumentException.class, () -> commentService.edit(savedComment.getId() + 1L, editCommentInfo));
+        assertThrows(IllegalArgumentException.class, () -> commentService.edit(savedComment.getPostId(), savedComment.getId() + 1L, editCommentInfo));
     }
 
     @Test
@@ -188,6 +194,7 @@ class CommentServiceTest {
 
     @BeforeEach
     void beforeEach() {
+        postRepository.save(new Post(1L, false, "exampleTest", "testtest", "test", 150, 0, true, LocalDate.now(), LocalDateTime.now()));
         parent = commentRepository.save(new Comment(100L, 1L, null, 0, "contentParent"));
         commentRepository.save(new Comment(200L, 1L, null, 0, "contentExample"));
         child = commentRepository.save(new Comment(300L, 1L, parent.getId(), 0, "contentChild"));

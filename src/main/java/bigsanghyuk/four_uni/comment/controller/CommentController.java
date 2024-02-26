@@ -7,8 +7,6 @@ import bigsanghyuk.four_uni.comment.dto.request.LikeCommentRequest;
 import bigsanghyuk.four_uni.comment.dto.request.RegisterCommentRequest;
 import bigsanghyuk.four_uni.comment.service.CommentService;
 import bigsanghyuk.four_uni.comment.service.LikeCommentService;
-import bigsanghyuk.four_uni.post.controller.PostController;
-import bigsanghyuk.four_uni.post.domain.entity.Post;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -31,15 +29,15 @@ public class CommentController {
 
     @Operation(summary = "댓글 등록", description = "URL 경로에 postId 전달")
     @PostMapping("/posts/{postId}/comment")
-    public ResponseEntity<CommonResponse> register(@Valid @RequestBody RegisterCommentRequest request) {
-        commentService.register(request.toDomain());
+    public ResponseEntity<CommonResponse> register(@PathVariable("postId") Long postId, @Valid @RequestBody RegisterCommentRequest request) {
+        commentService.register(postId, request.toDomain());
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
     }
 
     @Operation(summary = "댓글 수정", description = "URL 경로에 postId와 commentId 전달")
     @PutMapping("/posts/{postId}/{commentId}")
     public ResponseEntity<CommonResponse> edit(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId, @Valid @RequestBody EditCommentInfo request) {
-        commentService.edit(commentId, request);
+        commentService.edit(postId, commentId, request);
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
     }
 
