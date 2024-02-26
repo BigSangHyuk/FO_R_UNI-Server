@@ -32,7 +32,7 @@ public class OAuth2UserSuccessHandler extends SimpleUrlAuthenticationSuccessHand
     private final UserRepository userRepository;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
 
         String email = oAuth2User.getEmail();
@@ -46,9 +46,7 @@ public class OAuth2UserSuccessHandler extends SimpleUrlAuthenticationSuccessHand
 
         String accessToken = createAccessToken(email, authorities);
         String refreshToken = createRefreshToken(email);
-        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
-
-        user.setRefreshToken(refreshToken);
+        userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
 
         String uri = createURI(accessToken, refreshToken, email).toString();
         getRedirectStrategy().sendRedirect(request, response, uri);

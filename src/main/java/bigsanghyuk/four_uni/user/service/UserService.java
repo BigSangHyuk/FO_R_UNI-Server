@@ -69,24 +69,20 @@ public class UserService {
         User user = userRepository.findById(info.getId())
                 .orElseThrow(UserNotFoundException::new);
         user.edit(encoder.encode(info.getPassword()), info.getName(), info.getDept(), info.getNickName(), info.getImage());
-        userRepository.save(user);
-        User updatedUser = userRepository.findById(info.getId()).get();
+        User savedUser = userRepository.save(user);
         return EditResponse.builder()
-                .id(updatedUser.getId())
-                .name(updatedUser.getName())
-                .dept(updatedUser.getDept())
-                .nickName(updatedUser.getNickName())
-                .image(updatedUser.getImage())
-                .roles(updatedUser.getRoles())
+                .id(savedUser.getId())
+                .name(savedUser.getName())
+                .dept(savedUser.getDept())
+                .nickName(savedUser.getNickName())
+                .image(savedUser.getImage())
+                .roles(savedUser.getRoles())
                 .build();
     }
 
-    public LoginResponse login(LoginUserInfo info) throws Exception {
-        Optional<User> optionalUser = userRepository.findByEmail(info.getEmail());
-        if (optionalUser.isEmpty()) {
-            throw new UsernameNotFoundException("존재하지 않는 이메일입니다.");
-        }
-        User user = optionalUser.get();
+    public LoginResponse login(LoginUserInfo info) {
+        User user = userRepository.findByEmail(info.getEmail())
+                .orElseThrow(UserNotFoundException::new);
         if (!encoder.matches(info.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("잘못된 계정 정보입니다.");
         }
@@ -100,12 +96,12 @@ public class UserService {
                 .roles(user.getRoles())
                 .token(TokenDto.builder()
                         .accessToken(jwtProvider.createToken(user.getEmail(), user.getRoles()))
-                        .refreshToken(user.getRefreshToken())
+                        .refreshToken(createRefreshToken(user))
                         .build())
                 .build();
     }
 
-    public SignResponse getUser(String email) throws Exception {
+    public SignResponse getUser(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         return new SignResponse(user);
     }

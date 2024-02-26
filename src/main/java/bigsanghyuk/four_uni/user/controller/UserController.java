@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "users_jwt", description = "회원 API - JWT")
+@Tag(name = "users", description = "회원 API - JWT")
 public class UserController {
 
     private final UserService userService;
@@ -32,7 +32,7 @@ public class UserController {
 
     @Operation(summary = "로그인")
     @PostMapping("/sign-in")
-    public ResponseEntity<LoginResponse> signIn(@RequestBody LoginRequest request) throws Exception {
+    public ResponseEntity<LoginResponse> signIn(@RequestBody LoginRequest request) {
         return ResponseEntity.ok().body(userService.login(request.toDomain()));
     }
 
@@ -42,19 +42,19 @@ public class UserController {
         return ResponseEntity.ok().body(userService.edit(request.toDomain()));
     }
 
-    @Operation(summary = "유저 조회")
+    @Operation(summary = "유저 조회", description = "경로에 이메일 입력")
     @GetMapping("/user/get")
     public ResponseEntity<SignResponse> getUser(@RequestParam(name = "email") String email) throws Exception {
         return ResponseEntity.ok().body(userService.getUser(email));
     }
 
-    @Operation(summary = "관리자 권한 유저 조회")
+    @Operation(summary = "관리자 권한 유저 조회", description = "경로에 이메일 입력")
     @GetMapping("/admin/get")
     public ResponseEntity<SignResponse> getUserForAdmin(@RequestParam(name = "email") String email) throws Exception {
         return ResponseEntity.ok().body(userService.getUser(email));
     }
 
-    @Operation(summary = "토큰 재발급 요청")
+    @Operation(summary = "토큰 재발급 요청", description = "body 에 accessToken, refreshToken 담아서 요청")
     @GetMapping("/refresh")
     public ResponseEntity<TokenDto> refresh(@RequestBody TokenDto tokenDto) throws Exception {
         return new ResponseEntity<>(userService.refreshAccessToken(tokenDto), HttpStatus.OK);
