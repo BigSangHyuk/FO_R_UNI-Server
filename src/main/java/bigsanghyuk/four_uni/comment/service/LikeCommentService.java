@@ -18,19 +18,19 @@ public class LikeCommentService {
     private final LikeCommentRepository likeCommentRepository;
 
     @Transactional
-    public void likeComment(LikeCommentInfo domain) {
+    public void likeComment(LikeCommentInfo likeCommentInfo) {
 
-        Long userId = domain.getUserId();
-        Long commentId = domain.getCommentId();
+        Long userId = likeCommentInfo.getUserId();
+        Long commentId = likeCommentInfo.getCommentId();
 
-        if(commentRepository.findById(commentId).isEmpty()) {
-            throw new CommentNotFoundException();
-        } else if(likeCommentRepository.findByUserIdAndCommentId(userId, commentId).isPresent()) {
-            throw new AlreadyLikeException();
-        } else {
-            commentRepository.incrementLikesByCommentId(commentId);
-            likeCommentRepository.save(new LikeComment(userId, commentId));
-        }
+        commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+        likeCommentRepository.findByUserIdAndCommentId(userId, commentId)
+                .ifPresent(comment -> {
+                            throw new AlreadyLikeException();
+                    }
+                );
+        commentRepository.incrementLikesByCommentId(commentId);
+        likeCommentRepository.save(new LikeComment(userId, commentId));
     }
 
 }
