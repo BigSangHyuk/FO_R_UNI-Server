@@ -11,10 +11,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Builder
-@Getter
-@Table(name = "comment")
+@Entity @Builder
+@Getter @Table(name = "comments")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
@@ -29,6 +27,7 @@ public class Comment {
     private Long postId;
     @ColumnDefault("null")
     private Long parentCommentId;
+    @ColumnDefault("0")
     private int commentLike;
     private String content;
     @ColumnDefault("0")
@@ -50,7 +49,7 @@ public class Comment {
         this.content = content;
     }
 
-    public void CommentEdit(@Valid EditCommentInfo editCommentInfo) {
+    public void edit(@Valid EditCommentInfo editCommentInfo) {
         this.content = editCommentInfo.getContent();
     }
 
