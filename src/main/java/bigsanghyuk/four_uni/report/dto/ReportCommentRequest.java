@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.comment.dto.request;
+package bigsanghyuk.four_uni.report.dto;
 
 import bigsanghyuk.four_uni.report.domain.entity.ReportReason;
 import lombok.AllArgsConstructor;

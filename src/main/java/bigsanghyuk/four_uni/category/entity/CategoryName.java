@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.user.domain.entity;
+package bigsanghyuk.four_uni.category.entity;
 
 import lombok.Getter;
 

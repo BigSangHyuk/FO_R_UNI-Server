@@ -1,7 +1,8 @@
-package bigsanghyuk.four_uni.exception.comment;
+package bigsanghyuk.four_uni.exception.handler;
 
 import bigsanghyuk.four_uni.exception.ExceptionMessage;
-import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
+import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
+import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,16 +13,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 @Slf4j
 @RequiredArgsConstructor
-public class CommentExceptionHandler {
+public class UserExceptionHandler {
 
-    @ExceptionHandler(CommentNotFoundException.class)
-    public ResponseEntity<ExceptionMessage> handle(CommentNotFoundException e) {
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ExceptionMessage> handle(UserNotFoundException e) {
         final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(CommentEditOtherUserException.class)
-    public ResponseEntity<ExceptionMessage> handle(CommentEditOtherUserException e) {
+    @ExceptionHandler(EmailDuplicateException.class)
+    public ResponseEntity<ExceptionMessage> handle(EmailDuplicateException e) {
         final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
         return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
     }

@@ -1,7 +1,7 @@
-package bigsanghyuk.four_uni.exception.likecomment;
+package bigsanghyuk.four_uni.exception.handler;
 
 import bigsanghyuk.four_uni.exception.ExceptionMessage;
-import bigsanghyuk.four_uni.exception.comment.CommentNotFoundException;
+import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 @Slf4j
 @RequiredArgsConstructor
-public class LikeCommentExceptionHandler {
+public class TokenExceptionHandler {
 
-    @ExceptionHandler(AlreadyLikeException.class)
-    public ResponseEntity<ExceptionMessage> handle(AlreadyLikeException e) {
+    @ExceptionHandler(TokenNotFoundException.class)
+    public ResponseEntity<ExceptionMessage> handle(TokenNotFoundException e) {
         final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
-        return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
     }
 }

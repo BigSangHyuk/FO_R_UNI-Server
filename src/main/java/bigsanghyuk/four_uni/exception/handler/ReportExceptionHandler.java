@@ -1,6 +1,7 @@
-package bigsanghyuk.four_uni.exception.report;
+package bigsanghyuk.four_uni.exception.handler;
 
 import bigsanghyuk.four_uni.exception.ExceptionMessage;
+import bigsanghyuk.four_uni.exception.report.ReportReasonNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
