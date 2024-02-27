@@ -1,8 +1,7 @@
 package bigsanghyuk.four_uni.report.domain.entity;
 
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-@Getter
 public enum ReportReason {
 
     INSULTING("욕설_비하가_포함된_내용이에요"),
@@ -16,5 +15,10 @@ public enum ReportReason {
 
     ReportReason(String reason) {
         this.reason = reason;
+    }
+
+    @JsonValue
+    public String getReason() {
+        return reason;
     }
 }

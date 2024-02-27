@@ -25,6 +25,8 @@ public class Comment {
 
     private Long userId;
     private Long postId;
+    @Setter @ColumnDefault("false")
+    private boolean reported;
     @ColumnDefault("null")
     private Long parentCommentId;
     @ColumnDefault("0")
@@ -41,12 +43,13 @@ public class Comment {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public Comment(Long userId, Long postId, Long parentCommentId, int commentLike, String content) {
+    public Comment(Long userId, Long postId, Long parentCommentId, int commentLike, String content, boolean reported) {
         this.userId = userId;
         this.postId = postId;
         this.parentCommentId = parentCommentId;
         this.commentLike = commentLike;
         this.content = content;
+        this.reported = reported;
     }
 
     public void edit(@Valid EditCommentInfo editCommentInfo) {

@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.post.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -10,7 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter @Setter
+@Getter
 @Table(name = "posts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
@@ -22,11 +23,13 @@ public class Post {
     private Long id;
 
     private Long categoryId;
-    private boolean report;
+    @Setter @ColumnDefault("false")
+    private boolean reported;
     private String title;
     private String content;
     private String imageUrl; // 이미지로 된 게시글일 때 : 이미지 URL
     private int views; // 조회수
+    @Setter
     private int postReportCount;
     private boolean isClassified; // 미분류
 
@@ -40,9 +43,9 @@ public class Post {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public Post(Long categoryId, boolean report, String title, String content, String imageUrl, int views, int postReportCount, boolean isClassified, LocalDate postedAt, LocalDateTime deadline) {
+    public Post(Long categoryId, boolean reported, String title, String content, String imageUrl, int views, int postReportCount, boolean isClassified, LocalDate postedAt, LocalDateTime deadline) {
         this.categoryId = categoryId;
-        this.report = report;
+        this.reported = reported;
         this.title = title;
         this.content = content;
         this.imageUrl = imageUrl;
@@ -52,5 +55,4 @@ public class Post {
         this.postedAt = postedAt;
         this.deadline = deadline;
     }
-
 }
