@@ -38,7 +38,7 @@ class CommentServiceTest {
     @DisplayName("댓글 등록")
     void addComment() {
         // when : 댓글 등록 동작 수행
-        Comment savedComment = commentRepository.save(new Comment(10L, 10L, null, 0, "example"));
+        Comment savedComment = commentRepository.save(new Comment(10L, 10L, null, 0, "example", false));
 
         // then : 댓글 등록 후에는 ID가 존재해야 하고 저장된 댓글 정보를 조회하여 존재해야 함
         assertNotNull(savedComment.getId());
@@ -53,7 +53,7 @@ class CommentServiceTest {
     @DisplayName("댓글 수정 성공")
     void editCommentSuccess() {
         // given : 댓글 등록 및 수정할 내용을 set
-        Comment savedComment = commentRepository.save(new Comment(10L, 1L, null, 0, "example"));
+        Comment savedComment = commentRepository.save(new Comment(10L, 1L, null, 0, "example", false));
 
         editCommentInfo = new EditCommentInfo();
 
@@ -76,7 +76,7 @@ class CommentServiceTest {
     @Test
     @DisplayName("댓글 수정 실패 - 다른 유저")
     void editCommentOthers() {
-        Comment savedComment = commentRepository.save(new Comment(10L, 10L, null, 0, "example"));
+        Comment savedComment = commentRepository.save(new Comment(10L, 10L, null, 0, "example", false));
 
         editCommentInfo = new EditCommentInfo();
         editCommentInfo.setUserId(savedComment.getUserId() + 1L);
@@ -95,7 +95,7 @@ class CommentServiceTest {
     @Test
     @DisplayName("댓글 수정 실패 - 잘못된 댓글 id")
     void editCommentWrongId() {
-        Comment savedComment = commentRepository.save(new Comment(10L, 10L, null, 0, "example"));
+        Comment savedComment = commentRepository.save(new Comment(10L, 10L, null, 0, "example", false));
 
         editCommentInfo = new EditCommentInfo();
 
@@ -117,7 +117,7 @@ class CommentServiceTest {
     void removeComment() {
         // given : 댓글 등록
 //        Comment savedComment = commentRepository.save(comment);
-        Comment savedComment = commentRepository.save(new Comment(10L, 10L, null, 0, "example"));
+        Comment savedComment = commentRepository.save(new Comment(10L, 10L, null, 0, "example", false));
 
         // when : 댓글 삭제 동작 수행
         commentRepository.delete(savedComment);
@@ -132,7 +132,7 @@ class CommentServiceTest {
     void removeCommentNullPost() {
         // given : 댓글 등록
 //        Comment savedComment = commentRepository.save(comment);
-        Comment savedComment = commentRepository.save(new Comment(10L, 10L, null, 0, "example"));
+        Comment savedComment = commentRepository.save(new Comment(10L, 10L, null, 0, "example", false));
 
         // when : 잘못된 postId
         long wrongPostId = savedComment.getPostId() + 100L;
@@ -145,7 +145,7 @@ class CommentServiceTest {
     @DisplayName("댓글 삭제 실패 - 없는 댓글")
     void removeCommentNullComment() {
         // given : 댓글 등록
-        Comment savedComment = commentRepository.save(new Comment(10L, 10L, null, 0, "example"));
+        Comment savedComment = commentRepository.save(new Comment(10L, 10L, null, 0, "example", false));
 
         // when : 잘못된 commentId
         long wrongCommentId = savedComment.getId() + 100L;
@@ -195,11 +195,11 @@ class CommentServiceTest {
     @BeforeEach
     void beforeEach() {
         postRepository.save(new Post(1L, false, "exampleTest", "testtest", "test", 150, 0, true, LocalDate.now(), LocalDateTime.now()));
-        parent = commentRepository.save(new Comment(100L, 1L, null, 0, "contentParent"));
-        commentRepository.save(new Comment(200L, 1L, null, 0, "contentExample"));
-        child = commentRepository.save(new Comment(300L, 1L, parent.getId(), 0, "contentChild"));
-        commentRepository.save(new Comment(400L, 1L, parent.getId(), 0, "contentExample"));
-        commentRepository.save(new Comment(500L, 1L, parent.getId(), 0, "contentExample"));
+        parent = commentRepository.save(new Comment(100L, 1L, null, 0, "contentParent", false));
+        commentRepository.save(new Comment(200L, 1L, null, 0, "contentExample", false));
+        child = commentRepository.save(new Comment(300L, 1L, parent.getId(), 0, "contentChild", false));
+        commentRepository.save(new Comment(400L, 1L, parent.getId(), 0, "contentExample", false));
+        commentRepository.save(new Comment(500L, 1L, parent.getId(), 0, "contentExample", false));
     }
 
     @AfterEach
