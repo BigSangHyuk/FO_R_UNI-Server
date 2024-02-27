@@ -1,5 +1,6 @@
 package bigsanghyuk.four_uni.comment.domain.entity;
 
+import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,8 +14,7 @@ import java.time.LocalDateTime;
 @Entity @Getter
 @Table(name = "like_comments")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
-public class LikeComment {
+public class LikeComment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,13 +23,6 @@ public class LikeComment {
 
     private Long userId;
     private Long commentId;
-
-    @CreatedDate
-    @Column(updatable = false, nullable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
 
     public LikeComment(Long userId, Long commentId) {
         this.userId = userId;

@@ -1,5 +1,6 @@
 package bigsanghyuk.four_uni.post.domain.entity;
 
+import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,8 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
-public class Scrapped {
+public class Scrapped extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,14 +24,7 @@ public class Scrapped {
     private Long userId;
     private Long postId;
     private Long categoryId;
-
-    @CreatedDate
-    @Column(updatable = false, nullable = false)
-    private LocalDateTime createdAt;
     private LocalDateTime scrappedAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
 
     public Scrapped(Long userId, Long postId, Long categoryId) {
         this.userId = userId;
