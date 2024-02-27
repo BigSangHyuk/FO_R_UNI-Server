@@ -82,7 +82,6 @@ class LikeCommentServiceTest {
                 .commentLike(0)
                 .content(randomCode)
                 .commentReportCount(0)
-                .createdAt(LocalDateTime.now())
                 .build();
         commentRepository.save(comment);
     }

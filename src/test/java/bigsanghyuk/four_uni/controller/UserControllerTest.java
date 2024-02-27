@@ -41,7 +41,6 @@ public class UserControllerTest {
                 .dept(1)
                 .image("test_image_url")
                 .nickName("test_nickname")
-                .createdAt(LocalDateTime.now())
                 .build();
     }
 
