@@ -1,12 +1,11 @@
-package bigsanghyuk.four_uni.report.dto;
+package bigsanghyuk.four_uni.report.dto.request;
 
+import bigsanghyuk.four_uni.report.domain.ReportPostInfo;
 import bigsanghyuk.four_uni.report.domain.entity.ReportReason;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class ReportPostRequest {
 
     @NotNull
@@ -17,4 +16,7 @@ public class ReportPostRequest {
     private ReportReason reason;
     private String detail;
 
+    public ReportPostInfo toDomain() {
+        return new ReportPostInfo(userId, postId, reason, detail);
+    }
 }
