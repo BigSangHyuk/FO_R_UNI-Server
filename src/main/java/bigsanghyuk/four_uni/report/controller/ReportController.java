@@ -1,18 +1,16 @@
 package bigsanghyuk.four_uni.report.controller;
 
 import bigsanghyuk.four_uni.CommonResponse;
+import bigsanghyuk.four_uni.report.dto.request.ReportCommentRequest;
+import bigsanghyuk.four_uni.report.dto.request.ReportPostRequest;
 import bigsanghyuk.four_uni.report.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,31 +19,17 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    @Operation(summary = "댓글 신고", description = "userId와 commentId 전달")
-    @PostMapping("/comments/report/{userId}/{commentId}")
-    public ResponseEntity<String> reportComment(
-            @PathVariable("userId") Long userId,
-            @PathVariable("commentId") Long commentId,
-            @RequestBody Map<String, String> payload
-    ) {
-        String reportReasonString = payload.get("reportReason");
-        String detail = payload.get("detail");
-        reportService.reportComment(commentId, userId, reportReasonString, detail);
-
-        return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
+    @Operation(summary = "댓글 신고", description = "요청에 userId, commentId, reason, detail 넣어서")
+    @PostMapping("/comments/report")
+    public ResponseEntity<CommonResponse> reportComment(@RequestBody ReportCommentRequest request) {
+        reportService.reportComment(request.toDomain());
+        return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
-    @Operation(summary = "게시글 신고", description = "userId와 postId 전달")
-    @PostMapping("/posts/report/{userId}/{postId}")
-    public ResponseEntity<String> reportPost(
-            @PathVariable("userId") Long userId,
-            @PathVariable("postId") Long postId,
-            @RequestBody Map<String, String> payload
-    ) {
-        String reportReasonString = payload.get("reportReason");
-        String detail = payload.get("detail");
-        reportService.reportPost(postId, userId, reportReasonString, detail);
-
-        return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
+    @Operation(summary = "게시글 신고", description = "요청에 userId, postId, reason, detail 넣어서")
+    @PostMapping("/posts/report")
+    public ResponseEntity<CommonResponse> reportPost(@RequestBody ReportPostRequest request) {
+        reportService.reportPost(request.toDomain());
+        return ResponseEntity.ok().body(new CommonResponse(true));
     }
 }

@@ -1,5 +1,6 @@
 package bigsanghyuk.four_uni.report.domain.entity;
 
+import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -13,8 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "reports")
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class Report {
+public class Report extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,11 +29,4 @@ public class Report {
     private ReportReason reason; // 신고 사유
 
     private String detail; // 상세 사유
-
-    @CreatedDate
-    @Column(updatable = false, nullable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
 }

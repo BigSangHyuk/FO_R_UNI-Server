@@ -32,7 +32,8 @@ public class CommentService {
                 postId,
                 registerCommentInfo.getParentCommentId(),
                 registerCommentInfo.getCommentLike(),
-                registerCommentInfo.getContent()
+                registerCommentInfo.getContent(),
+                false
         );
 
         commentRepository.save(comment);

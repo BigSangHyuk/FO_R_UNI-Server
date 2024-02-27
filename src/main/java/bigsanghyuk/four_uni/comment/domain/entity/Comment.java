@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.comment.domain.entity;
 
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
+import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.*;
@@ -15,8 +16,7 @@ import java.time.LocalDateTime;
 @Getter @Table(name = "comments")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
-public class Comment {
+public class Comment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +25,8 @@ public class Comment {
 
     private Long userId;
     private Long postId;
+    @Setter @ColumnDefault("false")
+    private boolean reported;
     @ColumnDefault("null")
     private Long parentCommentId;
     @ColumnDefault("0")
@@ -34,19 +36,13 @@ public class Comment {
     @Setter
     private int commentReportCount;
 
-    @CreatedDate
-    @Column(updatable = false, nullable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
-    public Comment(Long userId, Long postId, Long parentCommentId, int commentLike, String content) {
+    public Comment(Long userId, Long postId, Long parentCommentId, int commentLike, String content, boolean reported) {
         this.userId = userId;
         this.postId = postId;
         this.parentCommentId = parentCommentId;
         this.commentLike = commentLike;
         this.content = content;
+        this.reported = reported;
     }
 
     public void edit(@Valid EditCommentInfo editCommentInfo) {
