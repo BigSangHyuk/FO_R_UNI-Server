@@ -5,6 +5,7 @@ import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.dto.request.LikeCommentRequest;
 import bigsanghyuk.four_uni.comment.dto.request.RegisterCommentRequest;
+import bigsanghyuk.four_uni.comment.dto.request.UnLikeCommentRequest;
 import bigsanghyuk.four_uni.comment.service.CommentService;
 import bigsanghyuk.four_uni.comment.service.LikeCommentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,9 +51,16 @@ public class CommentController {
 
     @Operation(summary = "댓글 좋아요", description = "Body 에 값 넣어서 전달")
     @PostMapping("/comments/like")
-    public ResponseEntity<CommonResponse> likedComment(@Valid @RequestBody LikeCommentRequest request) {
+    public ResponseEntity<CommonResponse> likeComment(@Valid @RequestBody LikeCommentRequest request) {
         likeCommentService.likeComment(request.toDomain());
         return new ResponseEntity(new CommonResponse(true), HttpStatus.OK);
+    }
+
+    @Operation(summary = "댓글 좋아요 취소", description = "Body 에 값 넣어서 전달")
+    @DeleteMapping("/comments/unlike")
+    public ResponseEntity<CommonResponse> unLikeComment(@Valid @RequestBody UnLikeCommentRequest request) {
+        likeCommentService.unLikeComment(request.toDomain());
+        return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
     @Operation(summary = "댓글 전체 조회", description = "postId 전달")
