@@ -20,7 +20,7 @@ public class ScrappedService {
     private final PostRepository postRepository;
 
     public List<Scrapped> getScrappedList(@NotNull Long userId) {
-        return scrappedRepository.findByUserId(userId);
+        return scrappedRepository.findByUserIdOrderByScrappedAt(userId);
     }
 
     public void scrap(ScrapInfo scrapInfo) {

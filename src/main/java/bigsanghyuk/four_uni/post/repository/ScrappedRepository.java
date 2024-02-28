@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface ScrappedRepository extends JpaRepository<Scrapped, Long> {
 
-    //각 user 마다의 scrapped 게시물 리스트를 반환
-    List<Scrapped> findByUserId(Long userId);
+    //각 user 마다의 scrapped 게시물 리스트를 스크랩된 순서로 반환
+    List<Scrapped> findByUserIdOrderByScrappedAt(Long userId);
 
     @Transactional
     void deleteScrappedByUserIdAndPostId(Long userId, Long postId);
