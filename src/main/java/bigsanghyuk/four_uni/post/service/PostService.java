@@ -2,12 +2,16 @@ package bigsanghyuk.four_uni.post.service;
 
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
+import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
 import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
+import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -15,6 +19,7 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final ScrappedRepository scrappedRepository;
 
     public List<Post> getUnClassifiedLists() {
         return postRepository.findByIsClassifiedFalse();
@@ -47,5 +52,16 @@ public class PostService {
             result.add(Long.parseLong(token));
         }
         return result;
+    }
+
+    public List<Post> getScrappedList(Long userId) {
+        Iterator<Scrapped> it = scrappedRepository.findByUserIdOrderByScrappedAt(userId).iterator();
+        LinkedList<Post> scrappedList = new LinkedList<>();
+        while (it.hasNext()) {
+            Long postId = it.next().getPostId();
+            Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+            scrappedList.add(post);
+        }
+        return scrappedList;
     }
 }
