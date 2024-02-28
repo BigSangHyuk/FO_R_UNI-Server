@@ -36,7 +36,7 @@ public class UserControllerTest {
         user = User.builder()
                 .id(randomNum)
                 .name("test_name")
-                .email("test_email")
+                .email("test_email@test.com")
                 .password(randomCode)
                 .dept(1)
                 .image("test_image_url")
@@ -71,7 +71,7 @@ public class UserControllerTest {
 
         // and : 수정할 정보
         String updatedName = "updated_name";
-        String updatedEmail = "updated_email";
+        String updatedEmail = "updated_email@test.com";
         String updatedNickName = "updated_nickname";
 
         // when : 회원 정보 업데이트 동작 수행
