@@ -45,7 +45,7 @@ class ScrappedRepositoryTest {
     @DisplayName("스크랩된 게시물을 찾는 테스트")
     @Test
     void printScrappedListTest() {
-        List<Scrapped> scrappedListUser = scrappedRepository.findByUserId(userId2);
+        List<Scrapped> scrappedListUser = scrappedRepository.findByUserIdOrderByScrappedAt(userId2);
         for (int i = 0; i < scrappedListUser.size(); i++) {
             Scrapped scrapped = scrappedListUser.get(i);
             Optional<Post> post = postRepository.findById(scrapped.getPostId());
@@ -57,18 +57,18 @@ class ScrappedRepositoryTest {
     @DisplayName("스크랩 제거 테스트")
     @Test
     void removeScrapTest() {
-        log.info("before deletion={}", scrappedRepository.findByUserId(userId2).size());
+        log.info("before deletion={}", scrappedRepository.findByUserIdOrderByScrappedAt(userId2).size());
         log.info("delete column twice");
         for (int i = 0; i < 2; i++) {
-            scrappedRepository.deleteScrappedByUserIdAndPostId(userId2, scrappedRepository.findByUserId(userId2).get(0).getPostId());   //postId 파라미터는 userId2의 제일 첫 글 -> 첫 글 삭제후 결과가 텍스트 결과
+            scrappedRepository.deleteScrappedByUserIdAndPostId(userId2, scrappedRepository.findByUserIdOrderByScrappedAt(userId2).get(0).getPostId());   //postId 파라미터는 userId2의 제일 첫 글 -> 첫 글 삭제후 결과가 텍스트 결과
         }
-        log.info("after deletion={}", scrappedRepository.findByUserId(userId2).size());
+        log.info("after deletion={}", scrappedRepository.findByUserIdOrderByScrappedAt(userId2).size());
     }
 
     @DisplayName("스크랩된 게시물이 없는 테스트")
     @Test
     void noScrappedTest() {
-        List<Scrapped> scrappedList = scrappedRepository.findByUserId(userId3);
+        List<Scrapped> scrappedList = scrappedRepository.findByUserIdOrderByScrappedAt(userId3);
         assertThat(scrappedList.size()).isEqualTo(0);
     }
 

@@ -59,6 +59,13 @@ public class PostController {
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
+    @Operation(summary = "스크랩한 게시글 조회", description = "파라미터로  userId 전달")
+    @GetMapping("/posts/scrapped")
+    public ResponseEntity<Result<List<Post>>> getScrapped(@RequestParam(name = "userId") Long userId) {
+        List<Post> scrappedList = postService.getScrappedList(userId);
+        return ResponseEntity.ok().body(new Result<>(scrappedList, scrappedList.size()));
+    }
+
     @Getter
     @Setter
     public static class Result<T> {
