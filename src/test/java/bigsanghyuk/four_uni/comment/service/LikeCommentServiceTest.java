@@ -1,14 +1,12 @@
 package bigsanghyuk.four_uni.comment.service;
 
 import bigsanghyuk.four_uni.comment.domain.LikeCommentInfo;
-import bigsanghyuk.four_uni.comment.domain.RegisterCommentInfo;
+import bigsanghyuk.four_uni.comment.domain.UnLikeCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
-import bigsanghyuk.four_uni.comment.domain.entity.LikeComment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.comment.repository.LikeCommentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,12 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Random;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Slf4j
@@ -52,11 +46,28 @@ class LikeCommentServiceTest {
         assertThat(findComment.getCommentLike()).isEqualTo(1);
     }
 
+    @DisplayName("댓글 좋아요 취소 성공")
+    @Test
+    void unLikeCommentSuccess() {
+        log.info("[unLikeCommentSuccess]");
+        Long commentId = comment.getId();
+        likeCommentService.likeComment(new LikeCommentInfo(1L, commentId));
+        Comment findCommentBeforeUnlike = commentRepository.findById(commentId).get();
+
+        log.info("likeCount before={}", findCommentBeforeUnlike.getCommentLike());
+        likeCommentService.unLikeComment(new UnLikeCommentInfo(1L, commentId));
+
+        Comment findCommentAfterUnlike = commentRepository.findById(commentId).get();
+        log.info("likeCount after={}", findCommentAfterUnlike.getCommentLike());
+
+        assertThat(findCommentAfterUnlike.getCommentLike()).isLessThan(findCommentBeforeUnlike.getCommentLike());
+    }
+
     @DisplayName("없는 댓글 Id")
     @Test
     void noExistComment() {
         log.info("[noExistComment]");
-        assertThatThrownBy(() -> likeCommentService.likeComment(new LikeCommentInfo(1L, 2L)))
+        assertThatThrownBy(() -> likeCommentService.likeComment(new LikeCommentInfo(1L, 102L)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
