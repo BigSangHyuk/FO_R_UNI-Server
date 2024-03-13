@@ -27,6 +27,7 @@ public class CommentService {
     private final LikeCommentRepository likeCommentRepository;
 
     public void register(Long postId, RegisterCommentInfo registerCommentInfo) {
+        postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         Comment comment = new Comment(
                 registerCommentInfo.getUserId(),
                 postId,
@@ -35,7 +36,6 @@ public class CommentService {
                 registerCommentInfo.getContent(),
                 false
         );
-
         commentRepository.save(comment);
     }
 
