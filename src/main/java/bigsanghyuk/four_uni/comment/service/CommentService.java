@@ -43,7 +43,7 @@ public class CommentService {
         postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
 
-        commentRepository.findByUserId(editCommentInfo.getUserId())
+        commentRepository.findByUserIdOrderByIdDesc(editCommentInfo.getUserId())
                 .orElseThrow(UserNotFoundException::new);
 
         Comment comment = commentRepository.findById(commentId)
