@@ -1,5 +1,7 @@
 package bigsanghyuk.four_uni.post.service;
 
+import bigsanghyuk.four_uni.comment.domain.entity.Comment;
+import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
@@ -9,10 +11,7 @@ import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +19,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final ScrappedRepository scrappedRepository;
+    private final CommentRepository commentRepository;
 
     public List<Post> getUnClassifiedLists() {
         return postRepository.findByIsClassifiedFalse();
@@ -63,5 +63,18 @@ public class PostService {
             scrappedList.add(post);
         }
         return scrappedList;
+    }
+
+    public List<Post> getCommented(Long userId) throws IllegalAccessException {
+        List<Comment> comments = commentRepository.findByUserIdOrderByIdDesc(userId).orElseThrow(IllegalAccessException::new);
+        LinkedHashSet<Long> set = new LinkedHashSet<>();
+        List<Post> result = new ArrayList<>();
+        for (Comment comment : comments) {
+            set.add(comment.getPostId());
+        }
+        for (Long postId : set) {
+            result.add(postRepository.findById(postId).orElseThrow(PostNotFoundException::new));
+        }
+        return result;
     }
 }

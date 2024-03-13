@@ -66,6 +66,13 @@ public class PostController {
         return ResponseEntity.ok().body(new Result<>(scrappedList, scrappedList.size()));
     }
 
+    @Operation(summary = "내가 댓글 남긴 글 조회", description = "파라미터로 userId 전달, 최근 댓글 남긴 글이 먼저 나옴")
+    @GetMapping("/posts/commented")
+    public ResponseEntity<Result<List<Post>>> getPostsCommented(@RequestParam(name = "userId") Long userId) throws IllegalAccessException {
+        List<Post> commentedPostList = postService.getCommented(userId);
+        return ResponseEntity.ok().body(new Result<>(commentedPostList, commentedPostList.size()));
+    }
+
     @Getter
     @Setter
     public static class Result<T> {
