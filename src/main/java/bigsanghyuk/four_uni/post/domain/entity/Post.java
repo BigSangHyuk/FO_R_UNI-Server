@@ -35,6 +35,9 @@ public class Post extends BaseTimeEntity {
     private LocalDate postedAt; //원글 게시일 (연/월/일만 포함되도 상관없을 것 같아서)
     private LocalDate deadline; //원글의 이벤트 마감일시
 
+    @Column(name = "notice_url", unique = true)
+    private String noticeUrl;
+
     public Post(Long categoryId, boolean reported, String title, String content, String imageUrl, int views, int postReportCount, boolean isClassified, LocalDate postedAt, LocalDate deadline) {
         this.categoryId = categoryId;
         this.reported = reported;
