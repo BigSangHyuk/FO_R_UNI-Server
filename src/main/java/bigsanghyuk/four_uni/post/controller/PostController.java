@@ -73,6 +73,13 @@ public class PostController {
         return ResponseEntity.ok().body(new Result<>(commentedPostList, commentedPostList.size()));
     }
 
+    @Operation(summary = "해당하는 연, 월의 게시글 조회", description = "2024-03 형식으로 연 월 전달하면 해당 달 앞, 뒤 1달까지의 글 반환")
+    @GetMapping("/posts/date")
+    public ResponseEntity<List<Post>> getPostByDate(@RequestParam(name = "target") String date) {
+        List<Post> postsByDate = postService.getPostsByDate(date);
+        return ResponseEntity.ok().body(postsByDate);
+    }
+
     @Getter
     @Setter
     public static class Result<T> {
