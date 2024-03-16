@@ -11,6 +11,7 @@ import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -76,5 +77,23 @@ public class PostService {
             result.add(postRepository.findById(postId).orElseThrow(PostNotFoundException::new));
         }
         return result;
+    }
+
+    public List<Post> getPostsByDate(String date) { //date format example: 2024-03
+        StringTokenizer st = new StringTokenizer(date, "-");
+        int targetYear = Integer.parseInt(st.nextToken());
+        int targetMonth = Integer.parseInt(st.nextToken());
+        LocalDate currentMonth = LocalDate.of(targetYear, targetMonth, 1);
+        LocalDate prevMonth = currentMonth.minusMonths(1);
+        LocalDate nextMonth = currentMonth.plusMonths(1);
+
+        return postRepository.findPostsByCurrentAndAdjacentMonths(
+                currentMonth.getYear(),
+                currentMonth.getMonthValue(),
+                prevMonth.getYear(),
+                prevMonth.getMonthValue(),
+                nextMonth.getYear(),
+                nextMonth.getMonthValue()
+        );
     }
 }
