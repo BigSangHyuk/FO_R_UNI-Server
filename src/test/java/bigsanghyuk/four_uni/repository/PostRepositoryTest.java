@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +26,10 @@ class PostRepositoryTest {
     @BeforeEach
     void beforeEach() {
         postRepository.deleteAll();
-        postRepository.save(new Post(1L, false, "hello", "hello kim", null, 0, 0, false, LocalDate.parse("2020-01-08"), LocalDateTime.of(2020, 1, 8, 00, 00, 00)));
-        postRepository.save(new Post(1L, false, "ollasdf", "hello kim", null, 0, 0, false, LocalDate.parse("2020-01-08"), LocalDateTime.of(2025, 1, 8, 00, 00, 00)));
-        postRepository.save(new Post(1L, false, "jfajg", "egrkjk han", null, 0, 0, false, LocalDate.parse("2023-01-08"), LocalDateTime.of(2024, 1, 8, 00, 00, 00)));
-        postRepository.save(new Post(1L, false, "askdfkas", "afdsdsaf jo", null, 0, 0, false, LocalDate.parse("2024-01-08"), LocalDateTime.of(2023, 1, 8, 00, 00, 00)));
+        postRepository.save(new Post(1L, false, "hello", "hello kim", null, 0, 0, false, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-08")));
+        postRepository.save(new Post(1L, false, "ollasdf", "hello kim", null, 0, 0, false, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-08")));
+        postRepository.save(new Post(1L, false, "jfajg", "egrkjk han", null, 0, 0, false, LocalDate.parse("2023-01-08"), LocalDate.parse("2020-01-08")));
+        postRepository.save(new Post(1L, false, "askdfkas", "afdsdsaf jo", null, 0, 0, false, LocalDate.parse("2024-01-08"), LocalDate.parse("2020-01-08")));
     }
 
     @AfterEach
@@ -77,7 +76,7 @@ class PostRepositoryTest {
 
     @Test
     void findByDeadline() {
-        LocalDateTime end = LocalDateTime.of(2023, 12, 31, 23, 59, 00);
+        LocalDate end = LocalDate.of(2023, 12, 31);
         List<Post> findResult = postRepository.findByDeadlineBefore(end);
         for (Post post : findResult) {
             System.out.println("post=" + post.getTitle() + ", " + post.getContent() + ", " + post.getDeadline());
