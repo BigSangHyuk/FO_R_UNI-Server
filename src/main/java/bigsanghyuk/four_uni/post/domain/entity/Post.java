@@ -2,14 +2,13 @@ package bigsanghyuk.four_uni.post.domain.entity;
 
 import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -34,9 +33,9 @@ public class Post extends BaseTimeEntity {
     private boolean isClassified; // 미분류
 
     private LocalDate postedAt; //원글 게시일 (연/월/일만 포함되도 상관없을 것 같아서)
-    private LocalDateTime deadline; //원글의 이벤트 마감일시
+    private LocalDate deadline; //원글의 이벤트 마감일시
 
-    public Post(Long categoryId, boolean reported, String title, String content, String imageUrl, int views, int postReportCount, boolean isClassified, LocalDate postedAt, LocalDateTime deadline) {
+    public Post(Long categoryId, boolean reported, String title, String content, String imageUrl, int views, int postReportCount, boolean isClassified, LocalDate postedAt, LocalDate deadline) {
         this.categoryId = categoryId;
         this.reported = reported;
         this.title = title;
