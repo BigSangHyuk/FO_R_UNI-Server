@@ -19,5 +19,5 @@ public class GetDetailResponse {
     private int views;
     private boolean isClassified;
     private LocalDate postedAt;
-    private LocalDateTime deadline;
+    private LocalDate deadline;
 }
