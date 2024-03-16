@@ -20,4 +20,5 @@ public class GetDetailResponse {
     private boolean isClassified;
     private LocalDate postedAt;
     private LocalDate deadline;
+    private String noticeUrl;
 }

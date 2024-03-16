@@ -38,6 +38,7 @@ public class PostService {
                 .isClassified(post.isClassified())
                 .postedAt(post.getPostedAt())
                 .deadline(post.getDeadline())
+                .noticeUrl(post.getNoticeUrl())
                 .build();
         return response;
     }
