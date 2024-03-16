@@ -2,6 +2,8 @@ package bigsanghyuk.four_uni.post.controller;
 
 import bigsanghyuk.four_uni.Results;
 import bigsanghyuk.four_uni.CommonResponse;
+import bigsanghyuk.four_uni.comment.domain.entity.Comment;
+import bigsanghyuk.four_uni.comment.service.CommentService;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.dto.request.ScrapRequest;
 import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
@@ -11,7 +13,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ public class PostController {
 
     private final PostService postService;
     private final ScrappedService scrappedService;
+    private final CommentService commentService;
 
     @Operation(summary = "게시글 단건 조회", description = "조회하고자 하는 게시글 아이디를 파라미터로 전달")
     @GetMapping("/posts")
@@ -81,15 +83,23 @@ public class PostController {
         return ResponseEntity.ok().body(postsByDate);
     }
 
-    @Getter
-    @Setter
-    public static class Result<T> {
-        private T data;
-        private int count;
+    @Operation(summary = "게시글과 댓글 함께 조회", description = "조회하고자 하는 게시글 아이디를 경로변수로 전달")
+    @GetMapping("/posts/{postId}")
+    public ResponseEntity<Details> getPostWithComments(@PathVariable(name = "postId") Long postId) {
+        GetDetailResponse detail = postService.getDetail(postId);
+        List<Comment> comments = commentService.getAllComments(postId);
+        return ResponseEntity.ok().body(new Details(detail, comments));
+    }
 
-        public Result(T data, int count) {
-            this.data = data;
-            this.count = count;
+    @Getter
+    public static class Details {
+
+        private GetDetailResponse detail;
+        private List<Comment> comments;
+
+        public Details(GetDetailResponse detail, List<Comment> comments) {
+            this.detail = detail;
+            this.comments = comments;
         }
     }
 }
