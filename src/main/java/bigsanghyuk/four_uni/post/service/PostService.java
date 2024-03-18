@@ -9,6 +9,7 @@ import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
 import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -87,19 +88,15 @@ public class PostService {
 
     public List<Post> getPostsByDate(String date) { //date format example: 2024-03
         StringTokenizer st = new StringTokenizer(date, "-");
-        int targetYear = Integer.parseInt(st.nextToken());
-        int targetMonth = Integer.parseInt(st.nextToken());
-        LocalDate currentMonth = LocalDate.of(targetYear, targetMonth, 1);
-        LocalDate prevMonth = currentMonth.minusMonths(1);
-        LocalDate nextMonth = currentMonth.plusMonths(1);
+        DateFilter filter = new DateFilter(st);
 
         return postRepository.findPostsByCurrentAndAdjacentMonths(
-                currentMonth.getYear(),
-                currentMonth.getMonthValue(),
-                prevMonth.getYear(),
-                prevMonth.getMonthValue(),
-                nextMonth.getYear(),
-                nextMonth.getMonthValue()
+                filter.getCurrentMonth().getYear(),
+                filter.getCurrentMonth().getMonthValue(),
+                filter.getPrevMonth().getYear(),
+                filter.getPrevMonth().getMonthValue(),
+                filter.getNextMonth().getYear(),
+                filter.getNextMonth().getMonthValue()
         );
     }
 
