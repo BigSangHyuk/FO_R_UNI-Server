@@ -27,9 +27,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     //해당 연, 월을 기준으로 post 의 deadline 에 해당하는 글만 반환, 전 후 한달까지 포함
     @Query("SELECT p FROM Post p " +
-            "WHERE (YEAR(p.deadline) = :year AND MONTH(p.deadline) = :month) " +
+            "WHERE ((YEAR(p.deadline) = :year AND MONTH(p.deadline) = :month) " +
             "OR (YEAR(p.deadline) = :prevYear AND MONTH(p.deadline) = :prevMonth) " +
-            "OR (YEAR(p.deadline) = :nextYear AND MONTH(p.deadline) = :nextMonth) " +
+            "OR (YEAR(p.deadline) = :nextYear AND MONTH(p.deadline) = :nextMonth)) " +
+            "AND p.isClassified = TRUE " +
             "ORDER BY p.deadline")
     List<Post> findPostsByCurrentAndAdjacentMonths(
             @Param("year") int year,
