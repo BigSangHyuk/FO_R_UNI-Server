@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,16 +74,16 @@ class ScrappedRepositoryTest {
     @BeforeEach
     void beforeEach() {
         log.info("[beforeEach] 테스트 데이터 추가");
-        Post save1 = postRepository.save(new Post(1L, false, "hello", "hello kim", null, 0, 0, true, LocalDate.parse("2020-01-08"), LocalDateTime.of(2020, 1, 8, 00, 00, 00)));
-        Post save2 = postRepository.save(new Post(2L, false, "ollasdf", "hello kim", null, 0, 0, true, LocalDate.parse("2020-01-08"), LocalDateTime.of(2025, 1, 8, 00, 00, 00)));
-        Post save3 = postRepository.save(new Post(3L, false, "jfajg", "egrkjk han", null, 0, 0, true, LocalDate.parse("2023-01-08"), LocalDateTime.of(2024, 1, 8, 00, 00, 00)));
-        Post save4 = postRepository.save(new Post(4L, false, "askdfkas", "afdsdsaf jo", null, 0, 0, false, LocalDate.parse("2024-01-08"), LocalDateTime.of(2023, 1, 8, 00, 00, 00)));
-        Post save5 = postRepository.save(new Post(1L, false, "asdfsadfff", "hello kim", null, 0, 0, true, LocalDate.parse("2020-01-08"), LocalDateTime.of(2020, 1, 8, 00, 00, 00)));
-        Post save6 = postRepository.save(new Post(2L, false, "ollasdf", "hello kim", null, 0, 0, true, LocalDate.parse("2020-01-08"), LocalDateTime.of(2025, 1, 8, 00, 00, 00)));
-        Post save7 = postRepository.save(new Post(3L, false, "jfajg", "egrkjk han", null, 0, 0, true, LocalDate.parse("2023-01-08"), LocalDateTime.of(2024, 1, 8, 00, 00, 00)));
-        Post save8 = postRepository.save(new Post(2L, false, "ollasdf", "hello kim", null, 0, 0, true, LocalDate.parse("2020-01-08"), LocalDateTime.of(2025, 1, 8, 00, 00, 00)));
-        Post save9 = postRepository.save(new Post(3L, false, "jfajg", "egrkjk han", null, 0, 0, true, LocalDate.parse("2023-01-08"), LocalDateTime.of(2024, 1, 8, 00, 00, 00)));
-        Post save10 = postRepository.save(new Post(4L, false, "askdfkas", "afdsdsaf jo", null, 0, 0, false, LocalDate.parse("2024-01-08"), LocalDateTime.of(2023, 1, 8, 00, 00, 00)));
+        Post save1 = postRepository.save(new Post(1L, false, "hello", "hello kim", null, 0, 0, true, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-08")));
+        Post save2 = postRepository.save(new Post(2L, false, "ollasdf", "hello kim", null, 0, 0, true, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-08")));
+        Post save3 = postRepository.save(new Post(3L, false, "jfajg", "egrkjk han", null, 0, 0, true, LocalDate.parse("2023-01-08"), LocalDate.parse("2023-01-08")));
+        Post save4 = postRepository.save(new Post(4L, false, "askdfkas", "afdsdsaf jo", null, 0, 0, false, LocalDate.parse("2024-01-08"), LocalDate.parse("2024-01-08")));
+        Post save5 = postRepository.save(new Post(1L, false, "asdfsadfff", "hello kim", null, 0, 0, true, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-08")));
+        Post save6 = postRepository.save(new Post(2L, false, "ollasdf", "hello kim", null, 0, 0, true, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-08")));
+        Post save7 = postRepository.save(new Post(3L, false, "jfajg", "egrkjk han", null, 0, 0, true, LocalDate.parse("2023-01-08"), LocalDate.parse("2023-01-08")));
+        Post save8 = postRepository.save(new Post(2L, false, "ollasdf", "hello kim", null, 0, 0, true, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-08")));
+        Post save9 = postRepository.save(new Post(3L, false, "jfajg", "egrkjk han", null, 0, 0, true, LocalDate.parse("2023-01-08"), LocalDate.parse("2023-01-08")));
+        Post save10 = postRepository.save(new Post(4L, false, "askdfkas", "afdsdsaf jo", null, 0, 0, false, LocalDate.parse("2024-01-08"), LocalDate.parse("2024-01-08")));
 
         scrappedRepository.save(new Scrapped(userId1, save1.getId(), save1.getCategoryId()));   //hello
         scrappedRepository.save(new Scrapped(userId1, save2.getId(), save2.getCategoryId()));   //ollasdf

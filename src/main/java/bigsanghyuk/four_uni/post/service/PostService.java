@@ -6,11 +6,14 @@ import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
 import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
+import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -25,6 +28,10 @@ public class PostService {
         return postRepository.findByIsClassifiedFalse();
     }
 
+    public List<PostRequired> getUnclassifiedRequired() {
+        return postRepository.findRequiredIsClassifiedFalse();
+    }
+
     public GetDetailResponse getDetail(Long postId) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         GetDetailResponse response = GetDetailResponse.builder()
@@ -37,6 +44,7 @@ public class PostService {
                 .isClassified(post.isClassified())
                 .postedAt(post.getPostedAt())
                 .deadline(post.getDeadline())
+                .noticeUrl(post.getNoticeUrl())
                 .build();
         return response;
     }
@@ -76,5 +84,51 @@ public class PostService {
             result.add(postRepository.findById(postId).orElseThrow(PostNotFoundException::new));
         }
         return result;
+    }
+
+    public List<Post> getPostsByDate(String date) { //date format example: 2024-03
+        StringTokenizer st = new StringTokenizer(date, "-");
+        DateFilter filter = new DateFilter(st);
+
+        return postRepository.findPostsByCurrentAndAdjacentMonths(
+                filter.getCurrentMonth().getYear(),
+                filter.getCurrentMonth().getMonthValue(),
+                filter.getPrevMonth().getYear(),
+                filter.getPrevMonth().getMonthValue(),
+                filter.getNextMonth().getYear(),
+                filter.getNextMonth().getMonthValue()
+        );
+    }
+
+    public List<PostRequired> getPostsByDateRequired(String date) { //date format example: 2024-03
+        StringTokenizer st = new StringTokenizer(date, "-");
+        DateFilter filter = new DateFilter(st);
+
+        return postRepository.findRequiredByCurrentAndAdjacentMonths(
+                filter.getCurrentMonth().getYear(),
+                filter.getCurrentMonth().getMonthValue(),
+                filter.getPrevMonth().getYear(),
+                filter.getPrevMonth().getMonthValue(),
+                filter.getNextMonth().getYear(),
+                filter.getNextMonth().getMonthValue()
+        );
+    }
+
+    @Getter
+    static class DateFilter {
+
+        private int targetYear;
+        private int targetMonth;
+        private LocalDate currentMonth;
+        private LocalDate prevMonth;
+        private LocalDate nextMonth;
+
+        public DateFilter(StringTokenizer st) {
+            this.targetYear = Integer.parseInt(st.nextToken());
+            this.targetMonth = Integer.parseInt(st.nextToken());
+            this.currentMonth = LocalDate.of(targetYear, targetMonth, 1);
+            this.prevMonth = currentMonth.minusMonths(1);
+            this.nextMonth = currentMonth.plusMonths(1);
+        }
     }
 }
