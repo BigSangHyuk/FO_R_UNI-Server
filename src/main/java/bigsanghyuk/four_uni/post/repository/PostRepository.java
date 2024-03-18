@@ -48,4 +48,20 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("nextYear") int nextYear,
             @Param("nextMonth") int nextMonth
     );
+
+    @Query(nativeQuery = true,
+            value = "SELECT post_id as postId, category_id as categoryId, title, deadline FROM Posts " +
+                    "WHERE ((YEAR(deadline) = :year AND MONTH(deadline) = :month) " +
+                    "OR (YEAR(deadline) = :prevYear AND MONTH(deadline) = :prevMonth) " +
+                    "OR (YEAR(deadline) = :nextYear AND MONTH(deadline) = :nextMonth)) " +
+                    "AND is_classified = TRUE " +
+                    "ORDER BY deadline")
+    List<PostRequired> findRequiredByCurrentAndAdjacentMonths(
+            @Param("year") int year,
+            @Param("month") int month,
+            @Param("prevYear") int prevYear,
+            @Param("prevMonth") int prevMonth,
+            @Param("nextYear") int nextYear,
+            @Param("nextMonth") int nextMonth
+    );
 }

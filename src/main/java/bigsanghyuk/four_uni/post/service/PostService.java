@@ -102,4 +102,36 @@ public class PostService {
                 nextMonth.getMonthValue()
         );
     }
+
+    public List<PostRequired> getPostsByDateRequired(String date) { //date format example: 2024-03
+        StringTokenizer st = new StringTokenizer(date, "-");
+        DateFilter filter = new DateFilter(st);
+
+        return postRepository.findRequiredByCurrentAndAdjacentMonths(
+                filter.getCurrentMonth().getYear(),
+                filter.getCurrentMonth().getMonthValue(),
+                filter.getPrevMonth().getYear(),
+                filter.getPrevMonth().getMonthValue(),
+                filter.getNextMonth().getYear(),
+                filter.getNextMonth().getMonthValue()
+        );
+    }
+
+    @Getter
+    static class DateFilter {
+
+        private int targetYear;
+        private int targetMonth;
+        private LocalDate currentMonth;
+        private LocalDate prevMonth;
+        private LocalDate nextMonth;
+
+        public DateFilter(StringTokenizer st) {
+            this.targetYear = Integer.parseInt(st.nextToken());
+            this.targetMonth = Integer.parseInt(st.nextToken());
+            this.currentMonth = LocalDate.of(targetYear, targetMonth, 1);
+            this.prevMonth = currentMonth.minusMonths(1);
+            this.nextMonth = currentMonth.plusMonths(1);
+        }
+    }
 }
