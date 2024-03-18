@@ -7,6 +7,7 @@ import bigsanghyuk.four_uni.comment.service.CommentService;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.dto.request.ScrapRequest;
 import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
+import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
 import bigsanghyuk.four_uni.post.service.PostService;
 import bigsanghyuk.four_uni.post.service.ScrappedService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +39,13 @@ public class PostController {
     public ResponseEntity<Results<List<Post>>> getUnclassified() {
         List<Post> unClassifiedPosts = postService.getUnClassifiedLists();
         return ResponseEntity.ok().body(new Results<>(unClassifiedPosts, unClassifiedPosts.size()));
+    }
+
+    @Operation(summary = "미분류 게시글 최소 항목 조회", description = "postId, categoryId, title, deadline 만 반환")
+    @GetMapping("/posts/unclassified-titles")
+    public ResponseEntity<Results<List<PostRequired>>> getUnclassifiedRequiredData() {
+        List<PostRequired> result = postService.getUnclassifiedRequired();
+        return ResponseEntity.ok().body(new Results<>(result, result.size()));
     }
 
     @Operation(summary = "게시글 필터로 조회", description = "/posts/filter?id=1-2-3-4 이런 식으로 id1-id2-...로 전달")
