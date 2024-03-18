@@ -48,13 +48,6 @@ public class PostController {
         return ResponseEntity.ok().body(new Results<>(result, result.size()));
     }
 
-    @Operation(summary = "해당하는 연, 월의 게시글 최소 항목 조회", description = "2024-03 형식으로 연 월 전달하면 해당 달 앞, 뒤 1달까지의 글 반환")
-    @GetMapping("/posts/date-required")
-    public ResponseEntity<List<PostRequired>> getPostByDateRequiredData(@RequestParam(name = "target") String date) {
-        List<PostRequired> postsRequired = postService.getPostsByDateRequired(date);
-        return ResponseEntity.ok().body(postsRequired);
-    }
-
     @Operation(summary = "게시글 필터로 조회", description = "/posts/filter?id=1-2-3-4 이런 식으로 id1-id2-...로 전달")
     @GetMapping("/posts/filter")
     public ResponseEntity<Results<List<Post>>> getByFiltered(@RequestParam(name = "id") String id) {
@@ -96,6 +89,13 @@ public class PostController {
     public ResponseEntity<List<Post>> getPostByDate(@RequestParam(name = "target") String date) {
         List<Post> postsByDate = postService.getPostsByDate(date);
         return ResponseEntity.ok().body(postsByDate);
+    }
+
+    @Operation(summary = "해당하는 연, 월의 게시글 최소 항목 조회", description = "2024-03 형식으로 연 월 전달하면 해당 달 앞, 뒤 1달까지의 글 반환")
+    @GetMapping("/posts/date-required")
+    public ResponseEntity<List<PostRequired>> getPostByDateRequiredData(@RequestParam(name = "target") String date) {
+        List<PostRequired> postsRequired = postService.getPostsByDateRequired(date);
+        return ResponseEntity.ok().body(postsRequired);
     }
 
     @Operation(summary = "게시글과 댓글 함께 조회", description = "조회하고자 하는 게시글 아이디를 경로변수로 전달")
