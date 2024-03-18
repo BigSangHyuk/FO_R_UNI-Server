@@ -6,6 +6,7 @@ import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
 import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
+import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,10 @@ public class PostService {
 
     public List<Post> getUnClassifiedLists() {
         return postRepository.findByIsClassifiedFalse();
+    }
+
+    public List<PostRequired> getUnclassifiedRequired() {
+        return postRepository.findRequiredIsClassifiedFalse();
     }
 
     public GetDetailResponse getDetail(Long postId) {

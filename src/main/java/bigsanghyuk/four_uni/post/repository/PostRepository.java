@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.post.repository;
 
 import bigsanghyuk.four_uni.post.domain.entity.Post;
+import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,6 +25,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     //미분류 게시판 사용 용도 (미분류된 게시글들만 조회)
     List<Post> findByIsClassifiedFalse();
+
+    @Query(
+            nativeQuery = true,
+            value = "SELECT post_id as postId, category_id as categoryId, title, deadline FROM Posts " +
+                    "WHERE is_classified = FALSE " +
+                    "ORDER BY created_at DESC")
+    List<PostRequired> findRequiredIsClassifiedFalse();
 
     //해당 연, 월을 기준으로 post 의 deadline 에 해당하는 글만 반환, 전 후 한달까지 포함
     @Query("SELECT p FROM Post p " +
