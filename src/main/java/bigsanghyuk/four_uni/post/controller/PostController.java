@@ -28,11 +28,13 @@ public class PostController {
     private final ScrappedService scrappedService;
     private final CommentService commentService;
 
+    /*
     @Operation(summary = "게시글 단건 조회", description = "조회하고자 하는 게시글 아이디를 파라미터로 전달")
     @GetMapping("/posts")
     public ResponseEntity<GetDetailResponse> getDetail(@RequestParam(name = "postId") Long postId) {
         return ResponseEntity.ok().body(postService.getDetail(postId));
     }
+    */
 
     @Operation(summary = "게시글과 댓글 함께 조회", description = "조회하고자 하는 게시글 아이디를 경로변수로 전달")
     @GetMapping("/posts/{postId}")
@@ -42,12 +44,14 @@ public class PostController {
         return ResponseEntity.ok().body(new Details(detail, comments));
     }
 
+    /*
     @Operation(summary = "미분류 게시글 조회", description = "파라미터 없이 호출")
     @GetMapping("/posts/unclassified")
     public ResponseEntity<Results<List<Post>>> getUnclassified() {
         List<Post> unClassifiedPosts = postService.getUnClassifiedLists();
         return ResponseEntity.ok().body(new Results<>(unClassifiedPosts, unClassifiedPosts.size()));
     }
+    */
 
     @Operation(summary = "미분류 게시글 최소 항목 조회", description = "postId, categoryId, title, deadline 만 반환")
     @GetMapping("/posts/unclassified-titles")
@@ -92,12 +96,14 @@ public class PostController {
         return ResponseEntity.ok().body(new Results<>(commentedPostList, commentedPostList.size()));
     }
 
+    /*
     @Operation(summary = "해당하는 연, 월의 게시글 조회", description = "2024-03 형식으로 연 월 전달하면 해당 달 앞, 뒤 1달까지의 글 반환")
     @GetMapping("/posts/date")
     public ResponseEntity<List<Post>> getPostByDate(@RequestParam(name = "target") String date) {
         List<Post> postsByDate = postService.getPostsByDate(date);
         return ResponseEntity.ok().body(postsByDate);
     }
+    */
 
     @Operation(summary = "해당하는 연, 월의 게시글 최소 항목 조회", description = "2024-03 형식으로 연 월 전달하면 해당 달 앞, 뒤 1달까지의 글 반환")
     @GetMapping("/posts/date-required")
