@@ -3,7 +3,7 @@ package bigsanghyuk.four_uni.post.dto.response;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter @Setter
 @NoArgsConstructor
@@ -15,7 +15,7 @@ public class GetDetailResponse {
     private Long categoryId;
     private String title;
     private String content;
-    private String imageUrl;
+    private List<String> imageUrl;
     private int views;
     private boolean isClassified;
     private LocalDate postedAt;
