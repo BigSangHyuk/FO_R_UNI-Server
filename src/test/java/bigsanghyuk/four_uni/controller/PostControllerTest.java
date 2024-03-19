@@ -148,8 +148,7 @@ class PostControllerTest {
     @DisplayName("게시글 조회 성공")
     @WithMockUser
     void getDetailSuccess() throws Exception {
-        ResultActions resultActions = mockMvc.perform(get("/posts")
-                        .param("postId", "1")
+        ResultActions resultActions = mockMvc.perform(get("/posts/{postId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
@@ -177,7 +176,7 @@ class PostControllerTest {
     @DisplayName("미분류 게시글 조회 성공")
     @WithMockUser
     void getUnclassified() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/posts/unclassified"))
+        MvcResult mvcResult = mockMvc.perform(get("/posts/unclassified-titles"))
                 .andExpect(status().isOk())
                 .andReturn();
         String contentAsString = mvcResult.getResponse().getContentAsString();
