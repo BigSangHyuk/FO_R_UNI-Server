@@ -1,34 +1,35 @@
 package bigsanghyuk.four_uni.post.domain.entity;
 
+import bigsanghyuk.four_uni.config.StringToListConverter;
 import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
+import java.util.List;
 
-@Entity
-@Getter
+@Entity @Getter @Builder
 @Table(name = "posts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Post extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
     private Long id;
-
     private Long categoryId;
     @Setter @ColumnDefault("false")
     private boolean reported;
     private String title;
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
-    private String imageUrl; // 이미지로 된 게시글일 때 : 이미지 URL
+    @Convert(converter = StringToListConverter.class)
+    private List<String> imageUrl; // 이미지로 된 게시글일 때 : 이미지 URL
+    @ColumnDefault("0")
     private int views; // 조회수
-    @Setter
+    @Setter @ColumnDefault("0")
     private int postReportCount;
     private boolean isClassified; // 미분류
 
@@ -38,7 +39,7 @@ public class Post extends BaseTimeEntity {
     @Column(name = "notice_url", unique = true)
     private String noticeUrl;
 
-    public Post(Long categoryId, boolean reported, String title, String content, String imageUrl, int views, int postReportCount, boolean isClassified, LocalDate postedAt, LocalDate deadline) {
+    public Post(Long categoryId, boolean reported, String title, String content, List<String> imageUrl, int views, int postReportCount, boolean isClassified, LocalDate postedAt, LocalDate deadline) {
         this.categoryId = categoryId;
         this.reported = reported;
         this.title = title;
