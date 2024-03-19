@@ -193,7 +193,7 @@ class CommentServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        postRepository.save(new Post(1L, false, "exampleTest", "testtest", "test", 150, 0, true, LocalDate.now(), LocalDate.now()));
+        postRepository.save(new Post(1L, false, "exampleTest", "testtest", List.of("test"), 150, 0, true, LocalDate.now(), LocalDate.now()));
         parent = commentRepository.save(new Comment(100L, 1L, null, 0, "contentParent", false));
         commentRepository.save(new Comment(200L, 1L, null, 0, "contentExample", false));
         child = commentRepository.save(new Comment(300L, 1L, parent.getId(), 0, "contentChild", false));

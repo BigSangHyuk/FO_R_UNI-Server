@@ -271,11 +271,11 @@ class PostControllerTest {
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
-        postRepository.save(new Post(1L, false, "title1", "content1", "imageUrl1", 0, 0, true, dateNow, dateNow));
-        postRepository.save(new Post(2L, false, "title2", "content2", "imageUrl2", 0, 0, true, dateNow, dateNow));
-        postRepository.save(new Post(2L, false, "title3", "content3", "imageUrl3", 0, 0, true, dateNow, dateNow));
-        postRepository.save(new Post(3L, false, "title4", "content4", "imageUrl4", 0, 0, true, dateNow, dateNow));
-        postRepository.save(new Post(3L, false, "title5", "content5", "imageUrl5", 0, 0, false, dateNow, dateNow));
+        postRepository.save(new Post(1L, false, "title1", "content1", List.of("imageUrl1"), 0, 0, true, dateNow, dateNow));
+        postRepository.save(new Post(2L, false, "title2", "content2", List.of("imageUrl2"), 0, 0, true, dateNow, dateNow));
+        postRepository.save(new Post(2L, false, "title3", "content3", List.of("imageUrl3"), 0, 0, true, dateNow, dateNow));
+        postRepository.save(new Post(3L, false, "title4", "content4", List.of("imageUrl4"), 0, 0, true, dateNow, dateNow));
+        postRepository.save(new Post(3L, false, "title5", "content5", List.of("imageUrl5"), 0, 0, false, dateNow, dateNow));
         commentRepository.save(new Comment(1L, 1L, null, 0, "content1", false));
         commentRepository.save(new Comment(1L, 2L, null, 0, "content2", false));
         commentRepository.save(new Comment(1L, 3L, null, 0, "content3", false));

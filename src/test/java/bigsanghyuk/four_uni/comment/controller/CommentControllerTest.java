@@ -28,6 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -263,8 +264,8 @@ class CommentControllerTest {
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
-        postRepository.save(new Post(1L, false, "title1", "content1", "imageUrl1", 0, 0, true, dateNow, dateNow));
-        postRepository.save(new Post(2L, false, "title2", "content2", "imageUrl2", 0, 0, true, dateNow, dateNow));
+        postRepository.save(new Post(1L, false, "title1", "content1", List.of("imageUrl1"), 0, 0, true, dateNow, dateNow));
+        postRepository.save(new Post(2L, false, "title2", "content2", List.of("imageUrl2"), 0, 0, true, dateNow, dateNow));
         commentRepository.save(new Comment(1L, 1L, null, 0, "content1", false));
         commentRepository.save(new Comment(1L, 2L, null, 0, "content2", false));
         commentRepository.save(new Comment(1L, 3L, null, 0, "content3", false));
