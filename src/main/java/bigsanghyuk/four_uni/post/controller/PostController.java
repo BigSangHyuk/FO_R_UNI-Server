@@ -1,15 +1,17 @@
 package bigsanghyuk.four_uni.post.controller;
 
-import bigsanghyuk.four_uni.Results;
 import bigsanghyuk.four_uni.CommonResponse;
+import bigsanghyuk.four_uni.Results;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.service.CommentService;
+import bigsanghyuk.four_uni.post.domain.RegisterPostInfo;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
+import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
 import bigsanghyuk.four_uni.post.dto.request.ScrapRequest;
 import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
-import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
 import bigsanghyuk.four_uni.post.service.PostService;
 import bigsanghyuk.four_uni.post.service.ScrappedService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
@@ -28,13 +30,16 @@ public class PostController {
     private final ScrappedService scrappedService;
     private final CommentService commentService;
 
-    /*
-    @Operation(summary = "게시글 단건 조회", description = "조회하고자 하는 게시글 아이디를 파라미터로 전달")
-    @GetMapping("/posts")
-    public ResponseEntity<GetDetailResponse> getDetail(@RequestParam(name = "postId") Long postId) {
-        return ResponseEntity.ok().body(postService.getDetail(postId));
+    @Operation(summary = "게시글 등록", description = "김동후 전용")
+    @PostMapping("/add-post")
+    public ResponseEntity<?> registerPost(@RequestBody String data) throws JsonProcessingException {
+        int success = 0;
+        List<RegisterPostInfo> infos = postService.jsonToDto(data);
+        for (RegisterPostInfo info : infos) {
+            success += postService.addPost(info);
+        }
+        return ResponseEntity.ok().body("{\"articles added\": " + success + "}");
     }
-    */
 
     @Operation(summary = "게시글과 댓글 함께 조회", description = "조회하고자 하는 게시글 아이디를 경로변수로 전달")
     @GetMapping("/posts/{postId}")
