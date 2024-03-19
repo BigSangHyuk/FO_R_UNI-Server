@@ -60,7 +60,7 @@ public class SecurityConfig {
                 // 조건마다 요청 허용, 제한 설정
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/sign-up", "/sign-in", "/refresh", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/admin/**", "/add-post").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/user/**", "/posts/**", "/comments/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
                         .anyRequest().denyAll())
                 .oauth2Login(oauth2 -> oauth2

@@ -3,6 +3,7 @@ package bigsanghyuk.four_uni.exception.handler;
 import bigsanghyuk.four_uni.exception.ExceptionMessage;
 import bigsanghyuk.four_uni.exception.comment.CommentEditOtherUserException;
 import bigsanghyuk.four_uni.exception.comment.CommentNotFoundException;
+import bigsanghyuk.four_uni.exception.comment.CommentRemoveOtherUserException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,12 @@ public class CommentExceptionHandler {
 
     @ExceptionHandler(CommentEditOtherUserException.class)
     public ResponseEntity<ExceptionMessage> handle(CommentEditOtherUserException e) {
+        final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(CommentRemoveOtherUserException.class)
+    public ResponseEntity<ExceptionMessage> handle(CommentRemoveOtherUserException e) {
         final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
         return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
     }

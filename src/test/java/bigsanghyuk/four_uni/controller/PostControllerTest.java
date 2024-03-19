@@ -28,7 +28,6 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -149,8 +148,7 @@ class PostControllerTest {
     @DisplayName("게시글 조회 성공")
     @WithMockUser
     void getDetailSuccess() throws Exception {
-        ResultActions resultActions = mockMvc.perform(get("/posts")
-                        .param("postId", "1")
+        ResultActions resultActions = mockMvc.perform(get("/posts/{postId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().isOk())
@@ -178,7 +176,7 @@ class PostControllerTest {
     @DisplayName("미분류 게시글 조회 성공")
     @WithMockUser
     void getUnclassified() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/posts/unclassified"))
+        MvcResult mvcResult = mockMvc.perform(get("/posts/unclassified-titles"))
                 .andExpect(status().isOk())
                 .andReturn();
         String contentAsString = mvcResult.getResponse().getContentAsString();
@@ -268,16 +266,15 @@ class PostControllerTest {
     @BeforeEach
     void beforeEach() {
         LocalDate dateNow = LocalDate.now();
-        LocalDateTime datetimeNow = LocalDateTime.now();
         this.mockMvc = MockMvcBuilders.webAppContextSetup(wac)
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
-        postRepository.save(new Post(1L, false, "title1", "content1", "imageUrl1", 0, 0, true, dateNow, datetimeNow));
-        postRepository.save(new Post(2L, false, "title2", "content2", "imageUrl2", 0, 0, true, dateNow, datetimeNow));
-        postRepository.save(new Post(2L, false, "title3", "content3", "imageUrl3", 0, 0, true, dateNow, datetimeNow));
-        postRepository.save(new Post(3L, false, "title4", "content4", "imageUrl4", 0, 0, true, dateNow, datetimeNow));
-        postRepository.save(new Post(3L, false, "title5", "content5", "imageUrl5", 0, 0, false, dateNow, datetimeNow));
+        postRepository.save(new Post(1L, false, "title1", "content1", List.of("imageUrl1"), 0, 0, true, dateNow, dateNow));
+        postRepository.save(new Post(2L, false, "title2", "content2", List.of("imageUrl2"), 0, 0, true, dateNow, dateNow));
+        postRepository.save(new Post(2L, false, "title3", "content3", List.of("imageUrl3"), 0, 0, true, dateNow, dateNow));
+        postRepository.save(new Post(3L, false, "title4", "content4", List.of("imageUrl4"), 0, 0, true, dateNow, dateNow));
+        postRepository.save(new Post(3L, false, "title5", "content5", List.of("imageUrl5"), 0, 0, false, dateNow, dateNow));
         commentRepository.save(new Comment(1L, 1L, null, 0, "content1", false));
         commentRepository.save(new Comment(1L, 2L, null, 0, "content2", false));
         commentRepository.save(new Comment(1L, 3L, null, 0, "content3", false));
