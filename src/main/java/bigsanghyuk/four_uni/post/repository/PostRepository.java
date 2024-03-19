@@ -11,6 +11,8 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
+    Boolean existsPostByNoticeUrl(String noticeUrl);
+
     //제목이나 내용에 키워드가 포함된 글 조회
     List<Post> findByTitleContainingOrContentContaining(String keywordTitle, String keywordContent);
 
