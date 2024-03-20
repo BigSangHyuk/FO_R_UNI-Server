@@ -58,13 +58,14 @@ class CommentServiceTest {
 
         editCommentInfo.setUserId(savedComment.getUserId());
         editCommentInfo.setContent(savedComment.getContent());
+        editCommentInfo.setPostId(savedComment.getPostId());
 
         // and : 수정할 정보
         String updatedContent = "updated_content";
 
         // when : 댓글 수정 동작 수행
         editCommentInfo.setContent(updatedContent);
-        Comment updatedComment = commentService.edit(savedComment.getPostId(), savedComment.getId(), editCommentInfo);
+        Comment updatedComment = commentService.edit(savedComment.getId(), editCommentInfo);
 
         // then : 업데이트된 댓글 정보 확인
         assertNotNull(updatedComment);
@@ -80,6 +81,7 @@ class CommentServiceTest {
         editCommentInfo = new EditCommentInfo();
         editCommentInfo.setUserId(savedComment.getUserId() + 1L);
         editCommentInfo.setContent(savedComment.getContent());
+        editCommentInfo.setPostId(savedComment.getPostId());
 
         // and : 수정할 정보
         String updatedContent = "updated_content";
@@ -88,7 +90,7 @@ class CommentServiceTest {
         editCommentInfo.setContent(updatedContent);
 
         // then : 업데이트된 댓글 정보 확인
-        assertThrows(IllegalArgumentException.class, () -> commentService.edit(savedComment.getPostId(), savedComment.getId(), editCommentInfo));
+        assertThrows(IllegalArgumentException.class, () -> commentService.edit(savedComment.getId(), editCommentInfo));
     }
 
     @Test
@@ -108,7 +110,7 @@ class CommentServiceTest {
         editCommentInfo.setContent(updatedContent);
 
         // then : 업데이트된 댓글 정보 확인
-        assertThrows(IllegalArgumentException.class, () -> commentService.edit(savedComment.getPostId(), savedComment.getId() + 1L, editCommentInfo));
+        assertThrows(IllegalArgumentException.class, () -> commentService.edit(savedComment.getId() + 1L, editCommentInfo));
     }
 
     @Test
@@ -137,7 +139,7 @@ class CommentServiceTest {
         long wrongPostId = savedComment.getPostId() + 100L;
 
         // then: 잘못된 postId 입력 시 IllegalArgumentException 이 던져져야 함
-        assertThrows(IllegalArgumentException.class, () -> commentService.remove(wrongPostId, savedComment.getId()));
+        assertThrows(IllegalArgumentException.class, () -> commentService.remove(savedComment.getId()));
     }
 
     @Test
@@ -150,7 +152,7 @@ class CommentServiceTest {
         long wrongCommentId = savedComment.getId() + 100L;
 
         // then: 잘못된 commentId 입력 시 IllegalArgumentException 이 던져져야 함
-        assertThrows(IllegalArgumentException.class, () -> commentService.remove(savedComment.getPostId(), wrongCommentId));
+        assertThrows(IllegalArgumentException.class, () -> commentService.remove(wrongCommentId));
     }
 
     @Test
