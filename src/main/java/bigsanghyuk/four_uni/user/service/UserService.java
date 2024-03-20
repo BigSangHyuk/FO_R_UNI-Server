@@ -65,8 +65,8 @@ public class UserService {
     }
 
     @Transactional
-    public EditResponse edit(EditUserInfo info) {
-        User user = userRepository.findById(info.getId())
+    public EditResponse edit(Long userId, EditUserInfo info) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
         user.edit(encoder.encode(info.getPassword()), info.getName(), info.getDept(), info.getNickName(), info.getImage());
         User savedUser = userRepository.save(user);
@@ -101,8 +101,8 @@ public class UserService {
                 .build();
     }
 
-    public SignResponse getUser(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+    public SignResponse getUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         return new SignResponse(user);
     }
 

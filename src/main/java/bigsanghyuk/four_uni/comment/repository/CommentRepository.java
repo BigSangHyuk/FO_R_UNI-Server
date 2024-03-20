@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    void deleteCommentByPostIdAndId(Long postId, Long commentId);
+    void deleteCommentByAndId(Long commentId);
 
     @Transactional
     @Modifying
