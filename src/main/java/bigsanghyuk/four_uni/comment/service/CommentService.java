@@ -3,6 +3,7 @@ package bigsanghyuk.four_uni.comment.service;
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.RegisterCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
+import bigsanghyuk.four_uni.comment.domain.entity.LikeComment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.comment.repository.LikeCommentRepository;
 import bigsanghyuk.four_uni.exception.comment.CommentEditOtherUserException;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @Service
@@ -81,5 +83,19 @@ public class CommentService {
 
         comments.addAll(childComments);
         return comments;
+    }
+
+    public List<Comment> getLikedComment(Long userId) throws IllegalAccessException {
+        List<Comment> comments = commentRepository.findByUserIdOrderByIdDesc(userId).orElseThrow(IllegalAccessException::new);
+
+        LinkedHashSet<Long> set = new LinkedHashSet<>();
+        List<Comment> result = new ArrayList<>();
+        for (Comment comment : comments) {
+            set.add(comment.getId());
+        }
+        for (Long commentId : set) {
+            result.add(commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new));
+        }
+        return result;
     }
 }
