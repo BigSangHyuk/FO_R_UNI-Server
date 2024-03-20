@@ -54,7 +54,7 @@ class CommentControllerTest {
     @WithMockUser
     void writeCommentSuccess() throws Exception {
         RegisterCommentInfo registerCommentInfo = new RegisterCommentInfo(1L, 1L, "content1", null, 0);
-        mockMvc.perform(post("/posts/{postId}/comment", "1")
+        mockMvc.perform(post("/comments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerCommentInfo)))
                 .andExpect(status().isOk());
@@ -65,7 +65,7 @@ class CommentControllerTest {
     @WithMockUser
     void writeCommentFail() throws Exception {
         RegisterCommentInfo registerCommentInfo = new RegisterCommentInfo(1L, 0L, "content1", null, 0);
-        mockMvc.perform(post("/posts/{postId}/comment", "0")
+        mockMvc.perform(post("/comments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerCommentInfo)))
                 .andExpect(status().is4xxClientError());
@@ -75,9 +75,9 @@ class CommentControllerTest {
     @DisplayName("댓글 수정 성공")
     @WithMockUser
     void editCommentSuccess() throws Exception {
-        EditCommentInfo editCommentInfo = new EditCommentInfo(1L, "editContent1");
         Comment originalComment = commentRepository.findById(1L).orElseThrow(CommentNotFoundException::new);
-        mockMvc.perform(put("/posts/{postId}/{commentId}", "1", "1")
+        EditCommentInfo editCommentInfo = new EditCommentInfo(1L, originalComment.getId(), 1L, "editContent1");
+        mockMvc.perform(patch("/comments/{commentId}", "1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editCommentInfo)))
                 .andExpect(status().isOk());
@@ -89,9 +89,9 @@ class CommentControllerTest {
     @DisplayName("댓글 수정 실패 - 없는 postId")
     @WithMockUser
     void editCommentFail1() throws Exception {
-        mockMvc.perform(put("/posts/{postId}/{commentId}", "0", "1")
+        mockMvc.perform(put("/comments/{commentId}", "1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new EditCommentInfo(1L, "content1"))))
+                        .content(objectMapper.writeValueAsString(new EditCommentInfo(0L, 1L, 1L, "editContent1"))))
                 .andExpect(status().is4xxClientError());    //잘못된 postId
     }
 
@@ -99,9 +99,9 @@ class CommentControllerTest {
     @DisplayName("댓글 수정 실패 - 없는 commentId")
     @WithMockUser
     void editCommentFail2() throws Exception {
-        mockMvc.perform(put("/posts/{postId}/{commentId}", "1", "0")
+        mockMvc.perform(put("/comments/{commentId}", "0")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new EditCommentInfo(1L, "content1"))))
+                        .content(objectMapper.writeValueAsString(new EditCommentInfo(1L, 0L, 1L, "content1"))))
                 .andExpect(status().is4xxClientError());    //잘못된 commentId
     }
 
@@ -109,9 +109,9 @@ class CommentControllerTest {
     @DisplayName("댓글 수정 실패 - 없는 userId")
     @WithMockUser
     void editCommentFail3() throws Exception {
-        mockMvc.perform(put("/posts/{postId}/{commentId}", "1", "1")
+        mockMvc.perform(put("/comments/{commentId}", "1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new EditCommentInfo(0L, "content1"))))
+                        .content(objectMapper.writeValueAsString(new EditCommentInfo(1L, 1L, 0L, "content1"))))
                 .andExpect(status().is4xxClientError());    //잘못된 userId
     }
 
@@ -119,24 +119,16 @@ class CommentControllerTest {
     @DisplayName("댓글 삭제 성공")
     @WithMockUser
     void deleteCommentSuccess() throws Exception {
-        mockMvc.perform(delete("/posts/{postId}/{commentId}", "1", "1"))
+        mockMvc.perform(delete("/comments/{commentId}", "1"))
                 .andExpect(status().isOk());
         Assertions.assertThat(commentRepository.findById(1L)).isEmpty();
-    }
-
-    @Test
-    @DisplayName("댓글 삭제 실패 - 없는 postId")
-    @WithMockUser
-    void deleteCommentFail1() throws Exception {
-        mockMvc.perform(delete("/posts/{postId}/{commentId}", "0", "1"))    //없는 postId
-                .andExpect(status().is4xxClientError());
     }
 
     @Test
     @DisplayName("댓글 삭제 실패 - 없는 commentId")
     @WithMockUser
     void deleteCommentFail2() throws Exception {
-        mockMvc.perform(delete("/posts/{postId}/{commentId}", "1", "0"))    //없는 commentId
+        mockMvc.perform(delete("/comments/{commentId}", "0"))    //없는 commentId
                 .andExpect(status().is4xxClientError());
     }
 
@@ -233,27 +225,6 @@ class CommentControllerTest {
         mockMvc.perform(delete("/comments/unlike")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new UnLikeCommentInfo(1L, 2L))))
-                .andExpect(status().is4xxClientError());
-    }
-
-    @Test
-    @DisplayName("댓글 전체 조회 성공")
-    @WithMockUser
-    void getAllCommentsSuccess() throws Exception {
-        String responseJson = mockMvc.perform(get("/posts/{postId}/comment", "1"))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        System.out.println(responseJson);
-        Assertions.assertThat(responseJson).isNotEqualTo("{\"data\":[],\"count\":0}");
-    }
-
-    @Test
-    @DisplayName("댓글 전체 조회 실패 - 없는 postId")
-    @WithMockUser
-    void getAllCommentsFail() throws Exception {
-        mockMvc.perform(get("/posts/{postId}/comment", "0"))
                 .andExpect(status().is4xxClientError());
     }
 
