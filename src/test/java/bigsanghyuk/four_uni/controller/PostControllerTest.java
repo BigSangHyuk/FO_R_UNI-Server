@@ -176,7 +176,7 @@ class PostControllerTest {
     @DisplayName("미분류 게시글 조회 성공")
     @WithMockUser
     void getUnclassified() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/posts/unclassified-titles"))
+        MvcResult mvcResult = mockMvc.perform(get("/posts/unclassified"))
                 .andExpect(status().isOk())
                 .andReturn();
         String contentAsString = mvcResult.getResponse().getContentAsString();
