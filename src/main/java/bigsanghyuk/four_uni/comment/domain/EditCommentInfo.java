@@ -10,6 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class EditCommentInfo {
 
+    private Long postId;
+    private Long commentId;
     private Long userId;
     private String content;
 

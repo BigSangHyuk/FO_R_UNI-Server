@@ -100,6 +100,8 @@ public class PostService {
                 .postedAt(post.getPostedAt())
                 .deadline(post.getDeadline())
                 .noticeUrl(post.getNoticeUrl())
+                .reported(post.isReported())
+                .postReportCount(post.getPostReportCount())
                 .build();
         return response;
     }

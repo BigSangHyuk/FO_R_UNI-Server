@@ -21,4 +21,6 @@ public class GetDetailResponse {
     private LocalDate postedAt;
     private LocalDate deadline;
     private String noticeUrl;
+    private boolean reported;
+    private int postReportCount;
 }

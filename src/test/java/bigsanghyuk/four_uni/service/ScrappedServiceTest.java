@@ -69,9 +69,10 @@ class ScrappedServiceTest {
     }
 
     @BeforeEach
-    void beforeEach() {
+    void beforeEach() throws InterruptedException {
         log.info("[beforeEach] 테스트 데이터 추가");
         postRepository.save(new Post(1L, false, "test1", "test1", List.of("test1"), 0, 0, true, LocalDate.now(), LocalDate.now()));
+        Thread.sleep(500);
         postRepository.save(new Post(2L, false, "test2", "test2", List.of("test2"), 0, 0, true, LocalDate.now(), LocalDate.now()));
         scrappedRepository.save(new Scrapped(testUserId, 100L, 10000L));
         scrappedRepository.save(new Scrapped(testUserId, 200L, 20000L));

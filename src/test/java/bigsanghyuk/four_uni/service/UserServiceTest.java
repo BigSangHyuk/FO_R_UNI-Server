@@ -66,7 +66,7 @@ class UserServiceTest {
     void updatePassword() {
         User originalUser = repository.findByEmail("test@test.com").get();
         String newPassword = "test1";
-        service.edit(new EditUserInfo(originalUser.getId(), newPassword, originalUser.getName(), originalUser.getDept(), originalUser.getNickName(), originalUser.getImage()));
+        service.edit(originalUser.getId(), new EditUserInfo(originalUser.getId(), newPassword, originalUser.getName(), originalUser.getDept(), originalUser.getNickName(), originalUser.getImage()));
         User updatedUser = repository.findByEmail("test@test.com").get();
         log.info("original Password={}", originalUser.getPassword());
         log.info("updated Password={}", updatedUser.getPassword());

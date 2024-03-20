@@ -26,7 +26,8 @@ public class CommentService {
     private final PostRepository postRepository;
     private final LikeCommentRepository likeCommentRepository;
 
-    public void register(Long postId, RegisterCommentInfo registerCommentInfo) {
+    public void register(RegisterCommentInfo registerCommentInfo) {
+        Long postId = registerCommentInfo.getPostId();
         postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         Comment comment = new Comment(
                 registerCommentInfo.getUserId(),
@@ -39,8 +40,8 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    public Comment edit(Long postId, Long commentId, @Valid EditCommentInfo editCommentInfo) {
-        postRepository.findById(postId)
+    public Comment edit(Long commentId, @Valid EditCommentInfo editCommentInfo) {
+        postRepository.findById(editCommentInfo.getPostId())
                 .orElseThrow(PostNotFoundException::new);
 
         commentRepository.findByUserIdOrderByIdDesc(editCommentInfo.getUserId())
@@ -59,13 +60,11 @@ public class CommentService {
     }
 
     @Transactional
-    public void remove(Long postId, Long commentId) {
-        postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-
+    public void remove(Long commentId) {
         commentRepository.findById(commentId)
                 .orElseThrow(CommentNotFoundException::new);
 
-        commentRepository.deleteCommentByPostIdAndId(postId, commentId);
+        commentRepository.deleteCommentByAndId(commentId);
         likeCommentRepository.deleteLikeCommentByCommentId(commentId);
     }
 
