@@ -37,21 +37,21 @@ public class UserController {
     }
 
     @Operation(summary = "회원 정보 수정")
-    @PatchMapping("/user/edit")
-    public ResponseEntity<EditResponse> editUser(@RequestBody EditRequest request) {
-        return ResponseEntity.ok().body(userService.edit(request.toDomain()));
+    @PatchMapping("/users/{userId}")
+    public ResponseEntity<EditResponse> editUser(@PathVariable(name = "userId") Long userId, @RequestBody EditRequest request) {
+        return ResponseEntity.ok().body(userService.edit(userId, request.toDomain()));
     }
 
     @Operation(summary = "유저 조회", description = "경로에 이메일 입력")
-    @GetMapping("/user/get")
-    public ResponseEntity<SignResponse> getUser(@RequestParam(name = "email") String email) throws Exception {
-        return ResponseEntity.ok().body(userService.getUser(email));
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<SignResponse> getUser(@PathVariable(name = "userId") Long userId) {
+        return ResponseEntity.ok().body(userService.getUser(userId));
     }
 
     @Operation(summary = "관리자 권한 유저 조회", description = "경로에 이메일 입력")
-    @GetMapping("/admin/get")
-    public ResponseEntity<SignResponse> getUserForAdmin(@RequestParam(name = "email") String email) throws Exception {
-        return ResponseEntity.ok().body(userService.getUser(email));
+    @GetMapping("/admins/{userId}")
+    public ResponseEntity<SignResponse> getUserForAdmin(@PathVariable(name = "userId") Long userId) {
+        return ResponseEntity.ok().body(userService.getUser(userId));
     }
 
     @Operation(summary = "토큰 재발급 요청", description = "body 에 accessToken, refreshToken 담아서 요청")

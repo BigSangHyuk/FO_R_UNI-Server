@@ -10,24 +10,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/reports")
 @Tag(name = "reports", description = "신고 API")
 public class ReportController {
 
     private final ReportService reportService;
 
     @Operation(summary = "댓글 신고", description = "요청에 userId, commentId, reason, detail 넣어서")
-    @PostMapping("/comments/report")
+    @PostMapping("/comment")
     public ResponseEntity<CommonResponse> reportComment(@RequestBody ReportCommentRequest request) {
         reportService.reportComment(request.toDomain());
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
     @Operation(summary = "게시글 신고", description = "요청에 userId, postId, reason, detail 넣어서")
-    @PostMapping("/posts/report")
+    @PostMapping("/post")
     public ResponseEntity<CommonResponse> reportPost(@RequestBody ReportPostRequest request) {
         reportService.reportPost(request.toDomain());
         return ResponseEntity.ok().body(new CommonResponse(true));

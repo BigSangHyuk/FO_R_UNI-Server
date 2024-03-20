@@ -59,7 +59,7 @@ public class PostController {
     */
 
     @Operation(summary = "미분류 게시글 최소 항목 조회", description = "postId, categoryId, title, deadline 만 반환")
-    @GetMapping("/posts/unclassified-titles")
+    @GetMapping("/posts/unclassified")
     public ResponseEntity<Results<List<PostRequired>>> getUnclassifiedRequiredData() {
         List<PostRequired> result = postService.getUnclassifiedRequired();
         return ResponseEntity.ok().body(new Results<>(result, result.size()));
@@ -111,7 +111,7 @@ public class PostController {
     */
 
     @Operation(summary = "해당하는 연, 월의 게시글 최소 항목 조회", description = "2024-03 형식으로 연 월 전달하면 해당 달 앞, 뒤 1달까지의 글 반환")
-    @GetMapping("/posts/date-required")
+    @GetMapping("/posts/date")
     public ResponseEntity<List<PostRequired>> getPostByDateRequiredData(@RequestParam(name = "target") String date) {
         List<PostRequired> postsRequired = postService.getPostsByDateRequired(date);
         return ResponseEntity.ok().body(postsRequired);
