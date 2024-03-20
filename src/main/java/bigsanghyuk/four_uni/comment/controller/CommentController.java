@@ -2,6 +2,8 @@ package bigsanghyuk.four_uni.comment.controller;
 
 import bigsanghyuk.four_uni.CommonResponse;
 import bigsanghyuk.four_uni.Results;
+import bigsanghyuk.four_uni.comment.domain.entity.LikeComment;
+import bigsanghyuk.four_uni.comment.dto.request.*;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.dto.request.EditCommentRequest;
 import bigsanghyuk.four_uni.comment.dto.request.LikeCommentRequest;
@@ -43,8 +45,8 @@ public class CommentController {
 
     @Operation(summary = "댓글 삭제", description = "URL 경로에 commentId 전달")
     @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<CommonResponse> remove(@PathVariable("commentId") Long commentId) {
-        commentService.remove(commentId);
+    public ResponseEntity<CommonResponse> remove(@PathVariable("commentId") Long commentId, @Valid @RequestBody DeleteCommentRequest request) {
+        commentService.remove(commentId, request.toDomain());
         return new ResponseEntity<>(new CommonResponse(true), HttpStatus.OK);
     }
 
