@@ -13,5 +13,5 @@ public interface LikeCommentRepository extends JpaRepository<LikeComment, Long> 
 
     void deleteLikeCommentByUserIdAndCommentId(Long userId, Long commentId);
 
-    Optional<List<LikeComment>> findByUserIdOrderByIdDesc(Long userId);
+    List<LikeComment> findByUserIdOrderByIdDesc(Long userId);
 }

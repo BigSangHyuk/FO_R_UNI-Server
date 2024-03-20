@@ -3,6 +3,8 @@ package bigsanghyuk.four_uni.comment.controller;
 import bigsanghyuk.four_uni.CommonResponse;
 import bigsanghyuk.four_uni.Results;
 import bigsanghyuk.four_uni.comment.domain.entity.LikeComment;
+import bigsanghyuk.four_uni.comment.dto.request.*;
+import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.dto.request.EditCommentRequest;
 import bigsanghyuk.four_uni.comment.dto.request.LikeCommentRequest;
 import bigsanghyuk.four_uni.comment.dto.request.RegisterCommentRequest;
@@ -43,8 +45,8 @@ public class CommentController {
 
     @Operation(summary = "댓글 삭제", description = "URL 경로에 commentId 전달")
     @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<CommonResponse> remove(@PathVariable("commentId") Long commentId) {
-        commentService.remove(commentId);
+    public ResponseEntity<CommonResponse> remove(@PathVariable("commentId") Long commentId, @Valid @RequestBody DeleteCommentRequest request) {
+        commentService.remove(commentId, request.toDomain());
         return new ResponseEntity<>(new CommonResponse(true), HttpStatus.OK);
     }
 
@@ -73,8 +75,8 @@ public class CommentController {
 
     @Operation(summary = "좋아요 한 댓글 조회", description = "userId 전달")
     @GetMapping("/comments/liked/{userId}")
-    public ResponseEntity<Results<List<LikeComment>>> getLikedComments(@PathVariable("userId") Long userId) throws IllegalAccessException {
-        List<LikeComment> likedComments = likeCommentService.getLikedComment(userId);
-        return ResponseEntity.ok().body(new Results<>(likedComments, likedComments.size()));
+    public ResponseEntity<Results<List<Comment>>> getLikedComments(@PathVariable("userId") Long userId) throws IllegalAccessException {
+        List<Comment> comments = commentService.getLikedComment(userId);
+        return ResponseEntity.ok().body(new Results<>(comments, comments.size()));
     }
 }
