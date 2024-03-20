@@ -53,19 +53,4 @@ public class LikeCommentService {
         commentRepository.decreaseLikesByCommentId(commentId);
         likeCommentRepository.deleteLikeCommentByUserIdAndCommentId(userId, commentId);
     }
-
-    public List<LikeComment> getLikedComment(Long userId) throws IllegalAccessException {
-        List<LikeComment> likeComments = likeCommentRepository.findByUserIdOrderByIdDesc(userId).orElseThrow(IllegalAccessException::new);
-
-        LinkedHashSet<Long> set = new LinkedHashSet<>();
-        List<LikeComment> result = new ArrayList<>();
-        for (LikeComment comment : likeComments) {
-            set.add(comment.getCommentId());
-        }
-        for (Long commentId : set) {
-            result.add(likeCommentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new));
-        }
-        return result;
-
-    }
 }
