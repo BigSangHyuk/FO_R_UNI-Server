@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -85,17 +85,13 @@ public class CommentService {
         return comments;
     }
 
-    public List<Comment> getLikedComment(Long userId) throws IllegalAccessException {
-        List<Comment> comments = commentRepository.findByUserIdOrderByIdDesc(userId).orElseThrow(IllegalAccessException::new);
+    public List<Comment> getLikedComment(Long userId) {
+        LinkedList<Comment> comments = new LinkedList<>();
+        List<LikeComment> likedComments = likeCommentRepository.findByUserIdOrderByIdDesc(userId);
+        for (LikeComment likeComment : likedComments) {
+            comments.add(commentRepository.findById(likeComment.getCommentId()).orElseThrow(CommentNotFoundException::new));
+        }
 
-        LinkedHashSet<Long> set = new LinkedHashSet<>();
-        List<Comment> result = new ArrayList<>();
-        for (Comment comment : comments) {
-            set.add(comment.getId());
-        }
-        for (Long commentId : set) {
-            result.add(commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new));
-        }
-        return result;
+        return comments;
     }
 }

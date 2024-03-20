@@ -3,7 +3,6 @@ package bigsanghyuk.four_uni.comment.controller;
 import bigsanghyuk.four_uni.CommonResponse;
 import bigsanghyuk.four_uni.Results;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
-import bigsanghyuk.four_uni.comment.domain.entity.LikeComment;
 import bigsanghyuk.four_uni.comment.dto.request.EditCommentRequest;
 import bigsanghyuk.four_uni.comment.dto.request.LikeCommentRequest;
 import bigsanghyuk.four_uni.comment.dto.request.RegisterCommentRequest;

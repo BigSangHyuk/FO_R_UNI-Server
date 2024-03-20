@@ -34,4 +34,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "WHERE c.postId = :postId AND c.parentCommentId IS NULL " +
             "ORDER BY c.createdAt ASC")
     List<Comment> findParentComments(@Param("postId") Long postId);
+
+    List<Comment> findAllByIdIn(List<Long> commentIds);
 }
