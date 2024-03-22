@@ -21,6 +21,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 
 import java.util.List;
 
@@ -70,6 +71,7 @@ public class SecurityConfig {
                                         .userService(customOAuth2UserService)
                         )
                 )
+                .addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class)
                 // 인증 필터
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 // 에러 핸들링
