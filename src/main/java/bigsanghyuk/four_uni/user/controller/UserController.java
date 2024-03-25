@@ -2,6 +2,8 @@ package bigsanghyuk.four_uni.user.controller;
 
 import bigsanghyuk.four_uni.CommonResponse;
 import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
+import bigsanghyuk.four_uni.config.mail.dto.SendMailRequest;
+import bigsanghyuk.four_uni.user.dto.request.ChangePasswordRequest;
 import bigsanghyuk.four_uni.user.dto.request.EditRequest;
 import bigsanghyuk.four_uni.user.dto.request.LoginRequest;
 import bigsanghyuk.four_uni.user.dto.request.SignRequest;
@@ -40,6 +42,20 @@ public class UserController {
     @PatchMapping("/users/{userId}")
     public ResponseEntity<EditResponse> editUser(@PathVariable(name = "userId") Long userId, @RequestBody EditRequest request) {
         return ResponseEntity.ok().body(userService.edit(userId, request.toDomain()));
+    }
+
+    @Operation(summary = "비밀번호 변경", description = "body에 userId, 이전 비밀번호, 신규 비밀번호 전달")
+    @PatchMapping("/users/password")
+    public ResponseEntity<CommonResponse> changePassword(@RequestBody ChangePasswordRequest request) throws IllegalAccessException {
+        Boolean result = userService.changePassword(request.toDomain());
+        return ResponseEntity.ok().body(new CommonResponse(result));
+    }
+
+    @Operation(summary = "임시 비밀번호 발급", description = "바디에 email 담아서 요청")
+    @PostMapping("/temp-pw")
+    public ResponseEntity<CommonResponse> tempPassword(@RequestBody SendMailRequest request) {
+        Boolean sendPw = userService.setToTempPassword(request.toDomain());
+        return ResponseEntity.ok().body(new CommonResponse(sendPw));
     }
 
     @Operation(summary = "유저 조회", description = "경로에 이메일 입력")
