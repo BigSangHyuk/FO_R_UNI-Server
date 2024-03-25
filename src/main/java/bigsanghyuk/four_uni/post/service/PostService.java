@@ -123,9 +123,7 @@ public class PostService {
         Iterator<Scrapped> it = scrappedRepository.findByUserIdOrderByScrappedAt(userId).iterator();
         LinkedList<Post> scrappedList = new LinkedList<>();
         while (it.hasNext()) {
-            Long postId = it.next().getPostId();
-            Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-            scrappedList.add(post);
+            scrappedList.add(it.next().getPost());
         }
         return scrappedList;
     }

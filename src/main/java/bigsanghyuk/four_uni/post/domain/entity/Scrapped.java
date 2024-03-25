@@ -24,13 +24,15 @@ public class Scrapped extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-    private Long postId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private Post post;
     private Long categoryId;
     private LocalDateTime scrappedAt;
 
-    public Scrapped(User user, Long postId, Long categoryId) {
+    public Scrapped(User user, Post post, Long categoryId) {
         this.user = user;
-        this.postId = postId;
+        this.post = post;
         this.categoryId = categoryId;
         this.scrappedAt = LocalDateTime.now();  //scrap 해제 후 다시 scrap 상황 생각시
     }
