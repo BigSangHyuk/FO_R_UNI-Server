@@ -6,6 +6,7 @@ import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
 import bigsanghyuk.four_uni.post.service.ScrappedService;
+import bigsanghyuk.four_uni.user.domain.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,11 +75,12 @@ class ScrappedServiceTest {
         postRepository.save(new Post(1L, false, "test1", "test1", List.of("test1"), 0, 0, true, LocalDate.now(), LocalDate.now()));
         Thread.sleep(500);
         postRepository.save(new Post(2L, false, "test2", "test2", List.of("test2"), 0, 0, true, LocalDate.now(), LocalDate.now()));
-        scrappedRepository.save(new Scrapped(testUserId, 100L, 10000L));
-        scrappedRepository.save(new Scrapped(testUserId, 200L, 20000L));
-        scrappedRepository.save(new Scrapped(testUserId, 300L, 30000L));
-        scrappedRepository.save(new Scrapped(testUserId, 400L, 40000L));
-        scrappedRepository.save(new Scrapped(testUserId, 500L, 50000L));
+        User user = User.builder().id(testUserId).build();
+        scrappedRepository.save(new Scrapped(user, 100L, 10000L));
+        scrappedRepository.save(new Scrapped(user, 200L, 20000L));
+        scrappedRepository.save(new Scrapped(user, 300L, 30000L));
+        scrappedRepository.save(new Scrapped(user, 400L, 40000L));
+        scrappedRepository.save(new Scrapped(user, 500L, 50000L));
     }
 
     @AfterEach

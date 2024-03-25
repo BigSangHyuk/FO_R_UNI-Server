@@ -6,6 +6,8 @@ import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.post.domain.ScrapInfo;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
+import bigsanghyuk.four_uni.user.domain.entity.User;
+import bigsanghyuk.four_uni.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
@@ -57,6 +59,8 @@ class PostControllerTest {
     @Autowired
     WebApplicationContext wac;
     MockMvc mockMvc;
+    @Autowired
+    UserRepository userRepository;
 
     @Test
     @DisplayName("괄호 있는 인코딩")
@@ -270,6 +274,7 @@ class PostControllerTest {
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
+        userRepository.save(User.builder().id(1L).email("string@string.com").password("string").name("string").dept(null).nickName("string").name("string").build());
         postRepository.save(new Post(1L, false, "title1", "content1", List.of("imageUrl1"), 0, 0, true, dateNow, dateNow));
         postRepository.save(new Post(2L, false, "title2", "content2", List.of("imageUrl2"), 0, 0, true, dateNow, dateNow));
         postRepository.save(new Post(2L, false, "title3", "content3", List.of("imageUrl3"), 0, 0, true, dateNow, dateNow));

@@ -1,9 +1,6 @@
 package bigsanghyuk.four_uni.comment.controller;
 
-import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
-import bigsanghyuk.four_uni.comment.domain.LikeCommentInfo;
-import bigsanghyuk.four_uni.comment.domain.RegisterCommentInfo;
-import bigsanghyuk.four_uni.comment.domain.UnLikeCommentInfo;
+import bigsanghyuk.four_uni.comment.domain.*;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.comment.repository.LikeCommentRepository;
@@ -119,7 +116,9 @@ class CommentControllerTest {
     @DisplayName("댓글 삭제 성공")
     @WithMockUser
     void deleteCommentSuccess() throws Exception {
-        mockMvc.perform(delete("/comments/{commentId}", "1"))
+        mockMvc.perform(delete("/comments/{commentId}", "1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new DeleteCommentInfo(1L, 1L, 1L))))
                 .andExpect(status().isOk());
         Assertions.assertThat(commentRepository.findById(1L)).isEmpty();
     }

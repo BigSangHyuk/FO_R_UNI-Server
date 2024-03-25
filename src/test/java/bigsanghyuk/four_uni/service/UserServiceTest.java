@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.service;
 
 import bigsanghyuk.four_uni.config.jwt.domain.Token;
 import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
+import bigsanghyuk.four_uni.department.domain.entity.Department;
 import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
@@ -36,13 +37,14 @@ class UserServiceTest {
     UserService service;
     @Autowired
     UserRepository repository;
+    public static final Department dept = Department.builder().id(1L).deptName("cse").build();
 
     @Test
     @DisplayName("회원가입 성공")
     void registerSuccess() throws Exception {
         log.info("[existUser] email={}, password={}", "test@test.com", "test");
         log.info("[addUser] email={}, password={}", "test1@test.com", "test");
-        SignUserInfo addUser = new SignUserInfo("test1@test.com", "test", "test", 10, "test", "test");
+        SignUserInfo addUser = new SignUserInfo("test1@test.com", "test", "test", dept, "test", "test");
         service.register(addUser);
         List<User> allUsers = repository.findAll();
         for (User user : allUsers) {
@@ -56,7 +58,7 @@ class UserServiceTest {
     void registerDuplicate() {
         log.info("[existUser] email={}, password={}", "test@test.com", "test");
         log.info("[addUser] email={}, password={}", "test@test.com", "test");
-        SignUserInfo addUser = new SignUserInfo("test@test.com", "test", "test", 10, "test", "test");
+        SignUserInfo addUser = new SignUserInfo("test@test.com", "test", "test", dept, "test", "test");
         assertThatThrownBy(() -> service.register(addUser))
                 .isInstanceOf(EmailDuplicateException.class);
     }
@@ -160,7 +162,7 @@ class UserServiceTest {
     void beforeEach() throws Exception {
         log.info("--- [beforeEach] add testUser ---");
         repository.deleteAll();
-        service.register(new SignUserInfo("test@test.com", "test", "test", 10, "test", "test"));
+        service.register(new SignUserInfo("test@test.com", "test", "test", dept, "test", "test"));
     }
 
     @AfterEach
