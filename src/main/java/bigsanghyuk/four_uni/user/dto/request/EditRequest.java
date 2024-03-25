@@ -1,5 +1,6 @@
 package bigsanghyuk.four_uni.user.dto.request;
 
+import bigsanghyuk.four_uni.department.domain.entity.Department;
 import bigsanghyuk.four_uni.user.domain.EditUserInfo;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -14,7 +15,7 @@ public class EditRequest {
     @NotNull
     private String name;
     @NotNull
-    private int dept;
+    private Department dept;
     @NotNull
     private String nickName;
     @NotNull

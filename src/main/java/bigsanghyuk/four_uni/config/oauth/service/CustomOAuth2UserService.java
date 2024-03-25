@@ -53,7 +53,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                         .email(email)
                         .nickName(attributes.getNickName())
                         .image(attributes.getImage())
-                        .dept(-1)   //null 이라고 생각
+                        .dept(null)   //null 이라고 생각
                         .name(attributes.getName())
                         .build());
         return userRepository.save(user);

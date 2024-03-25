@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.user.domain.entity;
 
 import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
+import bigsanghyuk.four_uni.department.domain.entity.Department;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -24,7 +25,9 @@ public class User extends BaseTimeEntity {
     private String email;
     private String password;
     private String name;
-    private int dept;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "dept_id")
+    private Department dept;
     private String nickName;
     private String image;
 
@@ -32,16 +35,7 @@ public class User extends BaseTimeEntity {
     @Builder.Default
     private List<Authority> roles = new ArrayList<>();
 
-    public User(String email, String password, String name, int dept, String nickName, String image) {
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.dept = dept;
-        this.nickName = nickName;
-        this.image = image;
-    }
-
-    public void edit(String password, String name, int dept, String nickName, String image) {
+    public void edit(String password, String name, Department dept, String nickName, String image) {
         this.password = password;
         this.name = name;
         this.dept = dept;

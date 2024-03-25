@@ -1,5 +1,6 @@
 package bigsanghyuk.four_uni.user.dto.request;
 
+import bigsanghyuk.four_uni.department.domain.entity.Department;
 import bigsanghyuk.four_uni.user.domain.SignUserInfo;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +17,7 @@ public class SignRequest {
     @NotNull
     private String name;
     @NotNull
-    private int dept;
+    private Department dept;
     @NotNull
     private String nickName;
     private String image;

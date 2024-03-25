@@ -38,7 +38,7 @@ public class UserControllerTest {
                 .name("test_name")
                 .email("test_email@test.com")
                 .password(randomCode)
-                .dept(1)
+                .dept(null)
                 .image("test_image_url")
                 .nickName("test_nickname")
                 .build();
