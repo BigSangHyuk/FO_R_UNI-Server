@@ -30,8 +30,11 @@ public class Comment extends BaseTimeEntity {
 
     @Setter @ColumnDefault("false")
     private boolean reported;
-    @ColumnDefault("null")
-    private Long parentCommentId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
     @ColumnDefault("0")
     private int commentLike;
     private String content;
@@ -39,10 +42,10 @@ public class Comment extends BaseTimeEntity {
     @Setter
     private int commentReportCount;
 
-    public Comment(User user, Post post, Long parentCommentId, int commentLike, String content, boolean reported) {
+    public Comment(User user, Post post, Comment parent, int commentLike, String content, boolean reported) {
         this.user = user;
         this.post = post;
-        this.parentCommentId = parentCommentId;
+        this.parent = parent;
         this.commentLike = commentLike;
         this.content = content;
         this.reported = reported;
@@ -52,7 +55,7 @@ public class Comment extends BaseTimeEntity {
         this.content = editCommentInfo.getContent();
     }
 
-    public void updateParent(Long parentCommentId) {
-        this.parentCommentId = parentCommentId;
+    public void updateParent(Comment parent) {
+        this.parent = parent;
     }
 }

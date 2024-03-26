@@ -58,7 +58,7 @@ public class ReportService {
             commentRepository.save(comment);
 
             Report newReport = Report.builder()
-                    .userId(user.getId())
+                    .user(user)
                     .commentId(comment.getId())
                     .reason(reason)
                     .detail(detail)
@@ -95,7 +95,7 @@ public class ReportService {
             postRepository.save(post);
 
             Report newReport = Report.builder()
-                    .userId(user.getId())
+                    .user(user)
                     .postId(post.getId())
                     .reason(reason)
                     .detail(detail)
