@@ -67,6 +67,7 @@ public class PostService {
             postRepository.save(
                     Post.builder()
                             .categoryId(registerPostInfo.getCategoryId())
+                            .categoryType(registerPostInfo.getCategoryType())
                             .title(registerPostInfo.getTitle())
                             .content(registerPostInfo.getContent())
                             .imageUrl(registerPostInfo.getImageUrl())

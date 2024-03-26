@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.post.domain.entity;
 
 import bigsanghyuk.four_uni.config.StringToListConverter;
 import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
+import bigsanghyuk.four_uni.user.enums.CategoryType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -20,6 +21,11 @@ public class Post extends BaseTimeEntity {
     @Column(name = "post_id")
     private Long id;
     private Long categoryId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category")
+    private CategoryType categoryType;
+
     @Setter @ColumnDefault("false")
     private boolean reported;
     private String title;

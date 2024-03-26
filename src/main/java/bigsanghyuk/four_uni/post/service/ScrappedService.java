@@ -33,7 +33,7 @@ public class ScrappedService {
         Post post = postRepository.findById(scrapInfo.getPostId())
                 .orElseThrow(PostNotFoundException::new);
 
-        Scrapped scrapped = new Scrapped(user, post, post.getCategoryId());
+        Scrapped scrapped = new Scrapped(user, post);
         scrappedRepository.save(scrapped);
     }
 
