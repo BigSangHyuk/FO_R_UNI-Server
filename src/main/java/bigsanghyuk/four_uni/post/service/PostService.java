@@ -119,13 +119,15 @@ public class PostService {
         return result;
     }
 
-    public List<Post> getScrappedList(Long userId) {
-        Iterator<Scrapped> it = scrappedRepository.findByUserIdOrderByScrappedAt(userId).iterator();
-        LinkedList<Post> scrappedList = new LinkedList<>();
-        while (it.hasNext()) {
-            scrappedList.add(it.next().getPost());
+    public List<PostRequired> getScrappedRequired(Long userId) {
+        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        List<ScrappedRequired> required = scrappedRepository.findRequired(userId);
+        LinkedList<PostRequired> posts = new LinkedList<>();
+        for (ScrappedRequired scrappedRequired : required) {
+            PostRequired found = postRepository.findRequiredByPostId(scrappedRequired.getPostId());
+            posts.add(found);
         }
-        return scrappedList;
+        return posts;
     }
 
     public List<Post> getCommented(Long userId) throws IllegalAccessException {

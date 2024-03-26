@@ -9,11 +9,8 @@ import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,10 +19,6 @@ public class ScrappedService {
     private final ScrappedRepository scrappedRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-
-    public List<Scrapped> getScrappedList(@NotNull Long userId) {
-        return scrappedRepository.findByUserIdOrderByScrappedAt(userId);
-    }
 
     public void scrap(ScrapInfo scrapInfo) {
         User user = userRepository.findById(scrapInfo.getUserId())
@@ -38,6 +31,11 @@ public class ScrappedService {
     }
 
     public void unScrap(ScrapInfo scrapInfo) {
-        scrappedRepository.deleteScrappedByUserIdAndPostId(scrapInfo.getUserId(), scrapInfo.getPostId());
+        User user = userRepository.findById(scrapInfo.getUserId())
+                .orElseThrow(UserNotFoundException::new);
+        Post post = postRepository.findById(scrapInfo.getPostId())
+                .orElseThrow(PostNotFoundException::new);
+
+        scrappedRepository.deleteScrappedByUserAndPost(user, post);
     }
 }
