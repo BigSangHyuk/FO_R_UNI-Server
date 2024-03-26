@@ -37,19 +37,22 @@ public class CommentService {
     public void register(RegisterCommentInfo registerCommentInfo) {
         Long userId = registerCommentInfo.getUserId();
         Long postId = registerCommentInfo.getPostId();
-        Long parentCommentId = registerCommentInfo.getParentCommentId();
+
+        Comment parent = null;
+        if (registerCommentInfo.getParentCommentId() != null) {
+            parent = commentRepository.findById(registerCommentInfo.getParentCommentId()).orElseThrow(CommentNotFoundException::new);
+        }
 
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        Comment parentComment = commentRepository.findById(parentCommentId).orElseThrow(CommentNotFoundException::new);
-        Comment comment = new Comment(
-                user,
-                post,
-                parentComment,
-                registerCommentInfo.getCommentLike(),
-                registerCommentInfo.getContent(),
-                false
-        );
+
+        Comment comment = Comment.builder()
+                .user(user)
+                .post(post)
+                .parent(parent)
+                .content(registerCommentInfo.getContent())
+                .build();
+
         commentRepository.save(comment);
     }
 

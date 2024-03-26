@@ -42,20 +42,7 @@ public class Comment extends BaseTimeEntity {
     @Setter
     private int commentReportCount;
 
-    public Comment(User user, Post post, Comment parent, int commentLike, String content, boolean reported) {
-        this.user = user;
-        this.post = post;
-        this.parent = parent;
-        this.commentLike = commentLike;
-        this.content = content;
-        this.reported = reported;
-    }
-
     public void edit(@Valid EditCommentInfo editCommentInfo) {
         this.content = editCommentInfo.getContent();
-    }
-
-    public void updateParent(Comment parent) {
-        this.parent = parent;
     }
 }
