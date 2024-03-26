@@ -2,15 +2,11 @@ package bigsanghyuk.four_uni.comment.domain.entity;
 
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
 import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
+import bigsanghyuk.four_uni.user.domain.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Entity @Builder
 @Getter @Table(name = "comments")
@@ -23,7 +19,10 @@ public class Comment extends BaseTimeEntity {
     @Column(name = "comment_id")
     private Long id;
 
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private Long postId;
     @Setter @ColumnDefault("false")
     private boolean reported;
@@ -36,8 +35,8 @@ public class Comment extends BaseTimeEntity {
     @Setter
     private int commentReportCount;
 
-    public Comment(Long userId, Long postId, Long parentCommentId, int commentLike, String content, boolean reported) {
-        this.userId = userId;
+    public Comment(User user, Long postId, Long parentCommentId, int commentLike, String content, boolean reported) {
+        this.user = user;
         this.postId = postId;
         this.parentCommentId = parentCommentId;
         this.commentLike = commentLike;

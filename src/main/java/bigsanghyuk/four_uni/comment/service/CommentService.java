@@ -13,6 +13,8 @@ import bigsanghyuk.four_uni.exception.comment.CommentRemoveOtherUserException;
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
+import bigsanghyuk.four_uni.user.domain.entity.User;
+import bigsanghyuk.four_uni.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,12 +31,16 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final LikeCommentRepository likeCommentRepository;
+    private final UserRepository userRepository;
 
     public void register(RegisterCommentInfo registerCommentInfo) {
+        Long userId = registerCommentInfo.getUserId();
         Long postId = registerCommentInfo.getPostId();
+
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         Comment comment = new Comment(
-                registerCommentInfo.getUserId(),
+                user,
                 postId,
                 registerCommentInfo.getParentCommentId(),
                 registerCommentInfo.getCommentLike(),
@@ -54,7 +60,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(CommentNotFoundException::new);
 
-        if (!editCommentInfo.getUserId().equals(comment.getUserId())) {
+        if (!editCommentInfo.getUserId().equals(comment.getUser().getId())) {
             throw new CommentEditOtherUserException();
         }
 
@@ -74,7 +80,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(CommentNotFoundException::new);
 
-        if (!deleteCommentInfo.getUserId().equals(comment.getUserId())) {
+        if (!deleteCommentInfo.getUserId().equals(comment.getUser().getId())) {
             throw new CommentRemoveOtherUserException();
         }
 
