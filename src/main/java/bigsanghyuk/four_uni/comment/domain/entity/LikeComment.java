@@ -1,15 +1,11 @@
 package bigsanghyuk.four_uni.comment.domain.entity;
 
 import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
+import bigsanghyuk.four_uni.user.domain.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Entity @Getter
 @Table(name = "like_comments")
@@ -21,11 +17,16 @@ public class LikeComment extends BaseTimeEntity {
     @Column(name = "liked_comment_id")
     private Long id;
 
-    private Long userId;
-    private Long commentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    public LikeComment(Long userId, Long commentId) {
-        this.userId = userId;
-        this.commentId = commentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
+
+    public LikeComment(User user, Comment comment) {
+        this.user = user;
+        this.comment = comment;
     }
 }
