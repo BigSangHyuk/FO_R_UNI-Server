@@ -87,19 +87,20 @@ public class CommentService {
             throw new CommentRemoveOtherUserException();
         }
 
-        commentRepository.deleteCommentByAndId(commentId);
-        likeCommentRepository.deleteLikeCommentByCommentId(commentId);
+        commentRepository.deleteById(comment.getId());
+        likeCommentRepository.deleteLikeCommentByComment(comment);
     }
 
     public List<Comment> getAllComments(Long postId) {
-        postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
         List<Comment> comments;
         List<Comment> childComments = new ArrayList<>();
-        comments = commentRepository.findParentComments(postId);
+        comments = commentRepository.findParentComments(post);
 
-        for (Comment parentComment : comments) {
-            childComments.addAll(commentRepository.findChildComments(postId, parentComment.getId()));
+        for (Comment parent : comments) {
+            childComments.addAll(commentRepository.findChildComments(post, parent));
         }
 
         comments.addAll(childComments);
@@ -107,10 +108,11 @@ public class CommentService {
     }
 
     public List<Comment> getLikedComment(Long userId) {
+
         LinkedList<Comment> comments = new LinkedList<>();
         List<LikeComment> likedComments = likeCommentRepository.findByUserIdOrderByIdDesc(userId);
         for (LikeComment likeComment : likedComments) {
-            comments.add(commentRepository.findById(likeComment.getCommentId()).orElseThrow(CommentNotFoundException::new));
+            comments.add(likeComment.getComment());
         }
 
         return comments;
