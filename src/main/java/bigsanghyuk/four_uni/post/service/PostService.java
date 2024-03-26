@@ -66,7 +66,6 @@ public class PostService {
         } else {
             postRepository.save(
                     Post.builder()
-                            .categoryId(registerPostInfo.getCategoryId())
                             .categoryType(registerPostInfo.getCategoryType())
                             .title(registerPostInfo.getTitle())
                             .content(registerPostInfo.getContent())
@@ -92,7 +91,7 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         GetDetailResponse response = GetDetailResponse.builder()
                 .id(postId)
-                .categoryId(post.getCategoryId())
+                .categoryType(post.getCategoryType())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .imageUrl(post.getImageUrl())
@@ -132,9 +131,9 @@ public class PostService {
     public List<Post> getCommented(Long userId) throws IllegalAccessException {
         List<Comment> comments = commentRepository.findByUserIdOrderByIdDesc(userId).orElseThrow(IllegalAccessException::new);
         LinkedHashSet<Long> set = new LinkedHashSet<>();
-        List<Post> result = new ArrayList<>();
+        LinkedList<Post> result = new LinkedList<>();
         for (Comment comment : comments) {
-            set.add(comment.getPostId());
+            set.add(comment.getPost().getId());
         }
         for (Long postId : set) {
             result.add(postRepository.findById(postId).orElseThrow(PostNotFoundException::new));

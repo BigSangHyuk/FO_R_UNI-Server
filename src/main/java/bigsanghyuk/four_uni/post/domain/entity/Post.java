@@ -20,7 +20,6 @@ public class Post extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
     private Long id;
-    private Long categoryId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
@@ -44,17 +43,4 @@ public class Post extends BaseTimeEntity {
 
     @Column(name = "notice_url", unique = true)
     private String noticeUrl;
-
-    public Post(Long categoryId, boolean reported, String title, String content, List<String> imageUrl, int views, int postReportCount, boolean isClassified, LocalDate postedAt, LocalDate deadline) {
-        this.categoryId = categoryId;
-        this.reported = reported;
-        this.title = title;
-        this.content = content;
-        this.imageUrl = imageUrl;
-        this.views = views;
-        this.postReportCount = postReportCount;
-        this.isClassified = isClassified;
-        this.postedAt = postedAt;
-        this.deadline = deadline;
-    }
 }

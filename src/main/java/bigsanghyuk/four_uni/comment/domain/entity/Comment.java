@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.comment.domain.entity;
 
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
 import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
+import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -23,7 +24,10 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private Long postId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private Post post;
+
     @Setter @ColumnDefault("false")
     private boolean reported;
     @ColumnDefault("null")
@@ -35,9 +39,9 @@ public class Comment extends BaseTimeEntity {
     @Setter
     private int commentReportCount;
 
-    public Comment(User user, Long postId, Long parentCommentId, int commentLike, String content, boolean reported) {
+    public Comment(User user, Post post, Long parentCommentId, int commentLike, String content, boolean reported) {
         this.user = user;
-        this.postId = postId;
+        this.post = post;
         this.parentCommentId = parentCommentId;
         this.commentLike = commentLike;
         this.content = content;

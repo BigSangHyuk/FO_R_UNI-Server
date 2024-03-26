@@ -12,6 +12,7 @@ import bigsanghyuk.four_uni.exception.comment.CommentNotFoundException;
 import bigsanghyuk.four_uni.exception.comment.CommentRemoveOtherUserException;
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
+import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
@@ -38,10 +39,10 @@ public class CommentService {
         Long postId = registerCommentInfo.getPostId();
 
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         Comment comment = new Comment(
                 user,
-                postId,
+                post,
                 registerCommentInfo.getParentCommentId(),
                 registerCommentInfo.getCommentLike(),
                 registerCommentInfo.getContent(),
