@@ -13,20 +13,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Boolean existsPostByNoticeUrl(String noticeUrl);
 
-    //제목이나 내용에 키워드가 포함된 글 조회
-    List<Post> findByTitleContainingOrContentContaining(String keywordTitle, String keywordContent);
-
     //categoryId가 서로 다른 글들을 동시에 조회 (필터에서 사용)
-    List<Post> findByCategoryIdIn(List<Long> categoryIds);
-
-    //startDate ~ endDate 사이에 게시된 글들 조회
-    List<Post> findByPostedAtBetween(LocalDate startDate, LocalDate endDate);
-
-    //deadline 이 특정 날짜 이전인 글만 조회
-    List<Post> findByDeadlineBefore(LocalDate deadline);
-
-    //미분류 게시판 사용 용도 (미분류된 게시글들만 조회)
-    List<Post> findByIsClassifiedFalse();
+    List<Post> findPostByCategoryTypeIn(List<String> categoryNames);
 
     @Query(
             nativeQuery = true,

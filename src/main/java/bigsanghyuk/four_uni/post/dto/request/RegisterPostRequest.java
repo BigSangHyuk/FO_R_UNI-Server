@@ -16,7 +16,6 @@ public class RegisterPostRequest {
 
     @JsonProperty(value = "category_id")
     private Long categoryId;
-    private CategoryType categoryType;
     private String title;
     private String content;
     @JsonProperty(value = "img_url")
@@ -30,6 +29,6 @@ public class RegisterPostRequest {
     private String noticeUrl;
 
     public RegisterPostInfo toDomain() {
-        return new RegisterPostInfo(title, content, categoryId, categoryType, imageUrl, noticeUrl, postedAt, deadline, isClassified);
+        return new RegisterPostInfo(title, content, categoryId, imageUrl, noticeUrl, postedAt, deadline, isClassified);
     }
 }

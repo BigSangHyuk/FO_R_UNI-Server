@@ -33,11 +33,7 @@ public class PostController {
     @Operation(summary = "게시글 등록", description = "김동후 전용")
     @PostMapping("/add-post")
     public ResponseEntity<?> registerPost(@RequestBody String data) throws JsonProcessingException {
-        int success = 0;
-        List<RegisterPostInfo> infos = postService.jsonToDto(data);
-        for (RegisterPostInfo info : infos) {
-            success += postService.addPost(info);
-        }
+        int success = postService.getAddPostResult(data);
         return ResponseEntity.ok().body("{\"articles added\": " + success + "}");
     }
 

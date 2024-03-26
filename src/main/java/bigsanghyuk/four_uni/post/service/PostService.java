@@ -3,14 +3,17 @@ package bigsanghyuk.four_uni.post.service;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
+import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
 import bigsanghyuk.four_uni.post.domain.RegisterPostInfo;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
-import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
+import bigsanghyuk.four_uni.post.domain.entity.ScrappedRequired;
 import bigsanghyuk.four_uni.post.dto.request.RegisterPostRequest;
 import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
 import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
+import bigsanghyuk.four_uni.user.enums.CategoryType;
+import bigsanghyuk.four_uni.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
@@ -35,6 +38,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final ScrappedRepository scrappedRepository;
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
     public List<RegisterPostInfo> jsonToDto(String data) throws JsonProcessingException {
         JSONParser jsonParser = new JSONParser();
@@ -52,7 +56,21 @@ public class PostService {
         return infos;
     }
 
-    public int addPost(RegisterPostInfo registerPostInfo) {
+    public int getAddPostResult(String data) throws JsonProcessingException {
+        int success = 0;
+        List<RegisterPostInfo> infos = jsonToDto(data);
+        CategoryType[] values = CategoryType.values();
+        for (RegisterPostInfo info : infos) {
+            for (CategoryType value : values) {
+                if (value.getId() == (int) (long) info.getCategoryId()) {
+                    success += addPost(info, CategoryType.valueOf(value.getKey()));
+                }
+            }
+        }
+        return success;
+    }
+
+    public int addPost(RegisterPostInfo registerPostInfo, CategoryType categoryType) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         LocalDate postedAt = LocalDate.parse(registerPostInfo.getPostedAt(), formatter);
         LocalDate deadline;
@@ -66,7 +84,7 @@ public class PostService {
         } else {
             postRepository.save(
                     Post.builder()
-                            .categoryType(registerPostInfo.getCategoryType())
+                            .categoryType(categoryType)
                             .title(registerPostInfo.getTitle())
                             .content(registerPostInfo.getContent())
                             .imageUrl(registerPostInfo.getImageUrl())
@@ -77,10 +95,6 @@ public class PostService {
                             .build());
             return 1;
         }
-    }
-
-    public List<Post> getUnClassifiedLists() {
-        return postRepository.findByIsClassifiedFalse();
     }
 
     public List<PostRequired> getUnclassifiedRequired() {
@@ -106,8 +120,17 @@ public class PostService {
         return response;
     }
 
-    public List<Post> getFilteredPostsByCategoryIds(List<Long> categoryIds) {
-        return postRepository.findByCategoryIdIn(categoryIds);
+    public List<Post> getFilteredPostsRequired(List<Long> categoryIds) {
+        List<String> categoryNames = new ArrayList<>();
+        CategoryType[] values = CategoryType.values();
+        for (Long id : categoryIds) {
+            for (CategoryType value : values) {
+                if ((int) value.getId() == id) {
+                    categoryNames.add(value.getKey());
+                }
+            }
+        }
+        return postRepository.findPostByCategoryTypeIn(categoryNames);
     }
 
     public List<Long> hyphenStringToList(String input, String delimiter) {
@@ -141,20 +164,6 @@ public class PostService {
             result.add(postRepository.findById(postId).orElseThrow(PostNotFoundException::new));
         }
         return result;
-    }
-
-    public List<Post> getPostsByDate(String date) { //date format example: 2024-03
-        StringTokenizer st = new StringTokenizer(date, "-");
-        DateFilter filter = new DateFilter(st);
-
-        return postRepository.findPostsByCurrentAndAdjacentMonths(
-                filter.getCurrentMonth().getYear(),
-                filter.getCurrentMonth().getMonthValue(),
-                filter.getPrevMonth().getYear(),
-                filter.getPrevMonth().getMonthValue(),
-                filter.getNextMonth().getYear(),
-                filter.getNextMonth().getMonthValue()
-        );
     }
 
     public List<PostRequired> getPostsByDateRequired(String date) { //date format example: 2024-03
