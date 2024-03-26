@@ -53,7 +53,7 @@ public class UserService {
                     .email(info.getEmail())
                     .password(encoder.encode(info.getPassword()))
                     .name(info.getName())
-                    .dept(info.getDept())
+                    .departmentType(info.getDepartmentType())
                     .nickName(info.getNickName())
                     .image(info.getImage())
                     .build();
@@ -74,12 +74,12 @@ public class UserService {
     public EditResponse edit(Long userId, EditUserInfo info) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        user.edit(encoder.encode(info.getPassword()), info.getName(), info.getDept(), info.getNickName(), info.getImage());
+        user.edit(encoder.encode(info.getPassword()), info.getName(), info.getDepartmentType(), info.getNickName(), info.getImage());
         User savedUser = userRepository.save(user);
         return EditResponse.builder()
                 .id(savedUser.getId())
                 .name(savedUser.getName())
-                .dept(savedUser.getDept())
+                .departmentType(savedUser.getDepartmentType())
                 .nickName(savedUser.getNickName())
                 .image(savedUser.getImage())
                 .roles(savedUser.getRoles())
@@ -97,7 +97,7 @@ public class UserService {
                 .id(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
-                .dept(user.getDept())
+                .departmentType(user.getDepartmentType())
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())
