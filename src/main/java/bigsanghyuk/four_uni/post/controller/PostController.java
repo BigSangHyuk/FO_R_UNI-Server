@@ -4,7 +4,6 @@ import bigsanghyuk.four_uni.CommonResponse;
 import bigsanghyuk.four_uni.Results;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.service.CommentService;
-import bigsanghyuk.four_uni.post.domain.RegisterPostInfo;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
 import bigsanghyuk.four_uni.post.dto.request.ScrapRequest;
@@ -45,27 +44,18 @@ public class PostController {
         return ResponseEntity.ok().body(new Details(detail, comments));
     }
 
-    /*
-    @Operation(summary = "미분류 게시글 조회", description = "파라미터 없이 호출")
-    @GetMapping("/posts/unclassified")
-    public ResponseEntity<Results<List<Post>>> getUnclassified() {
-        List<Post> unClassifiedPosts = postService.getUnClassifiedLists();
-        return ResponseEntity.ok().body(new Results<>(unClassifiedPosts, unClassifiedPosts.size()));
-    }
-    */
-
-    @Operation(summary = "미분류 게시글 최소 항목 조회", description = "postId, categoryId, title, deadline 만 반환")
+    @Operation(summary = "미분류 게시글 최소 항목 조회", description = "postId, category, title, deadline 만 반환")
     @GetMapping("/posts/unclassified")
     public ResponseEntity<Results<List<PostRequired>>> getUnclassifiedRequiredData() {
         List<PostRequired> result = postService.getUnclassifiedRequired();
         return ResponseEntity.ok().body(new Results<>(result, result.size()));
     }
 
-    @Operation(summary = "게시글 필터로 조회", description = "/posts/filter?id=1-2-3-4 이런 식으로 id1-id2-...로 전달")
+    @Operation(summary = "게시글 필터 최소 항목 조회", description = "/posts/filter?id=1-2-3-4 이런 식으로 id1-id2-...로 전달")
     @GetMapping("/posts/filter")
-    public ResponseEntity<Results<List<Post>>> getByFiltered(@RequestParam(name = "id") String id) {
+    public ResponseEntity<Results<List<Post>>> getByFilteredRequiredData(@RequestParam(name = "id") String id) {
         List<Long> categoryIds = postService.hyphenStringToList(id, "-");
-        List<Post> filteredPosts = postService.getFilteredPostsByCategoryIds(categoryIds);
+        List<Post> filteredPosts = postService.getFilteredPostsRequired(categoryIds);
         return ResponseEntity.ok().body(new Results<>(filteredPosts, filteredPosts.size()));
     }
 
@@ -83,10 +73,10 @@ public class PostController {
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
-    @Operation(summary = "스크랩한 게시글 조회", description = "파라미터로 userId 전달")
+    @Operation(summary = "스크랩한 게시글 최소 항목 조회", description = "파라미터로 userId 전달")
     @GetMapping("/posts/scrapped")
-    public ResponseEntity<Results<List<Post>>> getScrapped(@RequestParam(name = "userId") Long userId) {
-        List<Post> scrappedList = postService.getScrappedList(userId);
+    public ResponseEntity<Results<List<PostRequired>>> getScrappedRequiredData(@RequestParam(name = "userId") Long userId) {
+        List<PostRequired> scrappedList = postService.getScrappedRequired(userId);
         return ResponseEntity.ok().body(new Results<>(scrappedList, scrappedList.size()));
     }
 
@@ -96,15 +86,6 @@ public class PostController {
         List<Post> commentedPostList = postService.getCommented(userId);
         return ResponseEntity.ok().body(new Results<>(commentedPostList, commentedPostList.size()));
     }
-
-    /*
-    @Operation(summary = "해당하는 연, 월의 게시글 조회", description = "2024-03 형식으로 연 월 전달하면 해당 달 앞, 뒤 1달까지의 글 반환")
-    @GetMapping("/posts/date")
-    public ResponseEntity<List<Post>> getPostByDate(@RequestParam(name = "target") String date) {
-        List<Post> postsByDate = postService.getPostsByDate(date);
-        return ResponseEntity.ok().body(postsByDate);
-    }
-    */
 
     @Operation(summary = "해당하는 연, 월의 게시글 최소 항목 조회", description = "2024-03 형식으로 연 월 전달하면 해당 달 앞, 뒤 1달까지의 글 반환")
     @GetMapping("/posts/date")
