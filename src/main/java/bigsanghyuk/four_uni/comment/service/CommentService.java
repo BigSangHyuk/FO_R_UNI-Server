@@ -4,7 +4,9 @@ import bigsanghyuk.four_uni.comment.domain.DeleteCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.RegisterCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
+import bigsanghyuk.four_uni.comment.domain.entity.CommentProfile;
 import bigsanghyuk.four_uni.comment.domain.entity.CommentRequired;
+import bigsanghyuk.four_uni.comment.dto.CommentDto;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.comment.repository.LikeCommentRepository;
 import bigsanghyuk.four_uni.exception.comment.CommentEditOtherUserException;
@@ -12,9 +14,10 @@ import bigsanghyuk.four_uni.exception.comment.CommentNotFoundException;
 import bigsanghyuk.four_uni.exception.comment.CommentRemoveOtherUserException;
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
-import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.user.domain.entity.User;
+import bigsanghyuk.four_uni.user.domain.entity.UserRequired;
+import bigsanghyuk.four_uni.user.dto.UserDto;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -93,19 +96,27 @@ public class CommentService {
         commentRepository.deleteById(comment.getId());
     }
 
-    public List<Comment> getAllComments(Long postId) {
-
+    public List<CommentDto> getAllComments(Long postId) {
         postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
-        List<Comment> comments;
-        List<Comment> childComments = new ArrayList<>();
-        comments = commentRepository.findParentComments(postId);
+        List<CommentProfile> parentsProfile = commentRepository.findParentComments(postId);
+        List<CommentDto> comments = new ArrayList<>();
 
-        for (Comment parent : comments) {
-            childComments.addAll(commentRepository.findChildComments(postId, parent.getId()));
+        for (CommentProfile parent : parentsProfile) {
+            UserRequired parentRequired = userRepository.getUserRequired(parent.getUserId());
+            UserDto parentDto = makeUserDto(parentRequired);
+
+            List<CommentProfile> childrenProfile = commentRepository.findChildComments(postId, parent.getUserId());
+            List<CommentDto> children = new ArrayList<>();
+            for (CommentProfile child : childrenProfile) {
+                UserRequired childRequired = userRepository.getUserRequired(child.getUserId());
+                UserDto childDto = makeUserDto(childRequired);
+                CommentDto commentDto = makeCommentDto(child, childDto, null);
+                children.add(commentDto);
+            }
+            CommentDto commentDto = makeCommentDto(parent, parentDto, children);
+            comments.add(commentDto);
         }
-
-        comments.addAll(childComments);
 
         return comments;
     }
@@ -119,5 +130,26 @@ public class CommentService {
             comments.add(commentRequired);
         }
         return comments;
+    }
+
+    private UserDto makeUserDto(UserRequired userRequired) {
+        return UserDto.builder()
+                .userId(userRequired.getUserId())
+                .email(userRequired.getEmail())
+                .name(userRequired.getName())
+                .nickName(userRequired.getNickName())
+                .image(userRequired.getImage())
+                .build();
+    }
+
+    private CommentDto makeCommentDto(CommentProfile profile, UserDto userDto, List<CommentDto> children) {
+        return CommentDto.builder()
+                .commentId(profile.getCommentId())
+                .userId(profile.getUserId())
+                .user(userDto)
+                .commentLike(profile.getCommentLike())
+                .content(profile.getContent())
+                .children(children)
+                .build();
     }
 }
