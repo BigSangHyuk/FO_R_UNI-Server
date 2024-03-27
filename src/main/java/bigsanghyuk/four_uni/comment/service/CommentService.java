@@ -4,7 +4,7 @@ import bigsanghyuk.four_uni.comment.domain.DeleteCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.RegisterCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
-import bigsanghyuk.four_uni.comment.domain.entity.LikeComment;
+import bigsanghyuk.four_uni.comment.domain.entity.CommentRequired;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.comment.repository.LikeCommentRepository;
 import bigsanghyuk.four_uni.exception.comment.CommentEditOtherUserException;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -90,34 +89,35 @@ public class CommentService {
             throw new CommentRemoveOtherUserException();
         }
 
-        commentRepository.deleteById(comment.getId());
         likeCommentRepository.deleteLikeCommentByComment(comment);
+        commentRepository.deleteById(comment.getId());
     }
 
     public List<Comment> getAllComments(Long postId) {
 
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
         List<Comment> comments;
         List<Comment> childComments = new ArrayList<>();
-        comments = commentRepository.findParentComments(post);
+        comments = commentRepository.findParentComments(postId);
 
         for (Comment parent : comments) {
-            childComments.addAll(commentRepository.findChildComments(post, parent));
+            childComments.addAll(commentRepository.findChildComments(postId, parent.getId()));
         }
 
         comments.addAll(childComments);
+
         return comments;
     }
 
-    public List<Comment> getLikedComment(Long userId) {
-
-        LinkedList<Comment> comments = new LinkedList<>();
-        List<LikeComment> likedComments = likeCommentRepository.findByUserIdOrderByIdDesc(userId);
-        for (LikeComment likeComment : likedComments) {
-            comments.add(likeComment.getComment());
+    public List<CommentRequired> getLikedComment(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        List<CommentRequired> comments = new ArrayList<>();
+        List<Long> commentIds = likeCommentRepository.findCommentIds(user);
+        for (Long commentId : commentIds) {
+            CommentRequired commentRequired = commentRepository.findCommentRequired(commentId);
+            comments.add(commentRequired);
         }
-
         return comments;
     }
 }

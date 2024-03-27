@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.comment.repository;
 
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
+import bigsanghyuk.four_uni.comment.domain.entity.CommentRequired;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -26,14 +27,18 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Optional<List<Comment>> findByUserIdOrderByIdDesc(Long userId);
 
     @Query("SELECT c FROM Comment c " +
-            "WHERE c.post = :postId AND c.parent = :parent AND c.parent IS NOT NULL " +
+            "WHERE c.post.id = :postId AND c.parent.id = :parentId AND c.parent IS NOT NULL " +
             "ORDER BY c.createdAt ASC")
-    List<Comment> findChildComments(@Param("postId") Post post, @Param("parent") Comment parent);
+    List<Comment> findChildComments(@Param("postId") Long postId, @Param("parentId") Long parentId);
 
     @Query("SELECT c FROM Comment c " +
-            "WHERE c.post = :post AND c.parent IS NULL " +
+            "WHERE c.post.id = :postId AND c.parent IS NULL " +
             "ORDER BY c.createdAt ASC")
-    List<Comment> findParentComments(@Param("post") Post post);
+    List<Comment> findParentComments(@Param("postId") Long postId);
 
-    List<Comment> findAllByIdIn(List<Long> commentIds);
+    @Query(nativeQuery = true,
+            value = "SELECT comment_id as commentId, user_id as userId, post_id as postId, " +
+                    "comment_like as commentLike, content as content FROM Comments " +
+                    "WHERE comment_id = :commentId")
+    CommentRequired findCommentRequired(@Param("commentId") Long commentId);
 }
