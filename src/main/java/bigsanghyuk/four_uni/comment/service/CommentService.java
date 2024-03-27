@@ -43,11 +43,11 @@ public class CommentService {
         }
 
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
         Comment comment = Comment.builder()
                 .user(user)
-                .post(post)
+                .postId(postId)
                 .parent(parent)
                 .content(registerCommentInfo.getContent())
                 .build();

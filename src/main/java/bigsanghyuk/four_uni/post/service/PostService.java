@@ -158,7 +158,7 @@ public class PostService {
         LinkedHashSet<Long> set = new LinkedHashSet<>();
         LinkedList<Post> result = new LinkedList<>();
         for (Comment comment : comments) {
-            set.add(comment.getPost().getId());
+            set.add(comment.getPostId());
         }
         for (Long postId : set) {
             result.add(postRepository.findById(postId).orElseThrow(PostNotFoundException::new));
