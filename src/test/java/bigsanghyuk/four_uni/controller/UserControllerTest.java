@@ -1,15 +1,12 @@
 package bigsanghyuk.four_uni.controller;
 
 import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
-import bigsanghyuk.four_uni.user.domain.SignUserInfo;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
-import bigsanghyuk.four_uni.user.dto.request.SignRequest;
 import bigsanghyuk.four_uni.user.enums.CategoryType;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
 import bigsanghyuk.four_uni.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jose.shaded.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
