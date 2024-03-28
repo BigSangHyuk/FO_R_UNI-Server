@@ -3,7 +3,6 @@ package bigsanghyuk.four_uni.comment.repository;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.domain.entity.CommentProfile;
 import bigsanghyuk.four_uni.comment.domain.entity.CommentRequired;
-import bigsanghyuk.four_uni.post.domain.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -47,4 +46,12 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
                     "comment_like as commentLike, content as content FROM Comments " +
                     "WHERE comment_id = :commentId")
     CommentRequired findCommentRequired(@Param("commentId") Long commentId);
+
+    @Query(
+            nativeQuery = true,
+            value = "DELETE FROM Comments WHERE parent_id = :parentId"
+    )
+    @Transactional
+    @Modifying
+    void deleteChildrenByParentId(@Param("parentId") Long parentId);
 }
