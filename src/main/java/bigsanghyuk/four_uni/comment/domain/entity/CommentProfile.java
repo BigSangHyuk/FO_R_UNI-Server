@@ -15,4 +15,6 @@ public interface CommentProfile {
     int getCommentLike();
 
     String getContent();
+
+    boolean isDeleted();
 }

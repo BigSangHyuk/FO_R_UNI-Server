@@ -28,7 +28,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query(nativeQuery = true,
             value = "SELECT comment_id as commentId, user_id as userId, " +
-                    "comment_like as commentLike, content FROM comments " +
+                    "comment_like as commentLike, content, deleted FROM comments " +
                     "WHERE post_id = :postId AND parent_id = :parentId AND parent_id IS NOT NULL " +
                     "ORDER BY created_at ASC"
     )
@@ -36,7 +36,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query(nativeQuery = true,
             value = "SELECT comment_id as commentId, user_id as userId, " +
-                    "comment_like as commentLike, content FROM Comments " +
+                    "comment_like as commentLike, content, deleted FROM Comments " +
                     "WHERE post_id = :postId AND parent_id IS NULL"
     )
     List<CommentProfile> findParentComments(@Param("postId") Long postId);
