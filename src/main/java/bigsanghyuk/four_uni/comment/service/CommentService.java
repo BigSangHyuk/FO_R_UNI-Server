@@ -98,28 +98,18 @@ public class CommentService {
 
     public List<CommentDto> getAllComments(Long postId) {
         postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-
         List<CommentProfile> parentsProfile = commentRepository.findParentComments(postId);
         List<CommentDto> comments = new ArrayList<>();
-
         for (CommentProfile parent : parentsProfile) {
-            boolean isParentDeleted = parent.isDeleted();
-            UserRequired parentRequired = userRepository.getUserRequired(parent.getUserId());
-            UserDto parentDto = makeUserDto(parentRequired, isParentDeleted);
-
+            UserDto parentDto = makeUserDto(parent, parent.isDeleted());
             List<CommentProfile> childrenProfile = commentRepository.findChildComments(postId, parent.getCommentId());
             List<CommentDto> children = new ArrayList<>();
             for (CommentProfile child : childrenProfile) {
-                UserRequired childRequired = userRepository.getUserRequired(child.getUserId());
-                boolean isChildDeleted = child.isDeleted();
-                UserDto childDto = makeUserDto(childRequired, isChildDeleted);
-                CommentDto commentDto = makeCommentDto(child, childDto, null, isChildDeleted);
-                children.add(commentDto);
+                UserDto childDto = makeUserDto(child, child.isDeleted());
+                children.add(makeCommentDto(child, childDto, null));
             }
-            CommentDto commentDto = makeCommentDto(parent, parentDto, children, isParentDeleted);
-            comments.add(commentDto);
+            comments.add(makeCommentDto(parent, parentDto, children));
         }
-
         return comments;
     }
 
@@ -134,21 +124,27 @@ public class CommentService {
         return comments;
     }
 
-    private UserDto makeUserDto(UserRequired userRequired, boolean isDeleted) {
-        return UserDto.builder()
-                .userId(isDeleted ? null : userRequired.getUserId())
-                .email(isDeleted ? null : userRequired.getEmail())
-                .name(isDeleted ? null : userRequired.getName())
-                .nickName(isDeleted ? null : userRequired.getNickName())
-                .image(isDeleted ? null : userRequired.getImage())
-                .build();
+    private UserDto makeUserDto(CommentProfile profile, boolean isDeleted) {
+        if (isDeleted) {
+            return null;
+        } else {
+            UserRequired userRequired = userRepository.getUserRequired(profile.getUserId());
+            return UserDto.builder()
+                    .userId(userRequired.getUserId())
+                    .email(userRequired.getEmail())
+                    .name(userRequired.getName())
+                    .nickName(userRequired.getNickName())
+                    .image(userRequired.getImage())
+                    .build();
+        }
     }
 
-    private CommentDto makeCommentDto(CommentProfile profile, UserDto userDto, List<CommentDto> children, boolean isDeleted) {
+    private CommentDto makeCommentDto(CommentProfile profile, UserDto userDto, List<CommentDto> children) {
+        boolean isDeleted = (userDto == null);      // userDto 가 null 인 경우는 makeUserDto() 에서 이미 isDeleted == true 임
         return CommentDto.builder()
                 .commentId(profile.getCommentId())
                 .userId(isDeleted ? null : profile.getUserId())
-                .user(isDeleted ? null : userDto)
+                .user(userDto)
                 .commentLike(isDeleted ? null : profile.getCommentLike())
                 .content(isDeleted ? null : profile.getContent())
                 .children(children)
