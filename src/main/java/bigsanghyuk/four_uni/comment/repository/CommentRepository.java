@@ -27,6 +27,12 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Optional<List<Comment>> findByUserIdOrderByIdDesc(Long userId);
 
     @Query(nativeQuery = true,
+            value = "SELECT post_id as postId FROM Comments " +
+                    "WHERE user_id = :userId AND deleted = FALSE " +
+                    "ORDER BY comment_id DESC")
+    List<CommentProfile> findCommentedPostId(@Param("userId") Long userId);
+
+    @Query(nativeQuery = true,
             value = "SELECT comment_id as commentId, user_id as userId, " +
                     "comment_like as commentLike, content, deleted FROM comments " +
                     "WHERE post_id = :postId AND parent_id = :parentId AND parent_id IS NOT NULL " +
