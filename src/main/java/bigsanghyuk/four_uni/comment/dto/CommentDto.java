@@ -12,7 +12,7 @@ public class CommentDto {
     private Long commentId;
     private Long userId;
     private UserDto user;
-    private int commentLike;
+    private Integer commentLike;
     private String content;
     private List<CommentDto> children;
 }
