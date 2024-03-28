@@ -82,11 +82,11 @@ public class PostController {
         return ResponseEntity.ok().body(new Results<>(scrappedList, scrappedList.size()));
     }
 
-    @Operation(summary = "내가 댓글 남긴 글 조회", description = "파라미터로 userId 전달, 최근 댓글 남긴 글이 먼저 나옴")
+    @Operation(summary = "내가 댓글 남긴 글 최소 항목 조회", description = "파라미터로 userId 전달, 최신 순")
     @GetMapping("/posts/commented")
-    public ResponseEntity<Results<List<Post>>> getPostsCommented(@RequestParam(name = "userId") Long userId) throws IllegalAccessException {
-        List<Post> commentedPostList = postService.getCommented(userId);
-        return ResponseEntity.ok().body(new Results<>(commentedPostList, commentedPostList.size()));
+    public ResponseEntity<Results<List<PostRequired>>> getPostCommented(@RequestParam(name = "userId") Long userId) {
+        List<PostRequired> commentedPosts = postService.getCommentedPostRequired(userId);
+        return ResponseEntity.ok().body(new Results<>(commentedPosts, commentedPosts.size()));
     }
 
     @Operation(summary = "해당하는 연, 월의 게시글 최소 항목 조회", description = "2024-03 형식으로 연 월 전달하면 해당 달 앞, 뒤 1달까지의 글 반환")

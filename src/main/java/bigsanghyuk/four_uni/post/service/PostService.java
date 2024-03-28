@@ -1,6 +1,6 @@
 package bigsanghyuk.four_uni.post.service;
 
-import bigsanghyuk.four_uni.comment.domain.entity.Comment;
+import bigsanghyuk.four_uni.comment.domain.entity.CommentProfile;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
@@ -153,15 +153,15 @@ public class PostService {
         return posts;
     }
 
-    public List<Post> getCommented(Long userId) throws IllegalAccessException {
-        List<Comment> comments = commentRepository.findByUserIdOrderByIdDesc(userId).orElseThrow(IllegalAccessException::new);
+    public List<PostRequired> getCommentedPostRequired(Long userId) {
+        List<CommentProfile> commentedPostId = commentRepository.findCommentedPostId(userId);
         LinkedHashSet<Long> set = new LinkedHashSet<>();
-        LinkedList<Post> result = new LinkedList<>();
-        for (Comment comment : comments) {
-            set.add(comment.getPostId());
+        LinkedList<PostRequired> result = new LinkedList<>();
+        for (CommentProfile commentRequired : commentedPostId) {
+            set.add(commentRequired.getPostId());
         }
         for (Long postId : set) {
-            result.add(postRepository.findById(postId).orElseThrow(PostNotFoundException::new));
+            result.add(postRepository.findRequiredByPostId(postId));
         }
         return result;
     }
