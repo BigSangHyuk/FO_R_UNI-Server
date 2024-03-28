@@ -106,7 +106,7 @@ public class CommentService {
             UserRequired parentRequired = userRepository.getUserRequired(parent.getUserId());
             UserDto parentDto = makeUserDto(parentRequired);
 
-            List<CommentProfile> childrenProfile = commentRepository.findChildComments(postId, parent.getUserId());
+            List<CommentProfile> childrenProfile = commentRepository.findChildComments(postId, parent.getCommentId());
             List<CommentDto> children = new ArrayList<>();
             for (CommentProfile child : childrenProfile) {
                 UserRequired childRequired = userRepository.getUserRequired(child.getUserId());
