@@ -46,12 +46,4 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
                     "comment_like as commentLike, content as content FROM Comments " +
                     "WHERE comment_id = :commentId")
     CommentRequired findCommentRequired(@Param("commentId") Long commentId);
-
-    @Query(
-            nativeQuery = true,
-            value = "DELETE FROM Comments WHERE parent_id = :parentId"
-    )
-    @Transactional
-    @Modifying
-    void deleteChildrenByParentId(@Param("parentId") Long parentId);
 }

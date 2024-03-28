@@ -93,8 +93,7 @@ public class CommentService {
         }
 
         likeCommentRepository.deleteLikeCommentByComment(comment);
-        commentRepository.deleteChildrenByParentId(comment.getId());    // 일단 원댓글 삭제하면 대댓글까지 삭제되게 함 (추후 변경 가능)
-        commentRepository.deleteById(comment.getId());
+        commentRepository.deleteById(comment.getId());  // soft delete 사용
     }
 
     public List<CommentDto> getAllComments(Long postId) {
