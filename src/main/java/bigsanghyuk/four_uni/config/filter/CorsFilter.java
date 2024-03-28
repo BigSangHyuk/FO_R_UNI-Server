@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.config;
+package bigsanghyuk.four_uni.config.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
