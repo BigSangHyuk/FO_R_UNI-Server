@@ -103,18 +103,20 @@ public class CommentService {
         List<CommentDto> comments = new ArrayList<>();
 
         for (CommentProfile parent : parentsProfile) {
+            boolean isParentDeleted = parent.isDeleted();
             UserRequired parentRequired = userRepository.getUserRequired(parent.getUserId());
-            UserDto parentDto = makeUserDto(parentRequired);
+            UserDto parentDto = makeUserDto(parentRequired, isParentDeleted);
 
             List<CommentProfile> childrenProfile = commentRepository.findChildComments(postId, parent.getCommentId());
             List<CommentDto> children = new ArrayList<>();
             for (CommentProfile child : childrenProfile) {
                 UserRequired childRequired = userRepository.getUserRequired(child.getUserId());
-                UserDto childDto = makeUserDto(childRequired);
-                CommentDto commentDto = makeCommentDto(child, childDto, null);
+                boolean isChildDeleted = child.isDeleted();
+                UserDto childDto = makeUserDto(childRequired, isChildDeleted);
+                CommentDto commentDto = makeCommentDto(child, childDto, null, isChildDeleted);
                 children.add(commentDto);
             }
-            CommentDto commentDto = makeCommentDto(parent, parentDto, children);
+            CommentDto commentDto = makeCommentDto(parent, parentDto, children, isParentDeleted);
             comments.add(commentDto);
         }
 
@@ -132,23 +134,23 @@ public class CommentService {
         return comments;
     }
 
-    private UserDto makeUserDto(UserRequired userRequired) {
+    private UserDto makeUserDto(UserRequired userRequired, boolean isDeleted) {
         return UserDto.builder()
-                .userId(userRequired.getUserId())
-                .email(userRequired.getEmail())
-                .name(userRequired.getName())
-                .nickName(userRequired.getNickName())
-                .image(userRequired.getImage())
+                .userId(isDeleted ? null : userRequired.getUserId())
+                .email(isDeleted ? null : userRequired.getEmail())
+                .name(isDeleted ? null : userRequired.getName())
+                .nickName(isDeleted ? null : userRequired.getNickName())
+                .image(isDeleted ? null : userRequired.getImage())
                 .build();
     }
 
-    private CommentDto makeCommentDto(CommentProfile profile, UserDto userDto, List<CommentDto> children) {
+    private CommentDto makeCommentDto(CommentProfile profile, UserDto userDto, List<CommentDto> children, boolean isDeleted) {
         return CommentDto.builder()
                 .commentId(profile.getCommentId())
-                .userId(profile.getUserId())
-                .user(userDto)
-                .commentLike(profile.getCommentLike())
-                .content(profile.getContent())
+                .userId(isDeleted ? null : profile.getUserId())
+                .user(isDeleted ? null : userDto)
+                .commentLike(isDeleted ? null : profile.getCommentLike())
+                .content(isDeleted ? null : profile.getContent())
                 .children(children)
                 .build();
     }
