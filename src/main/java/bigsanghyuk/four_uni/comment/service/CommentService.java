@@ -147,6 +147,7 @@ public class CommentService {
                 .user(userDto)
                 .commentLike(isDeleted ? null : profile.getCommentLike())
                 .content(isDeleted ? null : profile.getContent())
+                .isDeleted(isDeleted ? true : null)
                 .children(children)
                 .build();
     }

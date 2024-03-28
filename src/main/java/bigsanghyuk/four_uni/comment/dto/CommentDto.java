@@ -16,5 +16,6 @@ public class CommentDto {
     private UserDto user;
     private Integer commentLike;
     private String content;
+    private Boolean isDeleted;
     private List<CommentDto> children;
 }
