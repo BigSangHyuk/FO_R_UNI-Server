@@ -21,8 +21,8 @@ public class ScrappedService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    public void scrap(ScrapInfo scrapInfo) {
-        User user = userRepository.findById(scrapInfo.getUserId())
+    public void scrap(Long userId, ScrapInfo scrapInfo) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findById(scrapInfo.getPostId())
                 .orElseThrow(PostNotFoundException::new);
@@ -34,8 +34,8 @@ public class ScrappedService {
         scrappedRepository.save(new Scrapped(user, post));
     }
 
-    public void unScrap(ScrapInfo scrapInfo) {
-        User user = userRepository.findById(scrapInfo.getUserId())
+    public void unScrap(Long userId, ScrapInfo scrapInfo) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findById(scrapInfo.getPostId())
                 .orElseThrow(PostNotFoundException::new);
