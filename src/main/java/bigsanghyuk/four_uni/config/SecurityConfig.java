@@ -98,7 +98,11 @@ public class SecurityConfig implements WebMvcConfigurer {
         registry.addInterceptor(new TokenInterceptor(jwtProvider))
                 .excludePathPatterns(
                         "/swagger-ui/**",
-                        "/v3/api-docs/**"
+                        "/v3/api-docs/**",
+                        "/auth/**",
+                        "/sign-up",
+                        "/sign-in",
+                        "/refresh"
                 );
     }
 
