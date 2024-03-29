@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.post.service;
 
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
+import bigsanghyuk.four_uni.exception.scrapped.AlreadyScrappedException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
 import bigsanghyuk.four_uni.post.domain.ScrapInfo;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
@@ -25,9 +26,12 @@ public class ScrappedService {
                 .orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findById(scrapInfo.getPostId())
                 .orElseThrow(PostNotFoundException::new);
-
-        Scrapped scrapped = new Scrapped(user, post);
-        scrappedRepository.save(scrapped);
+        scrappedRepository.findByUserAndPost(user, post)
+                .ifPresent(scrapped -> {
+                            throw new AlreadyScrappedException();
+                        }
+                );
+        scrappedRepository.save(new Scrapped(user, post));
     }
 
     public void unScrap(ScrapInfo scrapInfo) {

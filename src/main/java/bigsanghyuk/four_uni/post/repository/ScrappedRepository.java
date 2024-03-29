@@ -10,8 +10,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ScrappedRepository extends JpaRepository<Scrapped, Long> {
+
+    Optional<Scrapped> findByUserAndPost(User user, Post post);
 
     @Transactional
     void deleteScrappedByUserAndPost(User user, Post post);
