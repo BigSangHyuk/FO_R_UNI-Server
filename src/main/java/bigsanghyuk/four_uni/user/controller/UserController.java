@@ -63,7 +63,7 @@ public class UserController {
     }
 
     @Operation(summary = "토큰 재발급 요청", description = "body 에 accessToken, refreshToken 담아서 요청")
-    @GetMapping("/refresh")
+    @PatchMapping("/refresh")
     public ResponseEntity<TokenDto> refresh(@RequestBody TokenDto tokenDto) throws Exception {
         return new ResponseEntity<>(userService.refreshAccessToken(tokenDto), HttpStatus.OK);
     }
