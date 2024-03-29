@@ -102,7 +102,7 @@ public class UserService {
                 .image(user.getImage())
                 .roles(user.getRoles())
                 .token(TokenDto.builder()
-                        .accessToken(jwtProvider.createToken(user.getEmail(), user.getRoles()))
+                        .accessToken(jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles()))
                         .refreshToken(createRefreshToken(user))
                         .build())
                 .build();
@@ -146,7 +146,7 @@ public class UserService {
         Token token = validRefreshToken(user, tokenDto.getRefreshToken());
         if (token != null) {
             return TokenDto.builder()
-                    .accessToken(jwtProvider.createToken(email, user.getRoles()))
+                    .accessToken(jwtProvider.createToken(email, user.getId(), user.getRoles()))
                     .refreshToken(token.getRefreshToken())
                     .build();
         } else {
