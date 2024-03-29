@@ -18,14 +18,14 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    @Operation(summary = "댓글 신고", description = "요청에 userId, commentId, reason, detail 넣어서")
+    @Operation(summary = "댓글 신고", description = "요청에 commentId, reason, detail 넣어서")
     @PostMapping("/comment")
     public ResponseEntity<CommonResponse> reportComment(@RequestAttribute(name = "userId") Long userId, @RequestBody ReportCommentRequest request) {
         reportService.reportComment(userId, request.toDomain());
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
-    @Operation(summary = "게시글 신고", description = "요청에 userId, postId, reason, detail 넣어서")
+    @Operation(summary = "게시글 신고", description = "요청에 postId, reason, detail 넣어서")
     @PostMapping("/post")
     public ResponseEntity<CommonResponse> reportPost(@RequestAttribute(name = "userId") Long userId, @RequestBody ReportPostRequest request) {
         reportService.reportPost(userId, request.toDomain());

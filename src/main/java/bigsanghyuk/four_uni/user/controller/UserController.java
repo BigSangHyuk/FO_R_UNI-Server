@@ -56,7 +56,7 @@ public class UserController {
         return ResponseEntity.ok().body(userService.getUser(userId));
     }
 
-    @Operation(summary = "관리자 권한 유저 조회", description = "경로에 이메일 입력")
+    @Operation(summary = "관리자 권한 유저 조회", description = "관리자 권한 유저는 userId로 모든 유저 조회가능")
     @GetMapping("/admins/info/{userId}")
     public ResponseEntity<SignResponse> getUserForAdmin(@PathVariable(name = "userId") Long userId) {
         return ResponseEntity.ok().body(userService.getUser(userId));
