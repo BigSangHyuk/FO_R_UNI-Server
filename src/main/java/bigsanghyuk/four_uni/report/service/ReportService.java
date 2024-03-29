@@ -43,6 +43,9 @@ public class ReportService {
         if (reason == null) {
             throw new ReportReasonNotFoundException();
         }
+        if (comment.isDeleted()) {
+            throw new CommentNotFoundException();
+        }
 
         Optional<Report> report = reportRepository.findByUserAndComment(user, comment);
 
