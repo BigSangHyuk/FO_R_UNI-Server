@@ -8,7 +8,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,8 +31,9 @@ public class JwtProvider {
     private final JpaUserDetailsService userDetailsService;
     private final int EXP_MINUTES = 30;   // 30 min
 
-    public String createToken(String email, List<Authority> roles) {
+    public String createToken(String email, Long userId, List<Authority> roles) {
         Claims claims = Jwts.claims().setSubject(email);
+        claims.put("userId", userId);
         claims.put("roles", roles);
         Date now = new Date();
         return Jwts.builder()
@@ -53,15 +53,12 @@ public class JwtProvider {
 
     // 토큰에 담겨 있는 유저 Email
     public String getEmail(String token) {
-        try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
-        } catch (ExpiredJwtException e) {
-            e.printStackTrace();
-            return e.getClaims().getSubject();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        parseClaims(token).getSubject();
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+    }
+
+    public Long getUserIdInToken(String token) {
+        return parseClaims(token).get("userId", Long.class);
     }
 
     // authorization 헤더에서 인증
@@ -81,6 +78,15 @@ public class JwtProvider {
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    public Claims parseClaims(String token) {
+        try {
+            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        } catch (ExpiredJwtException e) {
+            e.printStackTrace();
+            return e.getClaims();
         }
     }
 
