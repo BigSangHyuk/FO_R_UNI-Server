@@ -44,16 +44,16 @@ public class OAuth2UserSuccessHandler extends SimpleUrlAuthenticationSuccessHand
     private void redirect(HttpServletRequest request, HttpServletResponse response, String email, List<Authority> authorities) throws IOException {
         log.info("creating Token");
 
-        String accessToken = createAccessToken(email, authorities);
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        String accessToken = createAccessToken(email, user.getId(), authorities);
         String refreshToken = createRefreshToken(email);
-        userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
 
         String uri = createURI(accessToken, refreshToken, email).toString();
         getRedirectStrategy().sendRedirect(request, response, uri);
     }
 
-    private String createAccessToken(String email, List<Authority> authorities) {
-        return jwtProvider.createToken(email, authorities);
+    private String createAccessToken(String email, Long userId, List<Authority> authorities) {
+        return jwtProvider.createToken(email, userId, authorities);
     }
 
     private String createRefreshToken(String email) {
