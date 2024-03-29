@@ -28,44 +28,44 @@ public class CommentController {
     private final CommentService commentService;
     private final LikeCommentService likeCommentService;
 
-    @Operation(summary = "댓글 등록")
+    @Operation(summary = "댓글 등록", description = "Body에 글 id, 부모 댓글 id (nullable), 댓글 내용 전달")
     @PostMapping("/comments")
-    public ResponseEntity<CommonResponse> register(@Valid @RequestBody RegisterCommentRequest request) {
-        commentService.register(request.toDomain());
+    public ResponseEntity<CommonResponse> register(@RequestAttribute(name = "userId") Long userId, @Valid @RequestBody RegisterCommentRequest request) {
+        commentService.write(userId, request.toDomain());
         return new ResponseEntity<>(new CommonResponse(true), HttpStatus.OK);
     }
 
-    @Operation(summary = "댓글 수정", description = "URL 경로에 commentId 전달")
-    @PatchMapping("/comments/{commentId}")
-    public ResponseEntity<CommonResponse> edit(@PathVariable(name = "commentId") Long commentId, @Valid @RequestBody EditCommentRequest request) {
-        commentService.edit(commentId, request.toDomain());
+    @Operation(summary = "댓글 수정", description = "Body에 postId, commentId, 수정 내용 넣어서 전달")
+    @PatchMapping("/comments")
+    public ResponseEntity<CommonResponse> edit(@RequestAttribute(name = "userId") Long userId, @Valid @RequestBody EditCommentRequest request) {
+        commentService.edit(userId, request.toDomain());
         return new ResponseEntity<>(new CommonResponse(true), HttpStatus.OK);
     }
 
-    @Operation(summary = "댓글 삭제", description = "URL 경로에 commentId 전달")
+    @Operation(summary = "댓글 삭제", description = "Body에 postId, commentId 넣어서 전달")
     @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<CommonResponse> remove(@PathVariable("commentId") Long commentId, @Valid @RequestBody DeleteCommentRequest request) {
-        commentService.remove(commentId, request.toDomain());
+    public ResponseEntity<CommonResponse> remove(@RequestAttribute(name = "userId") Long userId, @Valid @RequestBody DeleteCommentRequest request) {
+        commentService.remove(userId, request.toDomain());
         return new ResponseEntity<>(new CommonResponse(true), HttpStatus.OK);
     }
 
-    @Operation(summary = "댓글 좋아요", description = "Body 에 값 넣어서 전달")
+    @Operation(summary = "댓글 좋아요", description = "Body에 commentId 넣어서 전달")
     @PostMapping("/comments/like")
-    public ResponseEntity<CommonResponse> likeComment(@Valid @RequestBody LikeCommentRequest request) {
-        likeCommentService.likeComment(request.toDomain());
+    public ResponseEntity<CommonResponse> likeComment(@RequestAttribute(name = "userId") Long userId, @Valid @RequestBody LikeCommentRequest request) {
+        likeCommentService.likeComment(userId, request.toDomain());
         return new ResponseEntity<>(new CommonResponse(true), HttpStatus.OK);
     }
 
-    @Operation(summary = "댓글 좋아요 취소", description = "Body 에 값 넣어서 전달")
+    @Operation(summary = "댓글 좋아요 취소", description = "Body에 commentId 넣어서 전달")
     @DeleteMapping("/comments/unlike")
-    public ResponseEntity<CommonResponse> unLikeComment(@Valid @RequestBody UnLikeCommentRequest request) {
-        likeCommentService.unLikeComment(request.toDomain());
+    public ResponseEntity<CommonResponse> unLikeComment(@RequestAttribute(name = "userId") Long userId, @Valid @RequestBody UnLikeCommentRequest request) {
+        likeCommentService.unLikeComment(userId, request.toDomain());
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
-    @Operation(summary = "좋아요 한 댓글 조회 - 리스트 출력시 필요한 정보만", description = "userId 전달")
-    @GetMapping("/comments/liked/{userId}")
-    public ResponseEntity<Results<List<CommentRequired>>> getLikedCommentsRequiredData(@PathVariable("userId") Long userId) throws IllegalAccessException {
+    @Operation(summary = "좋아요 한 댓글 조회", description = "최소 정보")
+    @GetMapping("/comments/liked")
+    public ResponseEntity<Results<List<CommentRequired>>> getLikedCommentsRequiredData(@RequestAttribute(name = "userId") Long userId) {
         List<CommentRequired> comments = commentService.getLikedComment(userId);
         return ResponseEntity.ok().body(new Results<>(comments, comments.size()));
     }

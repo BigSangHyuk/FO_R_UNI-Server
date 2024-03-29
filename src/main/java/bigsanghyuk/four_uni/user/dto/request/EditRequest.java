@@ -9,8 +9,6 @@ import lombok.Getter;
 public class EditRequest {
 
     @NotNull
-    private Long id;
-    @NotNull
     private String password;
     @NotNull
     private String name;
@@ -22,6 +20,6 @@ public class EditRequest {
     private String image;
 
     public EditUserInfo toDomain() {
-        return new EditUserInfo(id, password, name, departmentType, nickName, image);
+        return new EditUserInfo(password, name, departmentType, nickName, image);
     }
 }

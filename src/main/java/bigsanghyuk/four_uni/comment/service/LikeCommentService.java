@@ -25,9 +25,8 @@ public class LikeCommentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void likeComment(LikeCommentInfo likeCommentInfo) {
+    public void likeComment(Long userId, LikeCommentInfo likeCommentInfo) {
 
-        Long userId = likeCommentInfo.getUserId();
         Long commentId = likeCommentInfo.getCommentId();
 
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
@@ -44,8 +43,7 @@ public class LikeCommentService {
     }
 
     @Transactional
-    public void unLikeComment(UnLikeCommentInfo unLikeCommentInfo) {
-        Long userId = unLikeCommentInfo.getUserId();
+    public void unLikeComment(Long userId, UnLikeCommentInfo unLikeCommentInfo) {
         Long commentId = unLikeCommentInfo.getCommentId();
 
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);

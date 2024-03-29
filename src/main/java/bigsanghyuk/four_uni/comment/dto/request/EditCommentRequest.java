@@ -12,10 +12,9 @@ public class EditCommentRequest {
 
     private Long postId;
     private Long commentId;
-    private Long userId;
     private String content;
 
     public EditCommentInfo toDomain() {
-        return new EditCommentInfo(postId, commentId, userId, content);
+        return new EditCommentInfo(postId, commentId, content);
     }
 }

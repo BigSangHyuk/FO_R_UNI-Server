@@ -9,7 +9,6 @@ import bigsanghyuk.four_uni.comment.domain.entity.CommentRequired;
 import bigsanghyuk.four_uni.comment.dto.CommentDto;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.comment.repository.LikeCommentRepository;
-import bigsanghyuk.four_uni.exception.comment.CommentEditOtherUserException;
 import bigsanghyuk.four_uni.exception.comment.CommentNotFoundException;
 import bigsanghyuk.four_uni.exception.comment.CommentRemoveOtherUserException;
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
@@ -36,15 +35,13 @@ public class CommentService {
     private final LikeCommentRepository likeCommentRepository;
     private final UserRepository userRepository;
 
-    public void register(RegisterCommentInfo registerCommentInfo) {
-        Long userId = registerCommentInfo.getUserId();
-        Long postId = registerCommentInfo.getPostId();
-
+    public void write(Long userId, RegisterCommentInfo registerCommentInfo) {
         Comment parent = null;
+        Long postId = registerCommentInfo.getPostId();
+        String content = registerCommentInfo.getContent();
         if (registerCommentInfo.getParentCommentId() != null) {
             parent = commentRepository.findById(registerCommentInfo.getParentCommentId()).orElseThrow(CommentNotFoundException::new);
         }
-
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
@@ -52,25 +49,17 @@ public class CommentService {
                 .user(user)
                 .postId(postId)
                 .parent(parent)
-                .content(registerCommentInfo.getContent())
+                .content(content)
                 .build();
-
         commentRepository.save(comment);
     }
 
-    public Comment edit(Long commentId, @Valid EditCommentInfo editCommentInfo) {
-        postRepository.findById(editCommentInfo.getPostId())
-                .orElseThrow(PostNotFoundException::new);
+    public Comment edit(Long userId, @Valid EditCommentInfo editCommentInfo) {
+        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        postRepository.findById(editCommentInfo.getPostId()).orElseThrow(PostNotFoundException::new);
+        Comment comment = commentRepository.findById(editCommentInfo.getCommentId()).orElseThrow(CommentNotFoundException::new);
 
-        commentRepository.findByUserIdOrderByIdDesc(editCommentInfo.getUserId())
-                .orElseThrow(UserNotFoundException::new);
-
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(CommentNotFoundException::new);
-
-        if (!editCommentInfo.getUserId().equals(comment.getUser().getId())) {
-            throw new CommentEditOtherUserException();
-        }
+        validateRequest(userId, comment);
 
         comment.edit(editCommentInfo);
         commentRepository.save(comment);
@@ -78,19 +67,12 @@ public class CommentService {
     }
 
     @Transactional
-    public void remove(Long commentId, @Valid DeleteCommentInfo deleteCommentInfo) {
-        postRepository.findById(deleteCommentInfo.getPostId())
-                .orElseThrow(PostNotFoundException::new);
+    public void remove(Long userId, @Valid DeleteCommentInfo deleteCommentInfo) {
+        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        postRepository.findById(deleteCommentInfo.getPostId()).orElseThrow(PostNotFoundException::new);
+        Comment comment = commentRepository.findById(deleteCommentInfo.getCommentId()).orElseThrow(CommentNotFoundException::new);
 
-        commentRepository.findByUserIdOrderByIdDesc(deleteCommentInfo.getUserId())
-                .orElseThrow(UserNotFoundException::new);
-
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(CommentNotFoundException::new);
-
-        if (!deleteCommentInfo.getUserId().equals(comment.getUser().getId())) {
-            throw new CommentRemoveOtherUserException();
-        }
+        validateRequest(userId, comment);
 
         likeCommentRepository.deleteLikeCommentByComment(comment);
         commentRepository.deleteById(comment.getId());  // soft delete 사용
@@ -150,5 +132,13 @@ public class CommentService {
                 .isDeleted(isDeleted ? true : null)
                 .children(children)
                 .build();
+    }
+
+    private void validateRequest(Long userId, Comment comment) {
+        if (!userId.equals(comment.getUser().getId())) {    // 내가 단 댓글이 아니면 예외
+            throw new CommentRemoveOtherUserException();
+        } else {
+            return;
+        }
     }
 }

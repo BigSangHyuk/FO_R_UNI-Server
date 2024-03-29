@@ -12,16 +12,15 @@ import lombok.NoArgsConstructor;
 public class RegisterCommentRequest {
 
     @NotNull
-    private Long userId;
-    @NotNull
     private Long postId;
 
     private Long parentCommentId;
+
     @NotNull
     private String content;
 
     public RegisterCommentInfo toDomain() {
-        return new RegisterCommentInfo(userId, postId, content, parentCommentId);
+        return new RegisterCommentInfo(postId, content, parentCommentId);
     }
 
 }

@@ -10,14 +10,12 @@ import lombok.Getter;
 public class ReportCommentRequest {
 
     @NotNull
-    private Long userId;
-    @NotNull
     private Long commentId;
     @NotNull
     private ReportReason reason;
     private String detail;
 
     public ReportCommentInfo toDomain() {
-        return new ReportCommentInfo(userId, commentId, reason, detail);
+        return new ReportCommentInfo(commentId, reason, detail);
     }
 }
