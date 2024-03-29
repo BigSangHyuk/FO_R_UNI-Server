@@ -18,12 +18,10 @@ public class RegisterCommentRequest {
 
     private Long parentCommentId;
     @NotNull
-    private int commentLike;
-    @NotNull
     private String content;
 
     public RegisterCommentInfo toDomain() {
-        return new RegisterCommentInfo(userId, postId, content, parentCommentId, commentLike);
+        return new RegisterCommentInfo(userId, postId, content, parentCommentId);
     }
 
 }

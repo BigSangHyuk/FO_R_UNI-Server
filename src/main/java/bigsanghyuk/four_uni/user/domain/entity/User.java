@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.user.domain.entity;
 
 import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
+import bigsanghyuk.four_uni.user.enums.CategoryType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -24,7 +25,11 @@ public class User extends BaseTimeEntity {
     private String email;
     private String password;
     private String name;
-    private int dept;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "department")
+    private CategoryType departmentType;
+
     private String nickName;
     private String image;
 
@@ -32,19 +37,10 @@ public class User extends BaseTimeEntity {
     @Builder.Default
     private List<Authority> roles = new ArrayList<>();
 
-    public User(String email, String password, String name, int dept, String nickName, String image) {
-        this.email = email;
+    public void edit(String password, String name, CategoryType departmentType, String nickName, String image) {
         this.password = password;
         this.name = name;
-        this.dept = dept;
-        this.nickName = nickName;
-        this.image = image;
-    }
-
-    public void edit(String password, String name, int dept, String nickName, String image) {
-        this.password = password;
-        this.name = name;
-        this.dept = dept;
+        this.departmentType = departmentType;
         this.nickName = nickName;
         this.image = image;
     }

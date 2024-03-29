@@ -45,12 +45,12 @@ public class ReportService {
             throw new ReportReasonNotFoundException();
         }
 
-        Optional<Report> report = reportRepository.findByUserIdAndCommentId(user.getId(), comment.getId());
+        Optional<Report> report = reportRepository.findByUserAndComment(user, comment);
 
         if (report.isPresent()) {
             Report existingReport = report.get();
-            existingReport.setReason(reason);
-            existingReport.setDetail(detail);
+            existingReport.editReason(reason);
+            existingReport.editDetail(detail);
             reportRepository.save(existingReport);
         } else {
             comment.setReported(true);
@@ -58,8 +58,8 @@ public class ReportService {
             commentRepository.save(comment);
 
             Report newReport = Report.builder()
-                    .userId(user.getId())
-                    .commentId(comment.getId())
+                    .user(user)
+                    .comment(comment)
                     .reason(reason)
                     .detail(detail)
                     .build();
@@ -82,12 +82,12 @@ public class ReportService {
             throw new ReportReasonNotFoundException();
         }
 
-        Optional<Report> report = reportRepository.findByUserIdAndPostId(user.getId(), post.getId());
+        Optional<Report> report = reportRepository.findByUserAndPost(user, post);
 
         if (report.isPresent()) {
             Report existingReport = report.get();
-            existingReport.setReason(reason);
-            existingReport.setDetail(detail);
+            existingReport.editReason(reason);
+            existingReport.editDetail(detail);
             reportRepository.save(existingReport);
         } else {
             post.setReported(true);
@@ -95,8 +95,8 @@ public class ReportService {
             postRepository.save(post);
 
             Report newReport = Report.builder()
-                    .userId(user.getId())
-                    .postId(post.getId())
+                    .user(user)
+                    .post(post)
                     .reason(reason)
                     .detail(detail)
                     .build();

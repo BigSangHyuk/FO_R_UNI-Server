@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.user.repository;
 
 import bigsanghyuk.four_uni.user.domain.entity.User;
+import bigsanghyuk.four_uni.user.domain.entity.UserRequired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,4 +20,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("UPDATE User u SET u.password = :password WHERE u.email = :email")
     void updatePassword(@Param("email") String email, @Param("password") String encodedPw);
+
+    @Query(
+            nativeQuery = true,
+            value = "SELECT user_id as userId, email, name, nick_name as nickName, image FROM Users " +
+                    "WHERE user_id = :userId")
+    UserRequired getUserRequired(@Param("userId") Long userId);
 }

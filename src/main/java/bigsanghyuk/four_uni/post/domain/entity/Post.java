@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.post.domain.entity;
 
 import bigsanghyuk.four_uni.config.StringToListConverter;
 import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
+import bigsanghyuk.four_uni.user.enums.CategoryType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -19,7 +20,11 @@ public class Post extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
     private Long id;
-    private Long categoryId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category")
+    private CategoryType categoryType;
+
     @Setter @ColumnDefault("false")
     private boolean reported;
     private String title;
@@ -38,17 +43,4 @@ public class Post extends BaseTimeEntity {
 
     @Column(name = "notice_url", unique = true)
     private String noticeUrl;
-
-    public Post(Long categoryId, boolean reported, String title, String content, List<String> imageUrl, int views, int postReportCount, boolean isClassified, LocalDate postedAt, LocalDate deadline) {
-        this.categoryId = categoryId;
-        this.reported = reported;
-        this.title = title;
-        this.content = content;
-        this.imageUrl = imageUrl;
-        this.views = views;
-        this.postReportCount = postReportCount;
-        this.isClassified = isClassified;
-        this.postedAt = postedAt;
-        this.deadline = deadline;
-    }
 }

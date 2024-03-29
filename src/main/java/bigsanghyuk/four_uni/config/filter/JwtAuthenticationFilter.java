@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.config;
+package bigsanghyuk.four_uni.config.filter;
 
 import bigsanghyuk.four_uni.config.jwt.JwtProvider;
 import jakarta.servlet.FilterChain;
