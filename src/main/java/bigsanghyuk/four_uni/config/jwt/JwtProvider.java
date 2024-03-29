@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.config.jwt;
 
 import bigsanghyuk.four_uni.config.jwt.service.JpaUserDetailsService;
+import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -17,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Duration;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -30,6 +32,8 @@ public class JwtProvider {
     private Key secretKey;
     private final JpaUserDetailsService userDetailsService;
     private final int EXP_MINUTES = 30;   // 30 min
+
+    private final List<String> notFilteredRoutes = List.of("/", "/sign-up", "/sign-in", "/refresh", "/auth/**");
 
     public String createToken(String email, Long userId, List<Authority> roles) {
         Claims claims = Jwts.claims().setSubject(email);
@@ -57,10 +61,6 @@ public class JwtProvider {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public Long getUserIdInToken(String token) {
-        return parseClaims(token).get("userId", Long.class);
-    }
-
     // authorization 헤더에서 인증
     public String resolveToken(HttpServletRequest request) {
         return request.getHeader("Authorization");
@@ -81,12 +81,40 @@ public class JwtProvider {
         }
     }
 
-    public Claims parseClaims(String token) {
+    private Claims parseClaims(String token) {
         try {
             return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
         } catch (ExpiredJwtException e) {
             e.printStackTrace();
             return e.getClaims();
+        }
+    }
+
+    private HashMap<String, Object> getParsedTokenHashMap(String token) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("token", token);
+        Claims claims = parseClaims(token);
+        map.put("claims", claims);
+        return map;
+    }
+
+    public HashMap<String, Object> parseJwt(HttpServletRequest request, String authorizationHeader) {
+        String requestURI = request.getRequestURI();
+        validateAuthorizationHeader(requestURI, authorizationHeader);
+        String token = extractToken(authorizationHeader);
+        return getParsedTokenHashMap(token);
+    }
+
+    private String extractToken(String authorizationHeader) {
+        return authorizationHeader.substring("Bearer ".length());
+    }
+
+    private void validateAuthorizationHeader(String requestURI, String header) {
+        if (notFilteredRoutes.contains(requestURI)) {
+            return;
+        }
+        if (header == null || !header.startsWith("Bearer ")) {
+            throw new TokenNotFoundException();
         }
     }
 
