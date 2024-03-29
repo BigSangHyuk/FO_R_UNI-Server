@@ -1,0 +1,150 @@
+package bigsanghyuk.four_uni.controller;
+
+import bigsanghyuk.four_uni.config.TestSecurityConfig;
+import bigsanghyuk.four_uni.post.controller.PostController;
+import bigsanghyuk.four_uni.post.domain.entity.Post;
+import bigsanghyuk.four_uni.post.repository.PostRepository;
+import bigsanghyuk.four_uni.post.service.PostService;
+import bigsanghyuk.four_uni.user.enums.CategoryType;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
+
+import java.time.LocalDate;
+import java.util.Collections;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@Slf4j
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@Import(TestSecurityConfig.class)
+public class PostControllerTest {
+
+    private MockMvc mockMvc;
+
+    @InjectMocks
+    private PostController postController;
+
+    @Mock
+    private PostService postService;
+
+    @Autowired
+    private PostRepository postRepository;
+
+
+    @Autowired
+    private WebApplicationContext wac;
+
+    @BeforeEach
+    public void init() {
+        MockitoAnnotations.openMocks(this); // 목 객체 초기화
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac)
+                .addFilter(new CharacterEncodingFilter("UTF-8", true))
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .build();
+
+        postRepository.save(Post.builder()
+                        .id(1L)
+                        .categoryType(CategoryType.ISIS)
+                        .reported(false)
+                        .title("testPostTitle")
+                        .imageUrl(Collections.singletonList("testImageUrl"))
+                        .views(0)
+                        .postReportCount(0)
+                        .isClassified(false)
+                        .postedAt(LocalDate.now())
+                        .deadline(LocalDate.now())
+                        .noticeUrl("testNoticeUrl")
+                .build());
+    }
+
+    @AfterEach
+    void afterEach() {
+        // 테스트 종료 후 데이터 정리
+        postRepository.deleteAll();
+    }
+
+    @Test
+    @DisplayName("게시글 등록")
+    void postRegisterSuccess() throws Exception {
+        //given
+        Authentication authentication = new TestingAuthenticationToken("test1@gmail.com", null, "ROLE_ADMIN");
+
+        String testData =
+                "[\n" +
+                "    {\n" +
+                "        \"category_id\": \"246\",\n" +
+                "        \"title\": \"대학수학  튜터시간표\",\n" +
+                "        \"content\": \"\\nTutor시간표 대학수학(1)\\n요일\\n월\\n화\\n수\\n목\\n금\\n시간\\n10:00~12:00/\\n14:00~16:00\\n튜터실\\n5-106호\\n※튜터실은5호관(자연과학대학)입니다.\\n\",\n" +
+                "        \"img_url\": [],\n" +
+                "        \"posted_at\": \"2024.03.28\",\n" +
+                "        \"deadline\": \"2024.03.28\",\n" +
+                "        \"isclassified\": true,\n" +
+                "        \"notice_url\": \"https://inu.ac.kr/bbs/inu/246/385074/artclView.do\"\n" +
+                "    }\n" +
+                "]";
+
+        //when, then
+        ResultActions actions = mockMvc.perform(post("/add-post")
+                        .content(testData)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(authentication(authentication))
+        );
+
+        actions
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+/*
+사용할 Json 형태의 게시글
+[
+    {
+        "category_id": "246",
+        "title": "대학수학  튜터시간표",
+        "content": "\nTutor시간표 대학수학(1)\n요일\n월\n화\n수\n목\n금\n시간\n10:00~12:00/\n14:00~16:00\n튜터실\n5-106호\n※튜터실은5호관(자연과학대학)입니다.\n",
+        "img_url": [],
+        "posted_at": "2024.03.28",
+        "deadline": "2024.03.28",
+        "isclassified": true,
+        "notice_url": "https://inu.ac.kr/bbs/inu/246/385074/artclView.do"
+    }
+]
+[
+    {
+        "category_id": "246",
+        "title": "2024학년도 1학기 수강포기 처리완료 안내",
+        "content": "\n2024학년도 1학기 수강포기 처리완료 안내\n2024학년도 1학기 수강포기 신청에 대한 처리결과를 아래와 같이 안내합니다.\n- 수강포기 결과 확인: 통합정보 → 학사행정 → 학적 → 학적기본관리 → 개인학적조회(학생)\n",
+        "img_url": [],
+        "posted_at": "2024.03.28",
+        "deadline": "",
+        "isclassified": false,
+        "notice_url": "https://inu.ac.kr/bbs/inu/246/385042/artclView.do"
+    }
+]
+ */
+}
