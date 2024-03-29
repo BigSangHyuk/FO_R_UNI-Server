@@ -31,10 +31,9 @@ public class ReportService {
     private final PostRepository postRepository;
     private final ReportRepository reportRepository;
 
-    public void reportComment(ReportCommentInfo reportCommentInfo) {
+    public void reportComment(Long userId, ReportCommentInfo reportCommentInfo) {
 
         Long commentId = reportCommentInfo.getCommentId();
-        Long userId = reportCommentInfo.getUserId();
         ReportReason reason = reportCommentInfo.getReason();
         String detail = reportCommentInfo.getDetail();
 
@@ -48,30 +47,22 @@ public class ReportService {
         Optional<Report> report = reportRepository.findByUserAndComment(user, comment);
 
         if (report.isPresent()) {
-            Report existingReport = report.get();
-            existingReport.editReason(reason);
-            existingReport.editDetail(detail);
-            reportRepository.save(existingReport);
+            Report updatedReport = editReport(report.get(), reason, detail);
+            reportRepository.save(updatedReport);
         } else {
             comment.setReported(true);
             comment.setCommentReportCount(comment.getCommentReportCount() + 1);
             commentRepository.save(comment);
 
-            Report newReport = Report.builder()
-                    .user(user)
-                    .comment(comment)
-                    .reason(reason)
-                    .detail(detail)
-                    .build();
+            Report newReport = makeReport(user, comment, null, reason, detail);
 
             reportRepository.save(newReport);
         }
     }
 
-    public void reportPost(ReportPostInfo reportPostInfo) {
+    public void reportPost(Long userId, ReportPostInfo reportPostInfo) {
 
         Long postId = reportPostInfo.getPostId();
-        Long userId = reportPostInfo.getUserId();
         ReportReason reason = reportPostInfo.getReason();
         String detail = reportPostInfo.getDetail();
 
@@ -85,23 +76,32 @@ public class ReportService {
         Optional<Report> report = reportRepository.findByUserAndPost(user, post);
 
         if (report.isPresent()) {
-            Report existingReport = report.get();
-            existingReport.editReason(reason);
-            existingReport.editDetail(detail);
-            reportRepository.save(existingReport);
+            Report updatedReport = editReport(report.get(), reason, detail);
+            reportRepository.save(updatedReport);
         } else {
             post.setReported(true);
             post.setPostReportCount(post.getPostReportCount() + 1);
             postRepository.save(post);
 
-            Report newReport = Report.builder()
-                    .user(user)
-                    .post(post)
-                    .reason(reason)
-                    .detail(detail)
-                    .build();
+            Report newReport = makeReport(user, null, post, reason, detail);
 
             reportRepository.save(newReport);
         }
+    }
+
+    private Report makeReport(User user, Comment comment, Post post, ReportReason reason, String detail) {
+        return Report.builder()
+                .user(user)
+                .comment(comment)
+                .post(post)
+                .reason(reason)
+                .detail(detail)
+                .build();
+    }
+
+    private Report editReport(Report report, ReportReason reason, String detail) {
+        report.editReason(reason);
+        report.editDetail(detail);
+        return report;
     }
 }
