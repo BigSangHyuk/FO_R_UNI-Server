@@ -72,8 +72,7 @@ public class UserService {
     // 회원 정보 수정
     @Transactional
     public EditResponse edit(Long userId, EditUserInfo info) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         user.edit(encoder.encode(info.getPassword()), info.getName(), info.getDepartmentType(), info.getNickName(), info.getImage());
         User savedUser = userRepository.save(user);
         return EditResponse.builder()
@@ -126,7 +125,7 @@ public class UserService {
     }
 
     // Refresh Token 검증
-    public Token validRefreshToken(User user, String refreshToken) throws Exception {
+    public Token validRefreshToken(User user, String refreshToken) {
         Token token = tokenRepository.findById(user.getId()).orElseThrow(TokenNotFoundException::new);
         if (token.getRefreshToken() == null) {
             return null;
@@ -170,8 +169,8 @@ public class UserService {
 
     // 비밀번호 변경
     @Transactional
-    public Boolean changePassword(ChangePasswordInfo changePasswordInfo) throws IllegalAccessException {
-        User user = userRepository.findById(changePasswordInfo.getId()).orElseThrow(UserNotFoundException::new);
+    public Boolean changePassword(Long userId, ChangePasswordInfo changePasswordInfo) throws IllegalAccessException {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         if (encoder.matches(changePasswordInfo.getOldPassword(), user.getPassword())) {
             userRepository.updatePassword(user.getEmail(), encoder.encode(changePasswordInfo.getNewPassword()));
             return true;

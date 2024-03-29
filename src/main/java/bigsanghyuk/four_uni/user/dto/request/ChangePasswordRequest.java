@@ -6,11 +6,10 @@ import lombok.Getter;
 @Getter
 public class ChangePasswordRequest {
 
-    private Long id;
     private String oldPassword;
     private String newPassword;
 
     public ChangePasswordInfo toDomain() {
-        return new ChangePasswordInfo(id, oldPassword, newPassword);
+        return new ChangePasswordInfo(oldPassword, newPassword);
     }
 }

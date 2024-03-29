@@ -7,7 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ChangePasswordInfo {
 
-    private Long id;
     private String oldPassword;
     private String newPassword;
 }

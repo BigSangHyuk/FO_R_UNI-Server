@@ -8,7 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class EditUserInfo {
 
-    private Long id;
     private String password;
     private String name;
     private CategoryType departmentType;
