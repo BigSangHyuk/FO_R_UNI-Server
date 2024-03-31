@@ -31,6 +31,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
@@ -47,6 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @Import(TestSecurityConfig.class)
+@Transactional
 public class PostControllerTest {
 
     private MockMvc mockMvc;
@@ -120,11 +122,9 @@ public class PostControllerTest {
     @AfterEach
     void afterEach() {
         // 테스트 종료 후 데이터 정리
+        commentRepository.deleteAll();
         postRepository.deleteAll();
-
-        // 게시글, 댓글 조회 테스트에 아래 2라인 코드 추가 시 오류
-//        commentRepository.deleteAll();
-//        userRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
