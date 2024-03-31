@@ -4,7 +4,6 @@ import bigsanghyuk.four_uni.CommonResponse;
 import bigsanghyuk.four_uni.Results;
 import bigsanghyuk.four_uni.comment.dto.CommentDto;
 import bigsanghyuk.four_uni.comment.service.CommentService;
-import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
 import bigsanghyuk.four_uni.post.dto.request.ScrapRequest;
 import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
@@ -52,10 +51,9 @@ public class PostController {
     }
 
     @Operation(summary = "게시글 필터 조회", description = "/posts/filter?id=1-2-3-4 이런 식으로 전달, 최소 항목")
-    @GetMapping("/posts/filter")
-    public ResponseEntity<Results<List<Post>>> getByFilteredRequiredData(@RequestParam(name = "id") String id) {
-        List<Long> categoryIds = postService.hyphenStringToList(id, "-");
-        List<Post> filteredPosts = postService.getFilteredPostsRequired(categoryIds);
+    @GetMapping("/posts/filtered")
+    public ResponseEntity<Results<List<PostRequired>>> getByFilteredRequired(@RequestParam(name = "id") String id) {
+        List<PostRequired> filteredPosts = postService.getFilteredRequired(id);
         return ResponseEntity.ok().body(new Results<>(filteredPosts, filteredPosts.size()));
     }
 
