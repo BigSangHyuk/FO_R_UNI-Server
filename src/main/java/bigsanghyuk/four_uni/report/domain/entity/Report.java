@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity @Builder
 @Getter
 @Table(name = "reports")
@@ -37,11 +39,17 @@ public class Report extends BaseTimeEntity {
 
     private String detail; // 상세 사유
 
+    private LocalDate deadline; // 수정 요청 받을때만 사용
+
     public void editReason(ReportReason reason) {
         this.reason = reason;
     }
 
     public void editDetail(String detail) {
         this.detail = detail;
+    }
+
+    public void editDeadline(LocalDate deadline) {
+        this.deadline = deadline;
     }
 }
