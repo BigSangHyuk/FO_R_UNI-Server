@@ -1,8 +1,7 @@
 package bigsanghyuk.four_uni.user.controller;
 
-import bigsanghyuk.four_uni.CommonResponse;
+import bigsanghyuk.four_uni.common.CommonResponse;
 import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
-import bigsanghyuk.four_uni.config.mail.dto.SendMailRequest;
 import bigsanghyuk.four_uni.user.dto.request.ChangePasswordRequest;
 import bigsanghyuk.four_uni.user.dto.request.EditRequest;
 import bigsanghyuk.four_uni.user.dto.request.LoginRequest;

@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni;
+package bigsanghyuk.four_uni.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

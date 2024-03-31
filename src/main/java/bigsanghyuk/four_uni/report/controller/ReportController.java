@@ -1,6 +1,6 @@
 package bigsanghyuk.four_uni.report.controller;
 
-import bigsanghyuk.four_uni.CommonResponse;
+import bigsanghyuk.four_uni.common.CommonResponse;
 import bigsanghyuk.four_uni.report.dto.request.CorrectDeadlineRequest;
 import bigsanghyuk.four_uni.report.dto.request.ReportCommentRequest;
 import bigsanghyuk.four_uni.report.dto.request.ReportPostRequest;

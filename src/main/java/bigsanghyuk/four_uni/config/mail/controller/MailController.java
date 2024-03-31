@@ -1,6 +1,6 @@
 package bigsanghyuk.four_uni.config.mail.controller;
 
-import bigsanghyuk.four_uni.CommonResponse;
+import bigsanghyuk.four_uni.common.CommonResponse;
 import bigsanghyuk.four_uni.config.mail.dto.SendMailRequest;
 import bigsanghyuk.four_uni.config.mail.service.MailService;
 import bigsanghyuk.four_uni.user.service.UserService;

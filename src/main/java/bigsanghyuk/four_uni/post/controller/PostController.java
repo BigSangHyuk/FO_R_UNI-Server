@@ -1,7 +1,7 @@
 package bigsanghyuk.four_uni.post.controller;
 
-import bigsanghyuk.four_uni.CommonResponse;
-import bigsanghyuk.four_uni.Results;
+import bigsanghyuk.four_uni.common.CommonResponse;
+import bigsanghyuk.four_uni.common.Results;
 import bigsanghyuk.four_uni.comment.dto.CommentDto;
 import bigsanghyuk.four_uni.comment.service.CommentService;
 import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
