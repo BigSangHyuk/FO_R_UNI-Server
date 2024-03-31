@@ -40,7 +40,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
-    public List<RegisterPostInfo> jsonToDto(String data) throws JsonProcessingException {
+    private List<RegisterPostInfo> jsonToDto(String data) throws JsonProcessingException {
         JSONParser jsonParser = new JSONParser();
         JSONArray array = new JSONArray();
         ObjectMapper objectMapper = new ObjectMapper();
