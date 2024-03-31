@@ -1,11 +1,15 @@
 package bigsanghyuk.four_uni.controller;
 
+import bigsanghyuk.four_uni.comment.domain.entity.Comment;
+import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.config.TestSecurityConfig;
 import bigsanghyuk.four_uni.post.controller.PostController;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.service.PostService;
+import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.enums.CategoryType;
+import bigsanghyuk.four_uni.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +25,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -33,6 +38,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -54,6 +60,14 @@ public class PostControllerTest {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private WebApplicationContext wac;
@@ -79,12 +93,38 @@ public class PostControllerTest {
                         .deadline(LocalDate.now())
                         .noticeUrl("testNoticeUrl")
                 .build());
+
+        User user = userRepository.save(User.builder()
+                .id(1L)
+                .name("test_name")
+                .email("test_email@test.com")
+                .password(passwordEncoder.encode("test1111"))
+                .departmentType(CategoryType.ISIS) // 컴퓨터 공학부
+                .image("test_image_url")
+                .nickName("test_nickname")
+                .build());
+
+        commentRepository.save(Comment.builder()
+                .id(1L)
+                .user(user)
+                .postId(1L)
+                .reported(false)
+                .parent(null)
+                .commentLike(0)
+                .content("testComment")
+                .commentReportCount(0)
+                .deleted(false)
+                .build());
     }
 
     @AfterEach
     void afterEach() {
         // 테스트 종료 후 데이터 정리
         postRepository.deleteAll();
+
+        // 게시글, 댓글 조회 테스트에 아래 2라인 코드 추가 시 오류
+//        commentRepository.deleteAll();
+//        userRepository.deleteAll();
     }
 
     @Test
@@ -113,6 +153,25 @@ public class PostControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .with(authentication(authentication))
+        );
+
+        actions
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("게시글과 댓글 함께 조회하는 테스트")
+    void getPostWithCommentsSuccess() throws Exception {
+        //given
+        Authentication authentication = new TestingAuthenticationToken("test1@gmail.com", null, "ROLE_ADMIN");
+
+        //when, then
+        ResultActions actions = mockMvc.perform(get("/posts/{postId}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .with(authentication(authentication))
+
         );
 
         actions
