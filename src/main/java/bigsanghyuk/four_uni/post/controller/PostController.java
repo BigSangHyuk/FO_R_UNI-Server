@@ -10,6 +10,7 @@ import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
 import bigsanghyuk.four_uni.post.service.PostService;
 import bigsanghyuk.four_uni.post.service.ScrappedService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
@@ -28,6 +29,7 @@ public class PostController {
     private final ScrappedService scrappedService;
     private final CommentService commentService;
 
+    @Hidden
     @Operation(summary = "게시글 등록", description = "김동후 전용")
     @PostMapping("/add-post")
     public ResponseEntity<?> registerPost(@RequestBody String data) throws JsonProcessingException {
