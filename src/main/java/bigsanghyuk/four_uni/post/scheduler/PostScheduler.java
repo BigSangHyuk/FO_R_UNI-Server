@@ -23,7 +23,7 @@ public class PostScheduler {
     @Scheduled(cron = "0 5 9-18 * * 1-5") // 평일 09~18시 05분마다 실행
     public void getPostData() {
         Mono<String> responseMono = webClient.get()
-                .uri("/")   // 목적지 서버의 controller 매핑 (추가해야됨)
+                .uri("/showdata/")   // 목적지 서버의 controller 매핑
                 .retrieve()
                 .bodyToMono(String.class);
 
@@ -31,10 +31,9 @@ public class PostScheduler {
     }
 
     private void addPost(String response) {
-        String data = "\"" + response + "\"";
         try {
-            int success = postService.getAddPostResult(data);
-            log.info("articles added={}, time={}", success, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            int success = postService.getAddPostResult(response);
+            log.info("articles_added={}, time={}", success, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
