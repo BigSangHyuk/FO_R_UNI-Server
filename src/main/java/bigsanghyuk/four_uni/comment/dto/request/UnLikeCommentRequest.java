@@ -12,12 +12,9 @@ import lombok.NoArgsConstructor;
 public class UnLikeCommentRequest {
 
     @NotNull
-    private Long userId;
-
-    @NotNull
     private Long commentId;
 
     public UnLikeCommentInfo toDomain() {
-        return new UnLikeCommentInfo(userId, commentId);
+        return new UnLikeCommentInfo(commentId);
     }
 }

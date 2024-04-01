@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.config;
+package bigsanghyuk.four_uni.common;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

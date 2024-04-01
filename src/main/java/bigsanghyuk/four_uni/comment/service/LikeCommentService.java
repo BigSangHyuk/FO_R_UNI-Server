@@ -9,15 +9,12 @@ import bigsanghyuk.four_uni.comment.repository.LikeCommentRepository;
 import bigsanghyuk.four_uni.exception.comment.CommentNotFoundException;
 import bigsanghyuk.four_uni.exception.comment.LikeCommentNotFoundException;
 import bigsanghyuk.four_uni.exception.likecomment.AlreadyLikeException;
-import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
-import bigsanghyuk.four_uni.post.domain.entity.Post;
+import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
+import bigsanghyuk.four_uni.user.domain.entity.User;
+import bigsanghyuk.four_uni.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,32 +22,36 @@ public class LikeCommentService {
 
     private final CommentRepository commentRepository;
     private final LikeCommentRepository likeCommentRepository;
+    private final UserRepository userRepository;
 
     @Transactional
-    public void likeComment(LikeCommentInfo likeCommentInfo) {
+    public void likeComment(Long userId, LikeCommentInfo likeCommentInfo) {
 
-        Long userId = likeCommentInfo.getUserId();
         Long commentId = likeCommentInfo.getCommentId();
 
-        commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
-        likeCommentRepository.findByUserIdAndCommentId(userId, commentId)
-                .ifPresent(comment -> {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        likeCommentRepository.findByUserAndComment(user, comment)
+                .ifPresent(likeComment -> {
                             throw new AlreadyLikeException();
                     }
                 );
+
         commentRepository.increaseLikesByCommentId(commentId);
-        likeCommentRepository.save(new LikeComment(userId, commentId));
+        likeCommentRepository.save(new LikeComment(user, comment));
     }
 
     @Transactional
-    public void unLikeComment(UnLikeCommentInfo unLikeCommentInfo) {
-        Long userId = unLikeCommentInfo.getUserId();
+    public void unLikeComment(Long userId, UnLikeCommentInfo unLikeCommentInfo) {
         Long commentId = unLikeCommentInfo.getCommentId();
 
-        commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
-        likeCommentRepository.findByUserIdAndCommentId(userId, commentId).orElseThrow(LikeCommentNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        likeCommentRepository.findByUserAndComment(user, comment).orElseThrow(LikeCommentNotFoundException::new);
 
         commentRepository.decreaseLikesByCommentId(commentId);
-        likeCommentRepository.deleteLikeCommentByUserIdAndCommentId(userId, commentId);
+        likeCommentRepository.deleteLikeCommentByUserAndComment(user, comment);
     }
 }

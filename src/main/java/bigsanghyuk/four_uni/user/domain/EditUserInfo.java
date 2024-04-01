@@ -1,5 +1,6 @@
 package bigsanghyuk.four_uni.user.domain;
 
+import bigsanghyuk.four_uni.user.enums.CategoryType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -7,10 +8,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class EditUserInfo {
 
-    private Long id;
     private String password;
     private String name;
-    private int dept;
+    private CategoryType departmentType;
     private String nickName;
     private String image;
 }

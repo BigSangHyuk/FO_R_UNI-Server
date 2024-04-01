@@ -2,20 +2,18 @@ package bigsanghyuk.four_uni.comment.domain.entity;
 
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
 import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
+import bigsanghyuk.four_uni.user.domain.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity @Builder
 @Getter @Table(name = "comments")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE comments SET deleted = TRUE WHERE comment_id = ?") // soft delete 사용
 public class Comment extends BaseTimeEntity {
 
     @Id
@@ -23,12 +21,20 @@ public class Comment extends BaseTimeEntity {
     @Column(name = "comment_id")
     private Long id;
 
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(name = "post_id")
     private Long postId;
+
     @Setter @ColumnDefault("false")
     private boolean reported;
-    @ColumnDefault("null")
-    private Long parentCommentId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
     @ColumnDefault("0")
     private int commentLike;
     private String content;
@@ -36,20 +42,10 @@ public class Comment extends BaseTimeEntity {
     @Setter
     private int commentReportCount;
 
-    public Comment(Long userId, Long postId, Long parentCommentId, int commentLike, String content, boolean reported) {
-        this.userId = userId;
-        this.postId = postId;
-        this.parentCommentId = parentCommentId;
-        this.commentLike = commentLike;
-        this.content = content;
-        this.reported = reported;
-    }
+    @ColumnDefault("false")
+    private boolean deleted;
 
     public void edit(@Valid EditCommentInfo editCommentInfo) {
         this.content = editCommentInfo.getContent();
-    }
-
-    public void updateParent(Long parentCommentId) {
-        this.parentCommentId = parentCommentId;
     }
 }

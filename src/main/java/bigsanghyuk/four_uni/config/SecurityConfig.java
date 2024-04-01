@@ -1,5 +1,8 @@
 package bigsanghyuk.four_uni.config;
 
+import bigsanghyuk.four_uni.config.filter.CorsFilter;
+import bigsanghyuk.four_uni.config.filter.JwtAuthenticationFilter;
+import bigsanghyuk.four_uni.config.interceptor.TokenInterceptor;
 import bigsanghyuk.four_uni.config.jwt.JwtProvider;
 import bigsanghyuk.four_uni.config.oauth.CustomAuthorityUtils;
 import bigsanghyuk.four_uni.config.oauth.handler.OAuth2UserSuccessHandler;
@@ -22,13 +25,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig implements WebMvcConfigurer {
 
     private final JwtProvider jwtProvider;
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -61,7 +66,7 @@ public class SecurityConfig {
                 // 조건마다 요청 허용, 제한 설정
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/sign-up", "/sign-in", "/refresh", "/swagger-ui/**", "/v3/api-docs/**", "/auth/**").permitAll()
-                        .requestMatchers("/admins/**", "/add-post").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/admins/**", "/add-post/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/users/**", "/posts/**", "/comments/**", "/reports/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
                         .anyRequest().denyAll())
                 .oauth2Login(oauth2 -> oauth2
@@ -86,6 +91,19 @@ public class SecurityConfig {
                         })
                 );
         return http.build();
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new TokenInterceptor(jwtProvider))
+                .excludePathPatterns(
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/auth/**",
+                        "/sign-up",
+                        "/sign-in",
+                        "/refresh"
+                );
     }
 
     @Bean

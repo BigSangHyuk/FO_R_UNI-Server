@@ -6,6 +6,7 @@ import bigsanghyuk.four_uni.exception.comment.CommentNotFoundException;
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
 import bigsanghyuk.four_uni.exception.report.ReportReasonNotFoundException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
+import bigsanghyuk.four_uni.report.domain.CorrectDeadlineInfo;
 import bigsanghyuk.four_uni.report.domain.ReportCommentInfo;
 import bigsanghyuk.four_uni.report.domain.ReportPostInfo;
 import bigsanghyuk.four_uni.report.domain.entity.ReportReason;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -31,10 +33,9 @@ public class ReportService {
     private final PostRepository postRepository;
     private final ReportRepository reportRepository;
 
-    public void reportComment(ReportCommentInfo reportCommentInfo) {
+    public boolean reportComment(Long userId, ReportCommentInfo reportCommentInfo) {
 
         Long commentId = reportCommentInfo.getCommentId();
-        Long userId = reportCommentInfo.getUserId();
         ReportReason reason = reportCommentInfo.getReason();
         String detail = reportCommentInfo.getDetail();
 
@@ -44,34 +45,30 @@ public class ReportService {
         if (reason == null) {
             throw new ReportReasonNotFoundException();
         }
+        if (comment.isDeleted()) {
+            throw new CommentNotFoundException();
+        }
 
-        Optional<Report> report = reportRepository.findByUserIdAndCommentId(user.getId(), comment.getId());
+        Optional<Report> report = reportRepository.findByUserAndComment(user, comment);
+        Report savedReport;
 
         if (report.isPresent()) {
-            Report existingReport = report.get();
-            existingReport.setReason(reason);
-            existingReport.setDetail(detail);
-            reportRepository.save(existingReport);
+            Report updatedReport = editReport(report.get(), reason, detail);
+            savedReport = reportRepository.save(updatedReport);
         } else {
             comment.setReported(true);
             comment.setCommentReportCount(comment.getCommentReportCount() + 1);
             commentRepository.save(comment);
 
-            Report newReport = Report.builder()
-                    .userId(user.getId())
-                    .commentId(comment.getId())
-                    .reason(reason)
-                    .detail(detail)
-                    .build();
-
-            reportRepository.save(newReport);
+            Report newReport = makeReport(user, comment, null, reason, detail);
+            savedReport = reportRepository.save(newReport);
         }
+        return savedReport.getId() != null;
     }
 
-    public void reportPost(ReportPostInfo reportPostInfo) {
+    public boolean reportPost(Long userId, ReportPostInfo reportPostInfo) {
 
         Long postId = reportPostInfo.getPostId();
-        Long userId = reportPostInfo.getUserId();
         ReportReason reason = reportPostInfo.getReason();
         String detail = reportPostInfo.getDetail();
 
@@ -82,26 +79,71 @@ public class ReportService {
             throw new ReportReasonNotFoundException();
         }
 
-        Optional<Report> report = reportRepository.findByUserIdAndPostId(user.getId(), post.getId());
+        Optional<Report> report = reportRepository.findByUserAndPost(user, post);
+        Report savedReport;
 
         if (report.isPresent()) {
-            Report existingReport = report.get();
-            existingReport.setReason(reason);
-            existingReport.setDetail(detail);
-            reportRepository.save(existingReport);
+            Report updatedReport = editReport(report.get(), reason, detail);
+            savedReport = reportRepository.save(updatedReport);
         } else {
             post.setReported(true);
             post.setPostReportCount(post.getPostReportCount() + 1);
             postRepository.save(post);
 
-            Report newReport = Report.builder()
-                    .userId(user.getId())
-                    .postId(post.getId())
-                    .reason(reason)
-                    .detail(detail)
-                    .build();
-
-            reportRepository.save(newReport);
+            Report newReport = makeReport(user, null, post, reason, detail);
+            savedReport = reportRepository.save(newReport);
         }
+        return savedReport.getId() != null;
+    }
+
+    public boolean reportDeadline(Long userId, CorrectDeadlineInfo correctDeadlineInfo) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Post post = postRepository.findById(correctDeadlineInfo.getPostId()).orElseThrow(PostNotFoundException::new);
+        LocalDate deadline = correctDeadlineInfo.getDeadline();
+
+        Optional<Report> report = reportRepository.findDeadlineReport(user, post);
+        Report savedReport;
+
+        if (report.isPresent()) {
+            Report updatedReport = editReport(report.get(), deadline);
+            savedReport = reportRepository.save(updatedReport);
+        } else {
+            post.setReported(true);
+            post.setPostReportCount(post.getPostReportCount() + 1);
+            postRepository.save(post);
+
+            Report newReport = makeReport(user, post, deadline);
+            savedReport = reportRepository.save(newReport);
+        }
+        return savedReport.getId() != null;
+    }
+
+    private Report makeReport(User user, Comment comment, Post post, ReportReason reason, String detail) {
+        return Report.builder()
+                .user(user)
+                .comment(comment)
+                .post(post)
+                .reason(reason)
+                .detail(detail)
+                .build();
+    }
+
+    private Report makeReport(User user, Post post, LocalDate deadline) {
+        return Report.builder()
+                .user(user)
+                .post(post)
+                .deadline(deadline)
+                .build();
+    }
+
+    private Report editReport(Report report, ReportReason reason, String detail) {
+        report.editReason(reason);
+        report.editDetail(detail);
+        return report;
+    }
+
+    private Report editReport(Report report, LocalDate deadline) {
+        report.editDeadline(deadline);
+        return report;
     }
 }

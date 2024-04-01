@@ -1,16 +1,19 @@
 package bigsanghyuk.four_uni.post.service;
 
-import bigsanghyuk.four_uni.comment.domain.entity.Comment;
+import bigsanghyuk.four_uni.comment.domain.entity.CommentProfile;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
+import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
 import bigsanghyuk.four_uni.post.domain.RegisterPostInfo;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
-import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
+import bigsanghyuk.four_uni.post.domain.entity.ScrappedRequired;
 import bigsanghyuk.four_uni.post.dto.request.RegisterPostRequest;
 import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
 import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
+import bigsanghyuk.four_uni.user.enums.CategoryType;
+import bigsanghyuk.four_uni.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
@@ -35,8 +38,9 @@ public class PostService {
     private final PostRepository postRepository;
     private final ScrappedRepository scrappedRepository;
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
-    public List<RegisterPostInfo> jsonToDto(String data) throws JsonProcessingException {
+    private List<RegisterPostInfo> jsonToDto(String data) throws JsonProcessingException {
         JSONParser jsonParser = new JSONParser();
         JSONArray array = new JSONArray();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -52,7 +56,21 @@ public class PostService {
         return infos;
     }
 
-    public int addPost(RegisterPostInfo registerPostInfo) {
+    public int getAddPostResult(String data) throws JsonProcessingException {
+        int success = 0;
+        List<RegisterPostInfo> infos = jsonToDto(data);
+        CategoryType[] values = CategoryType.values();
+        for (RegisterPostInfo info : infos) {
+            for (CategoryType value : values) {
+                if (value.getId() == (int) (long) info.getCategoryId()) {
+                    success += addPost(info, CategoryType.valueOf(value.getKey()));
+                }
+            }
+        }
+        return success;
+    }
+
+    public int addPost(RegisterPostInfo registerPostInfo, CategoryType categoryType) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         LocalDate postedAt = LocalDate.parse(registerPostInfo.getPostedAt(), formatter);
         LocalDate deadline;
@@ -66,7 +84,7 @@ public class PostService {
         } else {
             postRepository.save(
                     Post.builder()
-                            .categoryId(registerPostInfo.getCategoryId())
+                            .categoryType(categoryType)
                             .title(registerPostInfo.getTitle())
                             .content(registerPostInfo.getContent())
                             .imageUrl(registerPostInfo.getImageUrl())
@@ -79,10 +97,6 @@ public class PostService {
         }
     }
 
-    public List<Post> getUnClassifiedLists() {
-        return postRepository.findByIsClassifiedFalse();
-    }
-
     public List<PostRequired> getUnclassifiedRequired() {
         return postRepository.findRequiredIsClassifiedFalse();
     }
@@ -91,7 +105,7 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         GetDetailResponse response = GetDetailResponse.builder()
                 .id(postId)
-                .categoryId(post.getCategoryId())
+                .categoryType(post.getCategoryType())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .imageUrl(post.getImageUrl())
@@ -106,55 +120,35 @@ public class PostService {
         return response;
     }
 
-    public List<Post> getFilteredPostsByCategoryIds(List<Long> categoryIds) {
-        return postRepository.findByCategoryIdIn(categoryIds);
+    public List<PostRequired> getFilteredRequired(String ids) {
+        List<Long> categoryIds = stringToCategoryIds(ids);
+        List<String> categoryNames = getCategoryNames(categoryIds);
+
+        return postRepository.findPostRequiredFiltered(categoryNames);
     }
 
-    public List<Long> hyphenStringToList(String input, String delimiter) {
-        List<Long> result = new ArrayList<>();
-        String[] tokens = input.split(delimiter);
-        for (String token : tokens) {
-            result.add(Long.parseLong(token));
+    public List<PostRequired> getScrappedRequired(Long userId) {
+        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        List<ScrappedRequired> required = scrappedRepository.findRequired(userId);
+        LinkedList<PostRequired> posts = new LinkedList<>();
+        for (ScrappedRequired scrappedRequired : required) {
+            PostRequired found = postRepository.findRequiredByPostId(scrappedRequired.getPostId());
+            posts.add(found);
         }
-        return result;
+        return posts;
     }
 
-    public List<Post> getScrappedList(Long userId) {
-        Iterator<Scrapped> it = scrappedRepository.findByUserIdOrderByScrappedAt(userId).iterator();
-        LinkedList<Post> scrappedList = new LinkedList<>();
-        while (it.hasNext()) {
-            Long postId = it.next().getPostId();
-            Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-            scrappedList.add(post);
-        }
-        return scrappedList;
-    }
-
-    public List<Post> getCommented(Long userId) throws IllegalAccessException {
-        List<Comment> comments = commentRepository.findByUserIdOrderByIdDesc(userId).orElseThrow(IllegalAccessException::new);
+    public List<PostRequired> getCommentedPostRequired(Long userId) {
+        List<CommentProfile> commentedPostId = commentRepository.findCommentedPostId(userId);
         LinkedHashSet<Long> set = new LinkedHashSet<>();
-        List<Post> result = new ArrayList<>();
-        for (Comment comment : comments) {
-            set.add(comment.getPostId());
+        LinkedList<PostRequired> result = new LinkedList<>();
+        for (CommentProfile commentRequired : commentedPostId) {
+            set.add(commentRequired.getPostId());
         }
         for (Long postId : set) {
-            result.add(postRepository.findById(postId).orElseThrow(PostNotFoundException::new));
+            result.add(postRepository.findRequiredByPostId(postId));
         }
         return result;
-    }
-
-    public List<Post> getPostsByDate(String date) { //date format example: 2024-03
-        StringTokenizer st = new StringTokenizer(date, "-");
-        DateFilter filter = new DateFilter(st);
-
-        return postRepository.findPostsByCurrentAndAdjacentMonths(
-                filter.getCurrentMonth().getYear(),
-                filter.getCurrentMonth().getMonthValue(),
-                filter.getPrevMonth().getYear(),
-                filter.getPrevMonth().getMonthValue(),
-                filter.getNextMonth().getYear(),
-                filter.getNextMonth().getMonthValue()
-        );
     }
 
     public List<PostRequired> getPostsByDateRequired(String date) { //date format example: 2024-03
@@ -169,6 +163,28 @@ public class PostService {
                 filter.getNextMonth().getYear(),
                 filter.getNextMonth().getMonthValue()
         );
+    }
+
+    private List<String> getCategoryNames(List<Long> categoryIds) {
+        List<String> categoryNames = new ArrayList<>();
+        CategoryType[] values = CategoryType.values();
+        for (Long id : categoryIds) {
+            for (CategoryType value : values) {
+                if ((int) value.getId() == id) {
+                    categoryNames.add(value.getKey());
+                }
+            }
+        }
+        return categoryNames;
+    }
+
+    private List<Long> stringToCategoryIds(String input) {
+        List<Long> result = new ArrayList<>();
+        String[] tokens = input.split("-");
+        for (String token : tokens) {
+            result.add(Long.parseLong(token));
+        }
+        return result;
     }
 
     @Getter

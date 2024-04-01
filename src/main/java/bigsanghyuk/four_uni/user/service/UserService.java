@@ -4,9 +4,12 @@ import bigsanghyuk.four_uni.config.jwt.JwtProvider;
 import bigsanghyuk.four_uni.config.jwt.domain.Token;
 import bigsanghyuk.four_uni.config.jwt.domain.TokenRepository;
 import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
+import bigsanghyuk.four_uni.config.mail.domain.SendMailInfo;
+import bigsanghyuk.four_uni.config.mail.service.MailService;
 import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
+import bigsanghyuk.four_uni.user.domain.ChangePasswordInfo;
 import bigsanghyuk.four_uni.user.domain.EditUserInfo;
 import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
 import bigsanghyuk.four_uni.user.domain.SignUserInfo;
@@ -35,9 +38,11 @@ public class UserService {
     private final PasswordEncoder encoder;
     private final JwtProvider jwtProvider;
     private final TokenRepository tokenRepository;
+    private final MailService mailService;
 
     private static final int EXPIRATION_IN_MINUTES = 43800;
 
+    // 회원 가입
     public boolean register(SignUserInfo info) throws Exception {
         userRepository.findByEmail(info.getEmail())
                 .ifPresent(user -> {
@@ -48,7 +53,7 @@ public class UserService {
                     .email(info.getEmail())
                     .password(encoder.encode(info.getPassword()))
                     .name(info.getName())
-                    .dept(info.getDept())
+                    .departmentType(info.getDepartmentType())
                     .nickName(info.getNickName())
                     .image(info.getImage())
                     .build();
@@ -64,22 +69,23 @@ public class UserService {
         return true;
     }
 
+    // 회원 정보 수정
     @Transactional
     public EditResponse edit(Long userId, EditUserInfo info) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
-        user.edit(encoder.encode(info.getPassword()), info.getName(), info.getDept(), info.getNickName(), info.getImage());
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        user.edit(encoder.encode(info.getPassword()), info.getName(), info.getDepartmentType(), info.getNickName(), info.getImage());
         User savedUser = userRepository.save(user);
         return EditResponse.builder()
                 .id(savedUser.getId())
                 .name(savedUser.getName())
-                .dept(savedUser.getDept())
+                .departmentType(savedUser.getDepartmentType())
                 .nickName(savedUser.getNickName())
                 .image(savedUser.getImage())
                 .roles(savedUser.getRoles())
                 .build();
     }
 
+    // 로그인
     public LoginResponse login(LoginUserInfo info) {
         User user = userRepository.findByEmail(info.getEmail())
                 .orElseThrow(UserNotFoundException::new);
@@ -90,22 +96,24 @@ public class UserService {
                 .id(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
-                .dept(user.getDept())
+                .departmentType(user.getDepartmentType())
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())
                 .token(TokenDto.builder()
-                        .accessToken(jwtProvider.createToken(user.getEmail(), user.getRoles()))
+                        .accessToken(jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles()))
                         .refreshToken(createRefreshToken(user))
                         .build())
                 .build();
     }
 
+    // 유저 상세 정보 조회
     public SignResponse getUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         return new SignResponse(user);
     }
 
+    // Refresh Token 생성
     public String createRefreshToken(User user) {
         Token token = tokenRepository.save(Token.builder()
                 .id(user.getId())
@@ -116,7 +124,8 @@ public class UserService {
         return token.getRefreshToken();
     }
 
-    public Token validRefreshToken(User user, String refreshToken) throws Exception {
+    // Refresh Token 검증
+    public Token validRefreshToken(User user, String refreshToken) {
         Token token = tokenRepository.findById(user.getId()).orElseThrow(TokenNotFoundException::new);
         if (token.getRefreshToken() == null) {
             return null;
@@ -129,17 +138,44 @@ public class UserService {
         }
     }
 
+    // Access Token 갱신
     public TokenDto refreshAccessToken(TokenDto tokenDto) throws Exception {
         String email = jwtProvider.getEmail(tokenDto.getAccessToken());
         User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         Token token = validRefreshToken(user, tokenDto.getRefreshToken());
         if (token != null) {
             return TokenDto.builder()
-                    .accessToken(jwtProvider.createToken(email, user.getRoles()))
+                    .accessToken(jwtProvider.createToken(email, user.getId(), user.getRoles()))
                     .refreshToken(token.getRefreshToken())
                     .build();
         } else {
             throw new Exception("로그인이 필요합니다.");
+        }
+    }
+
+    // 임시 비밀번호 발급 후 전송
+    @Transactional
+    public Boolean setToTempPassword(SendMailInfo sendMailInfo) {
+        String email = sendMailInfo.getEmail();
+        userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        String encodedTempPw = encoder.encode(mailService.sendTempPwMail(sendMailInfo));
+        try {
+            userRepository.updatePassword(email, encodedTempPw);
+            return true;
+        } catch (Exception e) {
+            throw new IllegalStateException("오류가 발생했습니다.");
+        }
+    }
+
+    // 비밀번호 변경
+    @Transactional
+    public Boolean changePassword(Long userId, ChangePasswordInfo changePasswordInfo) throws IllegalAccessException {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        if (encoder.matches(changePasswordInfo.getOldPassword(), user.getPassword())) {
+            userRepository.updatePassword(user.getEmail(), encoder.encode(changePasswordInfo.getNewPassword()));
+            return true;
+        } else {
+            throw new IllegalAccessException("이전 비밀번호가 일치하지 않습니다.");
         }
     }
 }

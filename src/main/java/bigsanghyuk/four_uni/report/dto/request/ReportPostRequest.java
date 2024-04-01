@@ -11,12 +11,10 @@ public class ReportPostRequest {
     @NotNull
     private Long postId;
     @NotNull
-    private Long userId;
-    @NotNull
     private ReportReason reason;
     private String detail;
 
     public ReportPostInfo toDomain() {
-        return new ReportPostInfo(userId, postId, reason, detail);
+        return new ReportPostInfo(postId, reason, detail);
     }
 }

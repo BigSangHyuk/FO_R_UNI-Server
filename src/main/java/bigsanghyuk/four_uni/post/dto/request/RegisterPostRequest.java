@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.post.dto.request;
 
 import bigsanghyuk.four_uni.post.domain.RegisterPostInfo;
+import bigsanghyuk.four_uni.user.enums.CategoryType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

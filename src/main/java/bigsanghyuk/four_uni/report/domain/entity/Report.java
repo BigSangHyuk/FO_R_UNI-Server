@@ -1,16 +1,19 @@
 package bigsanghyuk.four_uni.report.domain.entity;
 
+import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
+import bigsanghyuk.four_uni.post.domain.entity.Post;
+import bigsanghyuk.four_uni.user.domain.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity @Builder
-@Getter @Setter
+@Getter
 @Table(name = "reports")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,14 +22,34 @@ public class Report extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId; // 신고하는 유저의 아이디
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user; // 신고하는 유저의 아이디
 
-    private Long commentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id")
+    private Comment comment;    // 신고당하는 댓글
 
-    private Long postId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private Post post;
 
     @Enumerated(EnumType.STRING)
     private ReportReason reason; // 신고 사유
 
     private String detail; // 상세 사유
+
+    private LocalDate deadline; // 수정 요청 받을때만 사용
+
+    public void editReason(ReportReason reason) {
+        this.reason = reason;
+    }
+
+    public void editDetail(String detail) {
+        this.detail = detail;
+    }
+
+    public void editDeadline(LocalDate deadline) {
+        this.deadline = deadline;
+    }
 }

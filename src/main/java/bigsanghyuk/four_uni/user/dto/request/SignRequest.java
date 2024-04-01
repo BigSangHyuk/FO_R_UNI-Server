@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.user.dto.request;
 
 import bigsanghyuk.four_uni.user.domain.SignUserInfo;
+import bigsanghyuk.four_uni.user.enums.CategoryType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -16,12 +17,12 @@ public class SignRequest {
     @NotNull
     private String name;
     @NotNull
-    private int dept;
+    private CategoryType departmentType;
     @NotNull
     private String nickName;
     private String image;
 
     public SignUserInfo toDomain() {
-        return new SignUserInfo(email, password, name, dept, nickName, image);
+        return new SignUserInfo(email, password, name, departmentType, nickName, image);
     }
 }

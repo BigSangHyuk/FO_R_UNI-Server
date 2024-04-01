@@ -12,9 +12,8 @@ public class DeleteCommentRequest {
 
     private Long postId;
     private Long commentId;
-    private Long userId;
 
     public DeleteCommentInfo toDomain() {
-        return new DeleteCommentInfo(postId, commentId, userId);
+        return new DeleteCommentInfo(postId, commentId);
     }
 }

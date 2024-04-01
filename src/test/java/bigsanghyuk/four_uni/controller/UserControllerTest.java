@@ -1,47 +1,73 @@
 package bigsanghyuk.four_uni.controller;
 
+import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
+import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
+import bigsanghyuk.four_uni.user.enums.CategoryType;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
 import bigsanghyuk.four_uni.user.service.UserService;
-import org.apache.commons.lang3.RandomStringUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.Random;
+import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@Slf4j
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class UserControllerTest {
 
-    User user;
-    @Autowired
-    UserService userService;
-    @Autowired
-    UserRepository userRepository;
+    private MockMvc mockMvc;
 
-    @BeforeEach // 테스트 실행할때마다 수행
-    public void registerSetUp() {
-        // given : 회원 가입 테스트를 위한 초기 설정
-        String randomCode = RandomStringUtils.randomAlphanumeric(15);
+    @Autowired
+    private UserService userService;
 
-        Random random = new Random();
-        Long randomNum = random.nextLong();
-        user = User.builder()
-                .id(randomNum)
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private WebApplicationContext wac;
+
+    @BeforeEach
+    public void init() {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac)
+                .addFilter(new CharacterEncodingFilter("UTF-8", true))
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .build();
+
+        userRepository.save(User.builder()
+                .id(1L)
                 .name("test_name")
                 .email("test_email@test.com")
-                .password(randomCode)
-                .dept(1)
+                .password(passwordEncoder.encode("test1111"))
+                .departmentType(CategoryType.ISIS) // 컴퓨터 공학부
                 .image("test_image_url")
                 .nickName("test_nickname")
-                .build();
+                .build());
     }
 
     @AfterEach
@@ -52,55 +78,49 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("회원가입")
-    void register() {
-        // when : 회원 가입 동작 수행
-        User savedUser = userRepository.save(user);
+    void signUpSuccess() throws Exception {
+        //given
+        User user = User.builder()
+                .id(2L)
+                .name("test_name2")
+                .email("test_email2@test.com")
+                .password("test2222")
+                .departmentType(CategoryType.ISIS) // 컴퓨터 공학부
+                .image("test_image_url2")
+                .nickName("test_nickname2")
+                .build();
 
-        // then : 회원 가입 후에는 ID가 존재해야 하고 저장된 회원 정보를 조회하여 존재해야 함
-        assertNotNull(savedUser.getId());
+        user.setRoles(Collections.singletonList(
+                Authority.builder()
+                        .name("ROLE_USER")
+                        .build()));
 
-        User retrievedUser = userRepository.findById(savedUser.getId()).orElse(null);
-        assertNotNull(retrievedUser);
+        // Convert User object to JSON
+        String content = objectMapper.writeValueAsString(user);
+
+        //when, then
+        mockMvc.perform(post("/sign-up")
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
+
 
     @Test
-    @DisplayName("회원정보수정")
-    void update() {
-        // given : 회원 정보 저장
-        User savedUser = userRepository.save(user);
+    @DisplayName("로그인")
+    public void signIn() throws Exception {
+        //given
+        LoginUserInfo info = new LoginUserInfo("test_email@test.com", "test1111");
 
-        // and : 수정할 정보
-        String updatedName = "updated_name";
-        String updatedEmail = "updated_email@test.com";
-        String updatedNickName = "updated_nickname";
-
-        // when : 회원 정보 업데이트 동작 수행
-        savedUser.setName(updatedName);
-        savedUser.setEmail(updatedEmail);
-        savedUser.setNickName(updatedNickName);
-
-        userRepository.save(savedUser);
-
-        // then : 업데이트된 회원 정보 확인
-        User updatedUser = userRepository.findById(savedUser.getId()).orElse(null);
-        assertNotNull(updatedUser);
-        assertEquals(updatedName, updatedUser.getName());
-        assertEquals(updatedEmail, updatedUser.getEmail());
-        assertEquals(updatedNickName, updatedUser.getNickName());
+        //when, then
+        mockMvc.perform(post("/sign-in")
+                        .content(objectMapper.writeValueAsString(info))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(status().isOk());
     }
-
-    @Test
-    @DisplayName("회원정보삭제")
-    void delete() {
-        // given : 회원 정보 저장
-        User savedUser = userRepository.save(user);
-
-        // when : 회원 정보 삭제 동작 수행
-        userRepository.deleteById(savedUser.getId());
-
-        // then : 삭제된 회원 정보 조회 시 null이 반환되어야 함
-        Optional<User> deletedUser = userRepository.findById(savedUser.getId());
-        assertFalse(deletedUser.isPresent());
-    }
-
 }

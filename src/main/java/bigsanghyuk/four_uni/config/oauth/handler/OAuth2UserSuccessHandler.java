@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.config.oauth.handler;
 
 import bigsanghyuk.four_uni.config.jwt.JwtProvider;
+import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
 import bigsanghyuk.four_uni.config.oauth.CustomAuthorityUtils;
 import bigsanghyuk.four_uni.config.oauth.domain.CustomOAuth2User;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
@@ -8,19 +9,20 @@ import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
 import bigsanghyuk.four_uni.user.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -37,23 +39,18 @@ public class OAuth2UserSuccessHandler extends SimpleUrlAuthenticationSuccessHand
 
         String email = oAuth2User.getEmail();
         List<Authority> authorities = authorityUtils.createAuthorities(email);
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
 
-        redirect(request, response, email, authorities);
-    }
-
-    private void redirect(HttpServletRequest request, HttpServletResponse response, String email, List<Authority> authorities) throws IOException {
-        log.info("creating Token");
-
-        String accessToken = createAccessToken(email, authorities);
+        String accessToken = createAccessToken(email, user.getId(), authorities);
         String refreshToken = createRefreshToken(email);
-        userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        Map<String, TokenDto> tokenDtoMap = makeTokenMap(accessToken, refreshToken);
 
-        String uri = createURI(accessToken, refreshToken, email).toString();
-        getRedirectStrategy().sendRedirect(request, response, uri);
+        String json = toJson(tokenDtoMap);
+        responseJson(response, json);
     }
 
-    private String createAccessToken(String email, List<Authority> authorities) {
-        return jwtProvider.createToken(email, authorities);
+    private String createAccessToken(String email, Long userId, List<Authority> authorities) {
+        return jwtProvider.createToken(email, userId, authorities);
     }
 
     private String createRefreshToken(String email) {
@@ -61,19 +58,25 @@ public class OAuth2UserSuccessHandler extends SimpleUrlAuthenticationSuccessHand
         return userService.createRefreshToken(user);
     }
 
-    private URI createURI(String accessToken, String refreshToken, String email) {
-        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-        queryParams.add("email", email);
-        queryParams.add("access_token", accessToken);
-        queryParams.add("refresh_token", refreshToken);
+    private Map<String, TokenDto> makeTokenMap(String accessToken, String refreshToken) {
+        HashMap<String, TokenDto> map = new HashMap<>();
+        TokenDto tokenDto = TokenDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+        map.put("token", tokenDto);
+        return map;
+    }
 
-        return UriComponentsBuilder
-                .newInstance()
-                .scheme("http")
-                .host("fouruni.app")
-                .path("/oauth")
-                .queryParams(queryParams)
-                .build()
-                .toUri();
+    private String toJson(Object object) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(object);
+    }
+
+    private void responseJson(HttpServletResponse response, String json) throws IOException {
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.getWriter().write(json);
+        response.getWriter().flush();
     }
 }

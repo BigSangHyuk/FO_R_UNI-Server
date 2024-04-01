@@ -1,13 +1,12 @@
 package bigsanghyuk.four_uni.post.domain.entity;
 
 import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
+import bigsanghyuk.four_uni.user.domain.entity.User;
+import bigsanghyuk.four_uni.user.enums.CategoryType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -20,16 +19,23 @@ public class Scrapped extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "scrapped_id")
     private Long id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private Post post;
 
-    private Long userId;
-    private Long postId;
-    private Long categoryId;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category")
+    private CategoryType categoryType;
+
     private LocalDateTime scrappedAt;
 
-    public Scrapped(Long userId, Long postId, Long categoryId) {
-        this.userId = userId;
-        this.postId = postId;
-        this.categoryId = categoryId;
+    public Scrapped(User user, Post post) {
+        this.user = user;
+        this.post = post;
+        this.categoryType = post.getCategoryType();
         this.scrappedAt = LocalDateTime.now();  //scrap 해제 후 다시 scrap 상황 생각시
     }
 }
