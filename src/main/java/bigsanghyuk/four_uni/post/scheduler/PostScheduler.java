@@ -20,8 +20,17 @@ public class PostScheduler {
     private final WebClient webClient;
     private final PostService postService;
 
-    @Scheduled(cron = "0 5 9-18 * * 1-5") // 평일 09~18시 05분마다 실행
+    @Scheduled(cron = "0 5 9-18/3 * * 1-5")   // 평일 09~18시 05분마다 3시간 간격으로 실행
     public void getPostData() {
+        getPostAndAdd();
+    }
+
+    @Scheduled(cron = "0 55 23 ? * 1-5")    // 평일 23시 55분에 실행 (18시 이후 글 누락 방지용)
+    public void getPostDataMidnight() {
+        getPostAndAdd();
+    }
+
+    private void getPostAndAdd() {
         Mono<String> responseMono = webClient.get()
                 .uri("/showdata/")   // 목적지 서버의 controller 매핑
                 .retrieve()
