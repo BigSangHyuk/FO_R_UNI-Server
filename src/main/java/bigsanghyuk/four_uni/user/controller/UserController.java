@@ -36,6 +36,20 @@ public class UserController {
         return ResponseEntity.ok().body(userService.login(request.toDomain()));
     }
 
+    @Operation(summary = "로그아웃")
+    @PostMapping("/log-out")
+    public ResponseEntity<CommonResponse> logout(@RequestAttribute(name = "userId") Long userId) {
+        // 로직
+        return ResponseEntity.ok().body(new CommonResponse(true));
+    }
+
+    @Operation(summary = "회원 탈퇴")
+    @DeleteMapping("/leave")
+    public ResponseEntity<CommonResponse> leave(@RequestAttribute(name = "userId") Long userId) {
+        // 로직
+        return ResponseEntity.ok().body(new CommonResponse(true));
+    }
+
     @Operation(summary = "회원 정보 수정")
     @PatchMapping("/users/edit")
     public ResponseEntity<EditResponse> editUser(@RequestAttribute(name = "userId") Long userId, @RequestBody EditRequest request) {
