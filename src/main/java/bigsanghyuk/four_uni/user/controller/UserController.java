@@ -2,14 +2,12 @@ package bigsanghyuk.four_uni.user.controller;
 
 import bigsanghyuk.four_uni.common.CommonResponse;
 import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
-import bigsanghyuk.four_uni.user.dto.request.ChangePasswordRequest;
-import bigsanghyuk.four_uni.user.dto.request.EditRequest;
-import bigsanghyuk.four_uni.user.dto.request.LoginRequest;
-import bigsanghyuk.four_uni.user.dto.request.SignRequest;
+import bigsanghyuk.four_uni.user.dto.request.*;
 import bigsanghyuk.four_uni.user.dto.response.EditResponse;
 import bigsanghyuk.four_uni.user.dto.response.LoginResponse;
 import bigsanghyuk.four_uni.user.dto.response.SignResponse;
 import bigsanghyuk.four_uni.user.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -38,8 +36,8 @@ public class UserController {
 
     @Operation(summary = "로그아웃")
     @PostMapping("/log-out")
-    public ResponseEntity<CommonResponse> logout(@RequestAttribute(name = "userId") Long userId) {
-        // 로직
+    public ResponseEntity<CommonResponse> logout(@RequestAttribute(name = "userId") Long userId, @RequestBody LogoutUserRequest request) throws JsonProcessingException, IllegalAccessException {
+        userService.logout(userId, request.toDomain());
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
