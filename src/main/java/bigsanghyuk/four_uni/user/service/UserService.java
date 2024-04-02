@@ -117,11 +117,8 @@ public class UserService {
     public void logout(Long userId, LogoutUserInfo logoutUserInfo) throws JsonProcessingException, IllegalAccessException {
         String accessToken = logoutUserInfo.getAccessToken();
 
-        Token token = tokenRepository.findById(userId).orElseThrow(TokenNotFoundException::new);
-        tokenRepository.delete(token);  // refresh token 삭제
-
-        Long expiration = jwtProvider.getExpiration(accessToken);
-        redisUtil.setBlackList(accessToken, "access_token", expiration);    // access token 유효기간 만큼 블랙리스트에 추가
+        deleteRefreshToken(userId);
+        setAccessTokenBlackList(accessToken);
     }
 
     @Transactional
@@ -183,6 +180,17 @@ public class UserService {
         } else {
             throw new Exception("로그인이 필요합니다.");
         }
+    }
+
+    @Transactional
+    protected void deleteRefreshToken(Long userId) {
+        Token token = tokenRepository.findById(userId).orElseThrow(TokenNotFoundException::new);
+        tokenRepository.delete(token);
+    }
+
+    private void setAccessTokenBlackList(String accessToken) throws JsonProcessingException {
+        Long expiration = jwtProvider.getExpiration(accessToken);
+        redisUtil.setBlackList(accessToken, "access_token", expiration);    // access token 유효기간 만큼 블랙리스트에 추가
     }
 
     // 임시 비밀번호 발급 후 전송
