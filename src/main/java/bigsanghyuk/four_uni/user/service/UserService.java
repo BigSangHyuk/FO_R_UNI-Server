@@ -9,6 +9,7 @@ import bigsanghyuk.four_uni.config.mail.domain.SendMailInfo;
 import bigsanghyuk.four_uni.config.mail.service.MailService;
 import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
+import bigsanghyuk.four_uni.exception.user.PasswordMismatchException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
 import bigsanghyuk.four_uni.user.domain.*;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
@@ -180,13 +181,13 @@ public class UserService {
 
     // 비밀번호 변경
     @Transactional
-    public Boolean changePassword(Long userId, ChangePasswordInfo changePasswordInfo) throws IllegalAccessException {
+    public Boolean changePassword(Long userId, ChangePasswordInfo changePasswordInfo) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         if (encoder.matches(changePasswordInfo.getOldPassword(), user.getPassword())) {
             userRepository.updatePassword(user.getEmail(), encoder.encode(changePasswordInfo.getNewPassword()));
             return true;
         } else {
-            throw new IllegalAccessException("이전 비밀번호가 일치하지 않습니다.");
+            throw new PasswordMismatchException();
         }
     }
 }
