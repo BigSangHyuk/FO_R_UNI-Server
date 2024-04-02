@@ -1,5 +1,6 @@
 package bigsanghyuk.four_uni.user.service;
 
+import bigsanghyuk.four_uni.config.RedisUtil;
 import bigsanghyuk.four_uni.config.jwt.JwtProvider;
 import bigsanghyuk.four_uni.config.jwt.domain.Token;
 import bigsanghyuk.four_uni.config.jwt.domain.TokenRepository;
@@ -9,16 +10,14 @@ import bigsanghyuk.four_uni.config.mail.service.MailService;
 import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
-import bigsanghyuk.four_uni.user.domain.ChangePasswordInfo;
-import bigsanghyuk.four_uni.user.domain.EditUserInfo;
-import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
-import bigsanghyuk.four_uni.user.domain.SignUserInfo;
+import bigsanghyuk.four_uni.user.domain.*;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.dto.response.EditResponse;
 import bigsanghyuk.four_uni.user.dto.response.LoginResponse;
 import bigsanghyuk.four_uni.user.dto.response.SignResponse;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -36,9 +35,10 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
-    private final JwtProvider jwtProvider;
+    private final JwtProvider  jwtProvider;
     private final TokenRepository tokenRepository;
     private final MailService mailService;
+    private final RedisUtil redisUtil;
 
     private static final int EXPIRATION_IN_MINUTES = 43800;
 
@@ -105,6 +105,17 @@ public class UserService {
                         .refreshToken(createRefreshToken(user))
                         .build())
                 .build();
+    }
+
+    @Transactional
+    public void logout(Long userId, LogoutUserInfo logoutUserInfo) throws JsonProcessingException, IllegalAccessException {
+        String accessToken = logoutUserInfo.getAccessToken();
+
+        Token token = tokenRepository.findById(userId).orElseThrow(TokenNotFoundException::new);
+        tokenRepository.delete(token);  // refresh token 삭제
+
+        Long expiration = jwtProvider.getExpiration(accessToken);
+        redisUtil.setBlackList(accessToken, "access_token", expiration);    // access token 유효기간 만큼 블랙리스트에 추가
     }
 
     // 유저 상세 정보 조회
