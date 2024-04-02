@@ -19,6 +19,8 @@ import bigsanghyuk.four_uni.user.dto.response.LoginResponse;
 import bigsanghyuk.four_uni.user.dto.response.SignResponse;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -40,6 +42,9 @@ public class UserService {
     private final TokenRepository tokenRepository;
     private final MailService mailService;
     private final RedisUtil redisUtil;
+
+    @PersistenceContext
+    private final EntityManager em;
 
     private static final int EXPIRATION_IN_MINUTES = 43800;
 
@@ -117,6 +122,21 @@ public class UserService {
 
         Long expiration = jwtProvider.getExpiration(accessToken);
         redisUtil.setBlackList(accessToken, "access_token", expiration);    // access token 유효기간 만큼 블랙리스트에 추가
+    }
+
+    @Transactional
+    public void leave(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        deleteAll(user);
+    }
+
+    @Transactional
+    protected void deleteAll(User user) {
+        em.createQuery("DELETE FROM Report r WHERE r.user = :user").setParameter("user", user).executeUpdate();
+        em.createQuery("DELETE FROM LikeComment lc WHERE lc.user = :user").setParameter("user", user).executeUpdate();
+        em.createQuery("DELETE FROM Comment c WHERE c.user = :user").setParameter("user", user).executeUpdate();
+        em.createQuery("DELETE FROM Scrapped s WHERE s.user = :user").setParameter("user", user).executeUpdate();
+        userRepository.delete(user);
     }
 
     // 유저 상세 정보 조회

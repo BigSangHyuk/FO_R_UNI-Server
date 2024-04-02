@@ -41,10 +41,10 @@ public class UserController {
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
-    @Operation(summary = "회원 탈퇴")
+    @Operation(summary = "탈퇴", description = "user를 참조하는 엔티티 모두 삭제")
     @DeleteMapping("/leave")
     public ResponseEntity<CommonResponse> leave(@RequestAttribute(name = "userId") Long userId) {
-        // 로직
+        userService.leave(userId);
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
