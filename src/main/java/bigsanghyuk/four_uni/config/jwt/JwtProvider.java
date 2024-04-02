@@ -1,5 +1,6 @@
 package bigsanghyuk.four_uni.config.jwt;
 
+import bigsanghyuk.four_uni.config.RedisUtil;
 import bigsanghyuk.four_uni.config.jwt.service.JpaUserDetailsService;
 import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
@@ -32,6 +33,7 @@ public class JwtProvider {
     private Key secretKey;
     private final JpaUserDetailsService userDetailsService;
     private final int EXP_MINUTES = 30;   // 30 min
+    private final RedisUtil redisUtil;
 
     private final List<String> notFilteredRoutes = List.of("/", "/sign-up", "/sign-in", "/refresh", "/auth/**");
 
@@ -73,6 +75,9 @@ public class JwtProvider {
                 return false;
             } else {
                 token = token.split(" ")[1].trim();
+            }
+            if (redisUtil.hasKeyBlackList(token)) { // access token이 블랙리스트에 있으면 검증 실패
+                return false;
             }
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
@@ -116,6 +121,12 @@ public class JwtProvider {
         if (header == null || !header.startsWith("Bearer ")) {
             throw new TokenNotFoundException();
         }
+    }
+
+    public Long getExpiration(String accessToken) {
+        Date expiration = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(accessToken).getBody().getExpiration();
+        long now = new Date().getTime();
+        return (expiration.getTime() - now);
     }
 
     @PostConstruct
