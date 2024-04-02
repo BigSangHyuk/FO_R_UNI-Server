@@ -54,7 +54,7 @@ public class UserController {
         return ResponseEntity.ok().body(userService.edit(userId, request.toDomain()));
     }
 
-    @Operation(summary = "비밀번호 변경", description = "body에 이전 비밀번호, 신규 비밀번호 전달")
+    @Operation(summary = "비밀번호 변경", description = "body에 이전 비밀번호 (임시 비밀번호), 신규 비밀번호 전달")
     @PatchMapping("/users/password")
     public ResponseEntity<CommonResponse> changePassword(@RequestAttribute(name = "userId") Long userId, @RequestBody ChangePasswordRequest request) throws IllegalAccessException {
         Boolean result = userService.changePassword(userId, request.toDomain());
