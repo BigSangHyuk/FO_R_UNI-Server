@@ -110,7 +110,8 @@ public class CommentService {
         if (isDeleted) {
             return null;
         } else {
-            UserRequired userRequired = userRepository.getUserRequired(profile.getUserId());
+            UserRequired userRequired = userRepository.getUserRequired(profile.getUserId())
+                    .orElseThrow(UserNotFoundException::new);
             return UserDto.builder()
                     .userId(userRequired.getUserId())
                     .email(userRequired.getEmail())

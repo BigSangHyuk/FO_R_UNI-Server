@@ -1,17 +1,21 @@
 package bigsanghyuk.four_uni.config;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
 public class RedisUtil {
 
     private final StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate blackListRedisTemplate;
 
     public String getData(String email) {
         ValueOperations<String,String> valueOperations = stringRedisTemplate.opsForValue();
@@ -31,5 +35,24 @@ public class RedisUtil {
 
     public void deleteData(String key) {
         stringRedisTemplate.delete(key);
+    }
+
+    public void setBlackList(String key, Object o, Long milliSeconds) throws JsonProcessingException {
+        ValueOperations<String, String> opsForValue = blackListRedisTemplate.opsForValue();
+        opsForValue.set(key, new ObjectMapper().writeValueAsString(o), milliSeconds, TimeUnit.MILLISECONDS);
+    }
+
+    public Boolean hasKeyBlackList(String key) {
+        return blackListRedisTemplate.hasKey(key);
+    }
+
+    public Object getBlackList(String key) throws JsonProcessingException {
+        ValueOperations<String, String> opsForValue = blackListRedisTemplate.opsForValue();
+        String value = opsForValue.get(key);
+        return value != null ? new ObjectMapper().readValue(value, Object.class) : null;
+    }
+
+    public Boolean deleteBlackList(String key) {
+        return blackListRedisTemplate.delete(key);
     }
 }

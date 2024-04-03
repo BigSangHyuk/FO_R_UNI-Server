@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.exception.handler;
 
 import bigsanghyuk.four_uni.exception.ExceptionMessage;
 import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
+import bigsanghyuk.four_uni.exception.user.PasswordMismatchException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,12 @@ public class UserExceptionHandler {
 
     @ExceptionHandler(EmailDuplicateException.class)
     public ResponseEntity<ExceptionMessage> handle(EmailDuplicateException e) {
+        final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(PasswordMismatchException.class)
+    public ResponseEntity<ExceptionMessage> handle(PasswordMismatchException e) {
         final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
         return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
     }

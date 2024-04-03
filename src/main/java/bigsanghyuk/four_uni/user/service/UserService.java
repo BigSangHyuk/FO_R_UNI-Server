@@ -1,24 +1,27 @@
 package bigsanghyuk.four_uni.user.service;
 
+import bigsanghyuk.four_uni.config.RedisUtil;
 import bigsanghyuk.four_uni.config.jwt.JwtProvider;
 import bigsanghyuk.four_uni.config.jwt.domain.Token;
 import bigsanghyuk.four_uni.config.jwt.domain.TokenRepository;
 import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
 import bigsanghyuk.four_uni.config.mail.domain.SendMailInfo;
 import bigsanghyuk.four_uni.config.mail.service.MailService;
+import bigsanghyuk.four_uni.config.s3.service.S3Uploader;
 import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
+import bigsanghyuk.four_uni.exception.user.PasswordMismatchException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
-import bigsanghyuk.four_uni.user.domain.ChangePasswordInfo;
-import bigsanghyuk.four_uni.user.domain.EditUserInfo;
-import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
-import bigsanghyuk.four_uni.user.domain.SignUserInfo;
+import bigsanghyuk.four_uni.user.domain.*;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.dto.response.EditResponse;
 import bigsanghyuk.four_uni.user.dto.response.LoginResponse;
 import bigsanghyuk.four_uni.user.dto.response.SignResponse;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -36,9 +39,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
-    private final JwtProvider jwtProvider;
+    private final JwtProvider  jwtProvider;
     private final TokenRepository tokenRepository;
     private final MailService mailService;
+    private final RedisUtil redisUtil;
+    private final S3Uploader s3Uploader;
+
+    @PersistenceContext
+    private final EntityManager em;
 
     private static final int EXPIRATION_IN_MINUTES = 43800;
 
@@ -73,16 +81,18 @@ public class UserService {
     @Transactional
     public EditResponse edit(Long userId, EditUserInfo info) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        user.edit(encoder.encode(info.getPassword()), info.getName(), info.getDepartmentType(), info.getNickName(), info.getImage());
+
+        if (info.getImage() != null) {
+            String oldImageUrl = user.getImage();
+            s3Uploader.delete(oldImageUrl);
+            user.updateImage(null);
+        }
+
+        editUser(user, info);
+
         User savedUser = userRepository.save(user);
-        return EditResponse.builder()
-                .id(savedUser.getId())
-                .name(savedUser.getName())
-                .departmentType(savedUser.getDepartmentType())
-                .nickName(savedUser.getNickName())
-                .image(savedUser.getImage())
-                .roles(savedUser.getRoles())
-                .build();
+
+        return editResponseBuilder(savedUser);
     }
 
     // 로그인
@@ -105,6 +115,29 @@ public class UserService {
                         .refreshToken(createRefreshToken(user))
                         .build())
                 .build();
+    }
+
+    @Transactional
+    public void logout(Long userId, LogoutUserInfo logoutUserInfo) throws JsonProcessingException, IllegalAccessException {
+        String accessToken = logoutUserInfo.getAccessToken();
+
+        deleteRefreshToken(userId);
+        setAccessTokenBlackList(accessToken);
+    }
+
+    @Transactional
+    public void leave(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        deleteAll(user);
+    }
+
+    @Transactional
+    protected void deleteAll(User user) {
+        em.createQuery("DELETE FROM Report r WHERE r.user = :user").setParameter("user", user).executeUpdate();
+        em.createQuery("DELETE FROM LikeComment lc WHERE lc.user = :user").setParameter("user", user).executeUpdate();
+        em.createQuery("DELETE FROM Comment c WHERE c.user = :user").setParameter("user", user).executeUpdate();
+        em.createQuery("DELETE FROM Scrapped s WHERE s.user = :user").setParameter("user", user).executeUpdate();
+        userRepository.delete(user);
     }
 
     // 유저 상세 정보 조회
@@ -153,14 +186,26 @@ public class UserService {
         }
     }
 
+    @Transactional
+    protected void deleteRefreshToken(Long userId) {
+        Token token = tokenRepository.findById(userId).orElseThrow(TokenNotFoundException::new);
+        tokenRepository.delete(token);
+    }
+
+    private void setAccessTokenBlackList(String accessToken) throws JsonProcessingException {
+        Long expiration = jwtProvider.getExpiration(accessToken);
+        redisUtil.setBlackList(accessToken, "access_token", expiration);    // access token 유효기간 만큼 블랙리스트에 추가
+    }
+
     // 임시 비밀번호 발급 후 전송
     @Transactional
     public Boolean setToTempPassword(SendMailInfo sendMailInfo) {
         String email = sendMailInfo.getEmail();
-        userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         String encodedTempPw = encoder.encode(mailService.sendTempPwMail(sendMailInfo));
+        user.updatePassword(encodedTempPw);
         try {
-            userRepository.updatePassword(email, encodedTempPw);
+            userRepository.save(user);
             return true;
         } catch (Exception e) {
             throw new IllegalStateException("오류가 발생했습니다.");
@@ -169,13 +214,35 @@ public class UserService {
 
     // 비밀번호 변경
     @Transactional
-    public Boolean changePassword(Long userId, ChangePasswordInfo changePasswordInfo) throws IllegalAccessException {
+    public Boolean changePassword(Long userId, ChangePasswordInfo changePasswordInfo) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        if (encoder.matches(changePasswordInfo.getOldPassword(), user.getPassword())) {
-            userRepository.updatePassword(user.getEmail(), encoder.encode(changePasswordInfo.getNewPassword()));
+        if (encoder.matches(changePasswordInfo.getOldPassword(), user.getPassword())) { // 메일로 받은 임시 비밀번호랑 적용된 임시 비밀번호랑 같을 때 (발급시에 유저 비밀번호가 바뀜)
+            user.updatePassword(encoder.encode(changePasswordInfo.getNewPassword()));
+            userRepository.save(user);
             return true;
         } else {
-            throw new IllegalAccessException("이전 비밀번호가 일치하지 않습니다.");
+            throw new PasswordMismatchException();
         }
+    }
+
+    @Transactional
+    protected void editUser(User user, EditUserInfo editUserInfo) {
+        user.edit(
+                editUserInfo.getName() == null ? user.getName() : editUserInfo.getName(),
+                editUserInfo.getDepartmentType() == null ? user.getDepartmentType() : editUserInfo.getDepartmentType(),
+                editUserInfo.getNickName() == null ? user.getNickName() : editUserInfo.getNickName(),
+                editUserInfo.getImage() == null ? user.getImage() : editUserInfo.getImage()
+        );
+    }
+
+    private EditResponse editResponseBuilder(User user) {
+        return EditResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .departmentType(user.getDepartmentType())
+                .nickName(user.getNickName())
+                .image(user.getImage())
+                .roles(user.getRoles())
+                .build();
     }
 }
