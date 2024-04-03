@@ -6,8 +6,9 @@ import bigsanghyuk.four_uni.config.TestSecurityConfig;
 import bigsanghyuk.four_uni.post.controller.PostController;
 import bigsanghyuk.four_uni.post.domain.ScrapInfo;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
-import bigsanghyuk.four_uni.post.dto.request.ScrapRequest;
+import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
+import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
 import bigsanghyuk.four_uni.post.service.PostService;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.enums.CategoryType;
@@ -42,8 +43,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -72,6 +72,9 @@ public class PostControllerTest {
     private CommentRepository commentRepository;
 
     @Autowired
+    private ScrappedRepository scrappedRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -85,7 +88,7 @@ public class PostControllerTest {
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
 
-        postRepository.save(Post.builder()
+        Post post = postRepository.save(Post.builder()
                         .id(1L)
                         .categoryType(CategoryType.ISIS)
                         .reported(false)
@@ -120,6 +123,8 @@ public class PostControllerTest {
                 .commentReportCount(0)
                 .deleted(false)
                 .build());
+
+        scrappedRepository.save(new Scrapped(user, post));
     }
 
     @AfterEach
@@ -218,6 +223,29 @@ public class PostControllerTest {
 
         //when, then
         ResultActions actions = mockMvc.perform(post("/posts/scrap")
+                .content(content)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .with(authentication(authentication))
+        );
+
+        actions
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("스크랩 취소 테스트")
+    void unScrapSuccess() throws Exception {
+        //given
+        Authentication authentication = new TestingAuthenticationToken("test1@gmail.com", null, "ROLE_ADMIN");
+
+        ScrapInfo info = new ScrapInfo(1L, 1L);
+        Gson gson = new Gson();
+        String content = gson.toJson(info);
+
+        //when, then
+        ResultActions actions = mockMvc.perform(delete("/posts/unscrap")
                 .content(content)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
