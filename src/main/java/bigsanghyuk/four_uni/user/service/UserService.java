@@ -201,10 +201,11 @@ public class UserService {
     @Transactional
     public Boolean setToTempPassword(SendMailInfo sendMailInfo) {
         String email = sendMailInfo.getEmail();
-        userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         String encodedTempPw = encoder.encode(mailService.sendTempPwMail(sendMailInfo));
+        user.updatePassword(encodedTempPw);
         try {
-            userRepository.updatePassword(email, encodedTempPw);
+            userRepository.save(user);
             return true;
         } catch (Exception e) {
             throw new IllegalStateException("오류가 발생했습니다.");
@@ -215,8 +216,9 @@ public class UserService {
     @Transactional
     public Boolean changePassword(Long userId, ChangePasswordInfo changePasswordInfo) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        if (encoder.matches(changePasswordInfo.getOldPassword(), user.getPassword())) {
-            userRepository.updatePassword(user.getEmail(), encoder.encode(changePasswordInfo.getNewPassword()));
+        if (encoder.matches(changePasswordInfo.getOldPassword(), user.getPassword())) { // 메일로 받은 임시 비밀번호랑 적용된 임시 비밀번호랑 같을 때 (발급시에 유저 비밀번호가 바뀜)
+            user.updatePassword(encoder.encode(changePasswordInfo.getNewPassword()));
+            userRepository.save(user);
             return true;
         } else {
             throw new PasswordMismatchException();

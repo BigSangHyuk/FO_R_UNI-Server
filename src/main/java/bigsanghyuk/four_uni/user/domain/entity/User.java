@@ -9,9 +9,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Builder
-@Getter @Setter
+@Entity @Builder @Getter
 @Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -61,6 +59,11 @@ public class User extends BaseTimeEntity {
 
     public User updateName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public User updatePassword(String password) {   // 임시 비밀번호 발급이나 비밀번호 변경시에만 사용
+        this.password = password;
         return this;
     }
 }
