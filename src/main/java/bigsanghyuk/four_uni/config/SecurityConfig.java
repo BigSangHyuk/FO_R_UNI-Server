@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -33,6 +34,8 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Profile("!test")
+public class SecurityConfig {
 public class SecurityConfig implements WebMvcConfigurer {
 
     private final JwtProvider jwtProvider;
