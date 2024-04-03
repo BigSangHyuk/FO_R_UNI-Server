@@ -7,6 +7,7 @@ import bigsanghyuk.four_uni.config.jwt.domain.TokenRepository;
 import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
 import bigsanghyuk.four_uni.config.mail.domain.SendMailInfo;
 import bigsanghyuk.four_uni.config.mail.service.MailService;
+import bigsanghyuk.four_uni.config.s3.service.S3Uploader;
 import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
 import bigsanghyuk.four_uni.exception.user.PasswordMismatchException;
@@ -42,6 +43,7 @@ public class UserService {
     private final TokenRepository tokenRepository;
     private final MailService mailService;
     private final RedisUtil redisUtil;
+    private final S3Uploader s3Uploader;
 
     @PersistenceContext
     private final EntityManager em;
@@ -79,16 +81,18 @@ public class UserService {
     @Transactional
     public EditResponse edit(Long userId, EditUserInfo info) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        user.edit(encoder.encode(info.getPassword()), info.getName(), info.getDepartmentType(), info.getNickName(), info.getImage());
+
+        if (info.getImage() != null) {
+            String oldImageUrl = user.getImage();
+            s3Uploader.delete(oldImageUrl);
+            user.updateImage(null);
+        }
+
+        editUser(user, info);
+
         User savedUser = userRepository.save(user);
-        return EditResponse.builder()
-                .id(savedUser.getId())
-                .name(savedUser.getName())
-                .departmentType(savedUser.getDepartmentType())
-                .nickName(savedUser.getNickName())
-                .image(savedUser.getImage())
-                .roles(savedUser.getRoles())
-                .build();
+
+        return editResponseBuilder(savedUser);
     }
 
     // 로그인
@@ -197,10 +201,11 @@ public class UserService {
     @Transactional
     public Boolean setToTempPassword(SendMailInfo sendMailInfo) {
         String email = sendMailInfo.getEmail();
-        userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         String encodedTempPw = encoder.encode(mailService.sendTempPwMail(sendMailInfo));
+        user.updatePassword(encodedTempPw);
         try {
-            userRepository.updatePassword(email, encodedTempPw);
+            userRepository.save(user);
             return true;
         } catch (Exception e) {
             throw new IllegalStateException("오류가 발생했습니다.");
@@ -211,11 +216,33 @@ public class UserService {
     @Transactional
     public Boolean changePassword(Long userId, ChangePasswordInfo changePasswordInfo) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        if (encoder.matches(changePasswordInfo.getOldPassword(), user.getPassword())) {
-            userRepository.updatePassword(user.getEmail(), encoder.encode(changePasswordInfo.getNewPassword()));
+        if (encoder.matches(changePasswordInfo.getOldPassword(), user.getPassword())) { // 메일로 받은 임시 비밀번호랑 적용된 임시 비밀번호랑 같을 때 (발급시에 유저 비밀번호가 바뀜)
+            user.updatePassword(encoder.encode(changePasswordInfo.getNewPassword()));
+            userRepository.save(user);
             return true;
         } else {
             throw new PasswordMismatchException();
         }
+    }
+
+    @Transactional
+    protected void editUser(User user, EditUserInfo editUserInfo) {
+        user.edit(
+                editUserInfo.getName() == null ? user.getName() : editUserInfo.getName(),
+                editUserInfo.getDepartmentType() == null ? user.getDepartmentType() : editUserInfo.getDepartmentType(),
+                editUserInfo.getNickName() == null ? user.getNickName() : editUserInfo.getNickName(),
+                editUserInfo.getImage() == null ? user.getImage() : editUserInfo.getImage()
+        );
+    }
+
+    private EditResponse editResponseBuilder(User user) {
+        return EditResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .departmentType(user.getDepartmentType())
+                .nickName(user.getNickName())
+                .image(user.getImage())
+                .roles(user.getRoles())
+                .build();
     }
 }

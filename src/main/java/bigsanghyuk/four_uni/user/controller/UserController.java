@@ -50,7 +50,7 @@ public class UserController {
 
     @Operation(summary = "회원 정보 수정")
     @PatchMapping("/users/edit")
-    public ResponseEntity<EditResponse> editUser(@RequestAttribute(name = "userId") Long userId, @RequestBody EditRequest request) {
+    public ResponseEntity<EditResponse> editUser(@RequestAttribute(name = "userId") Long userId, @RequestBody EditUserRequest request) {
         return ResponseEntity.ok().body(userService.edit(userId, request.toDomain()));
     }
 

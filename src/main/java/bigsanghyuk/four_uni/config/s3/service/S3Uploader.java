@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.config.s3.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,5 +67,15 @@ public class S3Uploader {
             return Optional.of(convertFile);
         }
         return Optional.empty();
+    }
+
+    public void delete(String imageUrl) {
+        if (!imageUrl.startsWith("https://" + bucket)) return;  // s3에 없는 이미지일 경우 break (e.x. oauth)
+        String fileName = extractFileNameFormUrl(imageUrl);
+        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
+    }
+
+    private String extractFileNameFormUrl(String url) {
+        return url.substring(url.indexOf("static"));
     }
 }
