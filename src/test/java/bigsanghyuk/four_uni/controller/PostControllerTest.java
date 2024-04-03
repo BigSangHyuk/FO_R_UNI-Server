@@ -4,12 +4,15 @@ import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.config.TestSecurityConfig;
 import bigsanghyuk.four_uni.post.controller.PostController;
+import bigsanghyuk.four_uni.post.domain.ScrapInfo;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
+import bigsanghyuk.four_uni.post.dto.request.ScrapRequest;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.service.PostService;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.enums.CategoryType;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
+import com.nimbusds.jose.shaded.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -172,6 +175,53 @@ public class PostControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .with(authentication(authentication))
 
+        );
+
+        actions
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("스크랩 추가 테스트")
+    void scrapSuccess() throws Exception {
+        //given
+        Authentication authentication = new TestingAuthenticationToken("test1@gmail.com", null, "ROLE_ADMIN");
+
+        User user = userRepository.save(User.builder()
+                .id(2L)
+                .name("test_name2")
+                .email("test_email2@test.com")
+                .password(passwordEncoder.encode("test2222"))
+                .departmentType(CategoryType.ISIS) // 컴퓨터 공학부
+                .image("test_image_url2")
+                .nickName("test_nickname2")
+                .build());
+
+        Post post = postRepository.save(Post.builder()
+                .id(2L)
+                .categoryType(CategoryType.ISIS)
+                .reported(false)
+                .title("testPostTitle2")
+                .imageUrl(Collections.singletonList("testImageUrl2"))
+                .views(0)
+                .postReportCount(0)
+                .isClassified(false)
+                .postedAt(LocalDate.now())
+                .deadline(LocalDate.now())
+                .noticeUrl("testNoticeUrl2")
+                .build());
+
+        ScrapInfo info = new ScrapInfo(user.getId(), post.getId());
+        Gson gson = new Gson();
+        String content = gson.toJson(info);
+
+        //when, then
+        ResultActions actions = mockMvc.perform(post("/posts/scrap")
+                .content(content)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .with(authentication(authentication))
         );
 
         actions
