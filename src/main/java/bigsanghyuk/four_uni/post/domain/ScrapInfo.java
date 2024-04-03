@@ -7,6 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ScrapInfo {
 
-    private Long userId;
     private Long postId;
 }

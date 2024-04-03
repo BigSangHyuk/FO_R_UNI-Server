@@ -1,6 +1,8 @@
 package bigsanghyuk.four_uni.config.jwt;
 
+import bigsanghyuk.four_uni.config.RedisUtil;
 import bigsanghyuk.four_uni.config.jwt.service.JpaUserDetailsService;
+import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -8,7 +10,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Duration;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -31,9 +33,13 @@ public class JwtProvider {
     private Key secretKey;
     private final JpaUserDetailsService userDetailsService;
     private final int EXP_MINUTES = 30;   // 30 min
+    private final RedisUtil redisUtil;
 
-    public String createToken(String email, List<Authority> roles) {
+    private final List<String> notFilteredRoutes = List.of("/", "/sign-up", "/sign-in", "/refresh", "/auth/**");
+
+    public String createToken(String email, Long userId, List<Authority> roles) {
         Claims claims = Jwts.claims().setSubject(email);
+        claims.put("userId", userId);
         claims.put("roles", roles);
         Date now = new Date();
         return Jwts.builder()
@@ -53,14 +59,7 @@ public class JwtProvider {
 
     // 토큰에 담겨 있는 유저 Email
     public String getEmail(String token) {
-        try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
-        } catch (ExpiredJwtException e) {
-            e.printStackTrace();
-            return e.getClaims().getSubject();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        parseClaims(token).getSubject();
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
@@ -77,11 +76,57 @@ public class JwtProvider {
             } else {
                 token = token.split(" ")[1].trim();
             }
+            if (redisUtil.hasKeyBlackList(token)) { // access token이 블랙리스트에 있으면 검증 실패
+                return false;
+            }
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private Claims parseClaims(String token) {
+        try {
+            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        } catch (ExpiredJwtException e) {
+            e.printStackTrace();
+            return e.getClaims();
+        }
+    }
+
+    private HashMap<String, Object> getParsedTokenHashMap(String token) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("token", token);
+        Claims claims = parseClaims(token);
+        map.put("claims", claims);
+        return map;
+    }
+
+    public HashMap<String, Object> parseJwt(HttpServletRequest request, String authorizationHeader) {
+        String requestURI = request.getRequestURI();
+        validateAuthorizationHeader(requestURI, authorizationHeader);
+        String token = extractToken(authorizationHeader);
+        return getParsedTokenHashMap(token);
+    }
+
+    private String extractToken(String authorizationHeader) {
+        return authorizationHeader.substring("Bearer ".length());
+    }
+
+    private void validateAuthorizationHeader(String requestURI, String header) {
+        if (notFilteredRoutes.contains(requestURI)) {
+            return;
+        }
+        if (header == null || !header.startsWith("Bearer ")) {
+            throw new TokenNotFoundException();
+        }
+    }
+
+    public Long getExpiration(String accessToken) {
+        Date expiration = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(accessToken).getBody().getExpiration();
+        long now = new Date().getTime();
+        return (expiration.getTime() - now);
     }
 
     @PostConstruct

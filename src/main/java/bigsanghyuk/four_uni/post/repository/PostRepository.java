@@ -13,7 +13,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Boolean existsPostByNoticeUrl(String noticeUrl);
 
     //categoryId가 서로 다른 글들을 동시에 조회 (필터에서 사용)
-    List<Post> findPostByCategoryTypeIn(List<String> categoryNames);
+    @Query(
+            nativeQuery = true,
+            value = "SELECT post_id as postId, category, title, deadline FROM Posts " +
+                    "WHERE category in :category"
+    )
+    List<PostRequired> findPostRequiredFiltered(@Param("category") List<String> categoryNames);
 
     @Query(
             nativeQuery = true,

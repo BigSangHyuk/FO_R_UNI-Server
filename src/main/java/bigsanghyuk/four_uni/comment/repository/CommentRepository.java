@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
@@ -23,8 +22,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Modifying
     @Query("UPDATE Comment c SET c.commentLike = c.commentLike - 1 WHERE c.id = :commentId")
     void decreaseLikesByCommentId(@Param("commentId") Long commentId);
-
-    Optional<List<Comment>> findByUserIdOrderByIdDesc(Long userId);
 
     @Query(nativeQuery = true,
             value = "SELECT post_id as postId FROM Comments " +
@@ -42,14 +39,14 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query(nativeQuery = true,
             value = "SELECT comment_id as commentId, user_id as userId, " +
-                    "comment_like as commentLike, content, deleted FROM Comments " +
+                    "comment_like as commentLike, content, deleted FROM comments " +
                     "WHERE post_id = :postId AND parent_id IS NULL"
     )
     List<CommentProfile> findParentComments(@Param("postId") Long postId);
 
     @Query(nativeQuery = true,
             value = "SELECT comment_id as commentId, user_id as userId, post_id as postId, " +
-                    "comment_like as commentLike, content as content FROM Comments " +
+                    "comment_like as commentLike, content as content FROM comments " +
                     "WHERE comment_id = :commentId")
     CommentRequired findCommentRequired(@Param("commentId") Long commentId);
 }

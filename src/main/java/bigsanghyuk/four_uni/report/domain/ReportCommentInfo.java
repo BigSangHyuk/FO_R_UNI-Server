@@ -8,7 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ReportCommentInfo {
 
-    private Long userId;
     private Long commentId;
     private ReportReason reason;
     private String detail;

@@ -40,7 +40,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
-    public List<RegisterPostInfo> jsonToDto(String data) throws JsonProcessingException {
+    private List<RegisterPostInfo> jsonToDto(String data) throws JsonProcessingException {
         JSONParser jsonParser = new JSONParser();
         JSONArray array = new JSONArray();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -120,26 +120,11 @@ public class PostService {
         return response;
     }
 
-    public List<Post> getFilteredPostsRequired(List<Long> categoryIds) {
-        List<String> categoryNames = new ArrayList<>();
-        CategoryType[] values = CategoryType.values();
-        for (Long id : categoryIds) {
-            for (CategoryType value : values) {
-                if ((int) value.getId() == id) {
-                    categoryNames.add(value.getKey());
-                }
-            }
-        }
-        return postRepository.findPostByCategoryTypeIn(categoryNames);
-    }
+    public List<PostRequired> getFilteredRequired(String ids) {
+        List<Long> categoryIds = stringToCategoryIds(ids);
+        List<String> categoryNames = getCategoryNames(categoryIds);
 
-    public List<Long> hyphenStringToList(String input, String delimiter) {
-        List<Long> result = new ArrayList<>();
-        String[] tokens = input.split(delimiter);
-        for (String token : tokens) {
-            result.add(Long.parseLong(token));
-        }
-        return result;
+        return postRepository.findPostRequiredFiltered(categoryNames);
     }
 
     public List<PostRequired> getScrappedRequired(Long userId) {
@@ -178,6 +163,28 @@ public class PostService {
                 filter.getNextMonth().getYear(),
                 filter.getNextMonth().getMonthValue()
         );
+    }
+
+    private List<String> getCategoryNames(List<Long> categoryIds) {
+        List<String> categoryNames = new ArrayList<>();
+        CategoryType[] values = CategoryType.values();
+        for (Long id : categoryIds) {
+            for (CategoryType value : values) {
+                if ((int) value.getId() == id) {
+                    categoryNames.add(value.getKey());
+                }
+            }
+        }
+        return categoryNames;
+    }
+
+    private List<Long> stringToCategoryIds(String input) {
+        List<Long> result = new ArrayList<>();
+        String[] tokens = input.split("-");
+        for (String token : tokens) {
+            result.add(Long.parseLong(token));
+        }
+        return result;
     }
 
     @Getter

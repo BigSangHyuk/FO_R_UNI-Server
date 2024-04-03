@@ -1,6 +1,6 @@
 package bigsanghyuk.four_uni.post.domain.entity;
 
-import bigsanghyuk.four_uni.config.StringToListConverter;
+import bigsanghyuk.four_uni.common.StringToListConverter;
 import bigsanghyuk.four_uni.config.domain.BaseTimeEntity;
 import bigsanghyuk.four_uni.user.enums.CategoryType;
 import jakarta.persistence.*;
