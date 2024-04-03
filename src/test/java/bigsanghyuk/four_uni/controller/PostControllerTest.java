@@ -195,19 +195,9 @@ public class PostControllerTest {
         //given
         Authentication authentication = new TestingAuthenticationToken("test1@gmail.com", null, "ROLE_ADMIN");
 
-        User user = userRepository.save(User.builder()
-                .id(2L)
-                .name("test_name2")
-                .email("test_email2@test.com")
-                .password(passwordEncoder.encode("test2222"))
-                .departmentType(CategoryType.ISIS) // 컴퓨터 공학부
-                .image("test_image_url2")
-                .nickName("test_nickname2")
-                .build());
-
         Post post = postRepository.save(new Post(2L, CategoryType.ISIS, false, "testPostTitle2", "testContent2", Collections.singletonList("testImageUrl2"), 0, 0, false, LocalDate.now(), LocalDate.now(), "testNoticeUrl2"));
 
-        ScrapInfo info = new ScrapInfo(user.getId(), post.getId());
+        ScrapInfo info = new ScrapInfo(post.getId());
         Gson gson = new Gson();
         String content = gson.toJson(info);
 
@@ -230,7 +220,7 @@ public class PostControllerTest {
         //given
         Authentication authentication = new TestingAuthenticationToken("test1@gmail.com", null, "ROLE_ADMIN");
 
-        ScrapInfo info = new ScrapInfo(1L, 1L);
+        ScrapInfo info = new ScrapInfo(1L);
         Gson gson = new Gson();
         String content = gson.toJson(info);
 
