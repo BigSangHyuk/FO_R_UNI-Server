@@ -25,5 +25,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
             nativeQuery = true,
             value = "SELECT user_id as userId, email, name, nick_name as nickName, image FROM Users " +
                     "WHERE user_id = :userId")
-    UserRequired getUserRequired(@Param("userId") Long userId);
+    Optional<UserRequired> getUserRequired(@Param("userId") Long userId);
 }
