@@ -14,11 +14,8 @@ public class SignRequest {
     private String email;
     @NotNull
     private String password;
-    @NotNull
     private String name;
-    @NotNull
     private CategoryType departmentType;
-    @NotNull
     private String nickName;
     private String image;
 
