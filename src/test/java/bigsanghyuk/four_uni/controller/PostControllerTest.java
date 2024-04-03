@@ -134,6 +134,7 @@ public class PostControllerTest {
         commentRepository.deleteAll();
         postRepository.deleteAll();
         userRepository.deleteAll();
+        scrappedRepository.deleteAll();
     }
 
     @Test
