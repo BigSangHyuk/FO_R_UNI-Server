@@ -93,6 +93,7 @@ public class PostControllerTest {
                         .categoryType(CategoryType.ISIS)
                         .reported(false)
                         .title("testPostTitle")
+                        .content("testContent")
                         .imageUrl(Collections.singletonList("testImageUrl"))
                         .views(0)
                         .postReportCount(0)
@@ -203,19 +204,7 @@ public class PostControllerTest {
                 .nickName("test_nickname2")
                 .build());
 
-        Post post = postRepository.save(Post.builder()
-                .id(2L)
-                .categoryType(CategoryType.ISIS)
-                .reported(false)
-                .title("testPostTitle2")
-                .imageUrl(Collections.singletonList("testImageUrl2"))
-                .views(0)
-                .postReportCount(0)
-                .isClassified(false)
-                .postedAt(LocalDate.now())
-                .deadline(LocalDate.now())
-                .noticeUrl("testNoticeUrl2")
-                .build());
+        Post post = postRepository.save(new Post(2L, CategoryType.ISIS, false, "testPostTitle2", "testContent2", Collections.singletonList("testImageUrl2"), 0, 0, false, LocalDate.now(), LocalDate.now(), "testNoticeUrl2"));
 
         ScrapInfo info = new ScrapInfo(user.getId(), post.getId());
         Gson gson = new Gson();
