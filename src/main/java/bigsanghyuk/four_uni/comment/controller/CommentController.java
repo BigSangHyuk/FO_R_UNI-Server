@@ -43,7 +43,7 @@ public class CommentController {
     }
 
     @Operation(summary = "댓글 삭제", description = "Body에 postId, commentId 넣어서 전달")
-    @DeleteMapping("/comments/{commentId}")
+    @DeleteMapping("/comments")
     public ResponseEntity<CommonResponse> remove(@RequestAttribute(name = "userId") Long userId, @Valid @RequestBody DeleteCommentRequest request) {
         commentService.remove(userId, request.toDomain());
         return new ResponseEntity<>(new CommonResponse(true), HttpStatus.OK);
