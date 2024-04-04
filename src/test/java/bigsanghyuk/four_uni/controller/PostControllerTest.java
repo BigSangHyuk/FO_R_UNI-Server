@@ -3,19 +3,18 @@ package bigsanghyuk.four_uni.controller;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.config.TestSecurityConfig;
+import bigsanghyuk.four_uni.config.jwt.JwtProvider;
 import bigsanghyuk.four_uni.post.controller.PostController;
-import bigsanghyuk.four_uni.post.domain.ScrapInfo;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
 import bigsanghyuk.four_uni.post.service.PostService;
+import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.enums.CategoryType;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
-import com.nimbusds.jose.shaded.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +25,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -76,6 +76,9 @@ public class PostControllerTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private JwtProvider jwtProvider;
 
     @Autowired
     private WebApplicationContext wac;
@@ -111,6 +114,7 @@ public class PostControllerTest {
                 .departmentType(CategoryType.ISIS) // 컴퓨터 공학부
                 .image("test_image_url")
                 .nickName("test_nickname")
+                .roles(Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()))
                 .build());
 
         commentRepository.save(Comment.builder()
@@ -128,20 +132,13 @@ public class PostControllerTest {
         scrappedRepository.save(new Scrapped(user, post));
     }
 
-    @AfterEach
-    void afterEach() {
-        // 테스트 종료 후 데이터 정리
-        commentRepository.deleteAll();
-        postRepository.deleteAll();
-        userRepository.deleteAll();
-        scrappedRepository.deleteAll();
-    }
-
     @Test
     @DisplayName("게시글 등록")
     void postRegisterSuccess() throws Exception {
         //given
-        Authentication authentication = new TestingAuthenticationToken("test1@gmail.com", null, "ROLE_ADMIN");
+        Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_ADMIN");
+
+        String accessToken = jwtProvider.createToken("test_email@test.com", 1L, Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()));
 
         String testData =
                 "[\n" +
@@ -159,10 +156,11 @@ public class PostControllerTest {
 
         //when, then
         ResultActions actions = mockMvc.perform(post("/add-post")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                         .content(testData)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .with(authentication(authentication))
+                        .with(authentication(atc))
         );
 
         actions
@@ -174,13 +172,16 @@ public class PostControllerTest {
     @DisplayName("게시글과 댓글 함께 조회하는 테스트")
     void getPostWithCommentsSuccess() throws Exception {
         //given
-        Authentication authentication = new TestingAuthenticationToken("test1@gmail.com", null, "ROLE_ADMIN");
+        Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_ADMIN");
+
+        String accessToken = jwtProvider.createToken("test_email@test.com", 1L, Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()));
 
         //when, then
         ResultActions actions = mockMvc.perform(get("/posts/{postId}", 1)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .with(authentication(authentication))
+                .with(authentication(atc))
 
         );
 
@@ -193,15 +194,18 @@ public class PostControllerTest {
     @DisplayName("스크랩 추가 테스트")
     void scrapSuccess() throws Exception {
         //given
-        Authentication authentication = new TestingAuthenticationToken("test1@gmail.com", null, "ROLE_ADMIN");
+        Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_ADMIN");
+
+        String accessToken = jwtProvider.createToken("test_email@test.com", 1L, Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()));
 
         Post post = postRepository.save(new Post(2L, CategoryType.ISIS, false, "testPostTitle2", "testContent2", Collections.singletonList("testImageUrl2"), 0, 0, false, LocalDate.now(), LocalDate.now(), "testNoticeUrl2"));
 
         //when, then
         ResultActions actions = mockMvc.perform(post("/posts/scrap/{postId}", post.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .with(authentication(authentication))
+                .with(authentication(atc))
         );
 
         actions
@@ -213,13 +217,16 @@ public class PostControllerTest {
     @DisplayName("스크랩 취소 테스트")
     void unScrapSuccess() throws Exception {
         //given
-        Authentication authentication = new TestingAuthenticationToken("test1@gmail.com", null, "ROLE_ADMIN");
+        Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_ADMIN");
+
+        String accessToken = jwtProvider.createToken("test_email@test.com", 1L, Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()));
 
         //when, then
         ResultActions actions = mockMvc.perform(delete("/posts/unscrap/{postId}", 1)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .with(authentication(authentication))
+                .with(authentication(atc))
         );
 
         actions
