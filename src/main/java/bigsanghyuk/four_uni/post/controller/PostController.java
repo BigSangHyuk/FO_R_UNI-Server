@@ -60,16 +60,16 @@ public class PostController {
     }
 
     @Operation(summary = "스크랩 추가", description = "요청에 postId 담아서 전송")
-    @PostMapping("/posts/scrap")
-    public ResponseEntity<CommonResponse> scrap(@RequestAttribute(name = "userId") Long userId, @RequestBody ScrapRequest request) {
-        scrappedService.scrap(userId, request.toDomain());
+    @PostMapping("/posts/scrap/{postId}")
+    public ResponseEntity<CommonResponse> scrap(@RequestAttribute(name = "userId") Long userId, @PathVariable(name = "postId") Long postId) {
+        scrappedService.scrap(userId, postId);
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
     @Operation(summary = "스크랩 해제", description = "요청에 postId 담아서 전송")
-    @DeleteMapping("/posts/unscrap")
-    public ResponseEntity<CommonResponse> unScrap(@RequestAttribute(name = "userId") Long userId, @RequestBody ScrapRequest request) {
-        scrappedService.unScrap(userId, request.toDomain());
+    @DeleteMapping("/posts/unscrap/{postId}")
+    public ResponseEntity<CommonResponse> unScrap(@RequestAttribute(name = "userId") Long userId, @PathVariable(name = "postId") Long postId) {
+        scrappedService.unScrap(userId, postId);
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 

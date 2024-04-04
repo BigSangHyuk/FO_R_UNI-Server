@@ -197,13 +197,8 @@ public class PostControllerTest {
 
         Post post = postRepository.save(new Post(2L, CategoryType.ISIS, false, "testPostTitle2", "testContent2", Collections.singletonList("testImageUrl2"), 0, 0, false, LocalDate.now(), LocalDate.now(), "testNoticeUrl2"));
 
-        ScrapInfo info = new ScrapInfo(post.getId());
-        Gson gson = new Gson();
-        String content = gson.toJson(info);
-
         //when, then
-        ResultActions actions = mockMvc.perform(post("/posts/scrap")
-                .content(content)
+        ResultActions actions = mockMvc.perform(post("/posts/scrap/{postId}", post.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .with(authentication(authentication))
@@ -220,13 +215,8 @@ public class PostControllerTest {
         //given
         Authentication authentication = new TestingAuthenticationToken("test1@gmail.com", null, "ROLE_ADMIN");
 
-        ScrapInfo info = new ScrapInfo(1L);
-        Gson gson = new Gson();
-        String content = gson.toJson(info);
-
         //when, then
-        ResultActions actions = mockMvc.perform(delete("/posts/unscrap")
-                .content(content)
+        ResultActions actions = mockMvc.perform(delete("/posts/unscrap/{postId}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .with(authentication(authentication))

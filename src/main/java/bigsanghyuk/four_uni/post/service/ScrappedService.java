@@ -22,10 +22,10 @@ public class ScrappedService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    public void scrap(Long userId, ScrapInfo scrapInfo) {
+    public void scrap(Long userId, Long postId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        Post post = postRepository.findById(scrapInfo.getPostId())
+        Post post = postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
         scrappedRepository.findByUserAndPost(user, post)
                 .ifPresent(scrapped -> {
@@ -35,10 +35,10 @@ public class ScrappedService {
         scrappedRepository.save(new Scrapped(user, post));
     }
 
-    public void unScrap(Long userId, ScrapInfo scrapInfo) {
+    public void unScrap(Long userId, Long postId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
-        Post post = postRepository.findById(scrapInfo.getPostId())
+        Post post = postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
         scrappedRepository.findByUserAndPost(user, post)
                 .orElseThrow(ScrapNotFoundException::new);
