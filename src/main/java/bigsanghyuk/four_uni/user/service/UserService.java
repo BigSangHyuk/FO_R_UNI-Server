@@ -12,6 +12,7 @@ import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
 import bigsanghyuk.four_uni.exception.user.PasswordMismatchException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
+import bigsanghyuk.four_uni.exception.user.WrongPasswordException;
 import bigsanghyuk.four_uni.user.domain.*;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
@@ -24,7 +25,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,30 +51,18 @@ public class UserService {
     private static final int EXPIRATION_IN_MINUTES = 43800;
 
     // 회원 가입
-    public boolean register(SignUserInfo info) throws Exception {
+    public void register(SignUserInfo info) throws Exception {
         userRepository.findByEmail(info.getEmail())
                 .ifPresent(user -> {
                     throw new EmailDuplicateException();
                 });
+        User user = userBuilder(info);
         try {
-            User user = User.builder()
-                    .email(info.getEmail())
-                    .password(encoder.encode(info.getPassword()))
-                    .name(info.getName())
-                    .departmentType(info.getDepartmentType())
-                    .nickName(info.getNickName())
-                    .image(info.getImage())
-                    .build();
-            user.setRoles(Collections.singletonList(
-                    Authority.builder()
-                            .name("ROLE_USER")
-                            .build()));
             userRepository.save(user);
         } catch (Exception e) {
             log.error("e.getMessage={}", e.getMessage());
             throw new Exception("잘못된 요청입니다.");
         }
-        return true;
     }
 
     // 회원 정보 수정
@@ -82,14 +70,12 @@ public class UserService {
     public EditResponse edit(Long userId, EditUserInfo info) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        if (info.getImage() != null) {
+        if (info.getImage() != null) {  // 새로운 이미지 등록 요청이 있고 이전 이미지가 s3에 업로드 되있었다면
             String oldImageUrl = user.getImage();
-            s3Uploader.delete(oldImageUrl);
+            s3Uploader.delete(oldImageUrl); // s3의 이미지 삭제
             user.updateImage(null);
         }
-
         editUser(user, info);
-
         User savedUser = userRepository.save(user);
 
         return editResponseBuilder(savedUser);
@@ -100,25 +86,13 @@ public class UserService {
         User user = userRepository.findByEmail(info.getEmail())
                 .orElseThrow(UserNotFoundException::new);
         if (!encoder.matches(info.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("잘못된 계정 정보입니다.");
+            throw new WrongPasswordException();
         }
-        return LoginResponse.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .name(user.getName())
-                .departmentType(user.getDepartmentType())
-                .nickName(user.getNickName())
-                .image(user.getImage())
-                .roles(user.getRoles())
-                .token(TokenDto.builder()
-                        .accessToken(jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles()))
-                        .refreshToken(createRefreshToken(user))
-                        .build())
-                .build();
+        return loginResponseBuilder(user);
     }
 
     @Transactional
-    public void logout(Long userId, LogoutUserInfo logoutUserInfo) throws JsonProcessingException, IllegalAccessException {
+    public void logout(Long userId, LogoutUserInfo logoutUserInfo) throws JsonProcessingException {
         String accessToken = logoutUserInfo.getAccessToken();
 
         deleteRefreshToken(userId);
@@ -177,10 +151,7 @@ public class UserService {
         User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         Token token = validRefreshToken(user, tokenDto.getRefreshToken());
         if (token != null) {
-            return TokenDto.builder()
-                    .accessToken(jwtProvider.createToken(email, user.getId(), user.getRoles()))
-                    .refreshToken(token.getRefreshToken())
-                    .build();
+            return tokenDtoBuilder(email, user, token);
         } else {
             throw new Exception("로그인이 필요합니다.");
         }
@@ -214,12 +185,11 @@ public class UserService {
 
     // 비밀번호 변경
     @Transactional
-    public Boolean changePassword(Long userId, ChangePasswordInfo changePasswordInfo) {
+    public void changePassword(Long userId, ChangePasswordInfo changePasswordInfo) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         if (encoder.matches(changePasswordInfo.getOldPassword(), user.getPassword())) { // 메일로 받은 임시 비밀번호랑 적용된 임시 비밀번호랑 같을 때 (발급시에 유저 비밀번호가 바뀜)
             user.updatePassword(encoder.encode(changePasswordInfo.getNewPassword()));
             userRepository.save(user);
-            return true;
         } else {
             throw new PasswordMismatchException();
         }
@@ -243,6 +213,45 @@ public class UserService {
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())
+                .build();
+    }
+
+    private User userBuilder(SignUserInfo info) {
+        User user = User.builder()
+                .email(info.getEmail())
+                .password(encoder.encode(info.getPassword()))
+                .name(info.getName())
+                .departmentType(info.getDepartmentType())
+                .nickName(info.getNickName())
+                .image(info.getImage())
+                .build();
+        user.setRoles(Collections.singletonList(
+                Authority.builder()
+                        .name("ROLE_USER")
+                        .build()));
+        return user;
+    }
+
+    private LoginResponse loginResponseBuilder(User user) {
+        return LoginResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .departmentType(user.getDepartmentType())
+                .nickName(user.getNickName())
+                .image(user.getImage())
+                .roles(user.getRoles())
+                .token(TokenDto.builder()
+                        .accessToken(jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles()))
+                        .refreshToken(createRefreshToken(user))
+                        .build())
+                .build();
+    }
+
+    private TokenDto tokenDtoBuilder(String email, User user, Token token) {
+        return TokenDto.builder()
+                .accessToken(jwtProvider.createToken(email, user.getId(), user.getRoles()))
+                .refreshToken(token.getRefreshToken())
                 .build();
     }
 }

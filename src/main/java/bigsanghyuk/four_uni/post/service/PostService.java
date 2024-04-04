@@ -40,22 +40,6 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
-    private List<RegisterPostInfo> jsonToDto(String data) throws JsonProcessingException {
-        JSONParser jsonParser = new JSONParser();
-        JSONArray array = new JSONArray();
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<RegisterPostInfo> infos = new ArrayList<>();
-        try {
-            array = (JSONArray) jsonParser.parse(data);
-        } catch (ParseException e) {
-            log.error("error={}", e.toString());
-        }
-        for (Object obj : array) {
-            infos.add(objectMapper.readValue(((JSONObject) obj).toJSONString(), RegisterPostRequest.class).toDomain());
-        }
-        return infos;
-    }
-
     public int getAddPostResult(String data) throws JsonProcessingException {
         int success = 0;
         List<RegisterPostInfo> infos = jsonToDto(data);
@@ -64,37 +48,11 @@ public class PostService {
             for (CategoryType value : values) {
                 if (value.getId() == (int) (long) info.getCategoryId()) {
                     success += addPost(info, CategoryType.valueOf(value.getKey()));
+                    break;
                 }
             }
         }
         return success;
-    }
-
-    public int addPost(RegisterPostInfo registerPostInfo, CategoryType categoryType) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-        LocalDate postedAt = LocalDate.parse(registerPostInfo.getPostedAt(), formatter);
-        LocalDate deadline;
-        try {
-            deadline = LocalDate.parse(registerPostInfo.getDeadline(), formatter);
-        } catch (DateTimeParseException e) {
-            deadline = null;
-        }
-        if (postRepository.existsPostByNoticeUrl(registerPostInfo.getNoticeUrl())) {
-            return 0;
-        } else {
-            postRepository.save(
-                    Post.builder()
-                            .categoryType(categoryType)
-                            .title(registerPostInfo.getTitle())
-                            .content(registerPostInfo.getContent())
-                            .imageUrl(registerPostInfo.getImageUrl())
-                            .isClassified(registerPostInfo.getIsClassified())
-                            .postedAt(postedAt)
-                            .deadline(deadline)
-                            .noticeUrl(registerPostInfo.getNoticeUrl())
-                            .build());
-            return 1;
-        }
     }
 
     public List<PostRequired> getUnclassifiedRequired() {
@@ -103,49 +61,30 @@ public class PostService {
 
     public GetDetailResponse getDetail(Long postId) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        GetDetailResponse response = GetDetailResponse.builder()
-                .id(postId)
-                .categoryType(post.getCategoryType())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .imageUrl(post.getImageUrl())
-                .views(post.getViews())
-                .isClassified(post.isClassified())
-                .postedAt(post.getPostedAt())
-                .deadline(post.getDeadline())
-                .noticeUrl(post.getNoticeUrl())
-                .reported(post.isReported())
-                .postReportCount(post.getPostReportCount())
-                .build();
-        return response;
+        return detailBuilder(post);
     }
 
     public List<PostRequired> getFilteredRequired(String ids) {
         List<Long> categoryIds = stringToCategoryIds(ids);
         List<String> categoryNames = getCategoryNames(categoryIds);
-
         return postRepository.findPostRequiredFiltered(categoryNames);
     }
 
     public List<PostRequired> getScrappedRequired(Long userId) {
         userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         List<ScrappedRequired> required = scrappedRepository.findRequired(userId);
-        LinkedList<PostRequired> posts = new LinkedList<>();
-        for (ScrappedRequired scrappedRequired : required) {
-            PostRequired found = postRepository.findRequiredByPostId(scrappedRequired.getPostId());
-            posts.add(found);
-        }
-        return posts;
+        return getScrappedInfo(required);
     }
 
     public List<PostRequired> getCommentedPostRequired(Long userId) {
         List<CommentProfile> commentedPostId = commentRepository.findCommentedPostId(userId);
-        LinkedHashSet<Long> set = new LinkedHashSet<>();
+        return getCommented(commentedPostId);
+    }
+
+    private List<PostRequired> getCommented(List<CommentProfile> commentedPostId) {
         LinkedList<PostRequired> result = new LinkedList<>();
         for (CommentProfile commentRequired : commentedPostId) {
-            set.add(commentRequired.getPostId());
-        }
-        for (Long postId : set) {
+            Long postId = commentRequired.getPostId();
             result.add(postRepository.findRequiredByPostId(postId));
         }
         return result;
@@ -172,6 +111,7 @@ public class PostService {
             for (CategoryType value : values) {
                 if ((int) value.getId() == id) {
                     categoryNames.add(value.getKey());
+                    break;
                 }
             }
         }
@@ -185,6 +125,75 @@ public class PostService {
             result.add(Long.parseLong(token));
         }
         return result;
+    }
+
+    private List<RegisterPostInfo> jsonToDto(String data) throws JsonProcessingException {
+        JSONParser jsonParser = new JSONParser();
+        JSONArray array = new JSONArray();
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<RegisterPostInfo> infos = new ArrayList<>();
+        try {
+            array = (JSONArray) jsonParser.parse(data);
+        } catch (ParseException e) {
+            log.error("error={}", e.toString());
+        }
+        for (Object obj : array) {
+            infos.add(objectMapper.readValue(((JSONObject) obj).toJSONString(), RegisterPostRequest.class).toDomain());
+        }
+        return infos;
+    }
+
+    private int addPost(RegisterPostInfo registerPostInfo, CategoryType categoryType) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        LocalDate postedAt = LocalDate.parse(registerPostInfo.getPostedAt(), formatter);
+        LocalDate deadline;
+        try {
+            deadline = LocalDate.parse(registerPostInfo.getDeadline(), formatter);
+        } catch (DateTimeParseException e) {
+            deadline = null;
+        }
+        if (postRepository.existsPostByNoticeUrl(registerPostInfo.getNoticeUrl())) {
+            return 0;
+        } else {
+            postRepository.save(
+                    Post.builder()
+                            .categoryType(categoryType)
+                            .title(registerPostInfo.getTitle())
+                            .content(registerPostInfo.getContent())
+                            .imageUrl(registerPostInfo.getImageUrl())
+                            .isClassified(registerPostInfo.getIsClassified())
+                            .postedAt(postedAt)
+                            .deadline(deadline)
+                            .noticeUrl(registerPostInfo.getNoticeUrl())
+                            .build());
+            return 1;
+        }
+    }
+
+    private GetDetailResponse detailBuilder(Post post) {
+        return GetDetailResponse.builder()
+                .id(post.getId())
+                .categoryType(post.getCategoryType())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .imageUrl(post.getImageUrl())
+                .views(post.getViews())
+                .isClassified(post.isClassified())
+                .postedAt(post.getPostedAt())
+                .deadline(post.getDeadline())
+                .noticeUrl(post.getNoticeUrl())
+                .reported(post.isReported())
+                .postReportCount(post.getPostReportCount())
+                .build();
+    }
+
+    private List<PostRequired> getScrappedInfo(List<ScrappedRequired> required) {
+        LinkedList<PostRequired> infos = new LinkedList<>();
+        for (ScrappedRequired scrappedRequired : required) {
+            PostRequired found = postRepository.findRequiredByPostId(scrappedRequired.getPostId());
+            infos.add(found);
+        }
+        return infos;
     }
 
     @Getter

@@ -25,33 +25,48 @@ public class LikeCommentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void likeComment(Long userId, LikeCommentInfo likeCommentInfo) {
-
-        Long commentId = likeCommentInfo.getCommentId();
-
+    public void likeComment(Long userId, LikeCommentInfo info) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+        Comment comment = commentRepository.findById(info.getCommentId()).orElseThrow(CommentNotFoundException::new);
 
-        likeCommentRepository.findByUserAndComment(user, comment)
-                .ifPresent(likeComment -> {
-                            throw new AlreadyLikeException();
-                    }
-                );
+        checkIsLiked(user, comment);
 
-        commentRepository.increaseLikesByCommentId(commentId);
-        likeCommentRepository.save(new LikeComment(user, comment));
+        increaseLike(user, comment);
     }
 
     @Transactional
-    public void unLikeComment(Long userId, UnLikeCommentInfo unLikeCommentInfo) {
-        Long commentId = unLikeCommentInfo.getCommentId();
-
+    public void unLikeComment(Long userId, UnLikeCommentInfo info) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+        Comment comment = commentRepository.findById(info.getCommentId()).orElseThrow(CommentNotFoundException::new);
 
-        likeCommentRepository.findByUserAndComment(user, comment).orElseThrow(LikeCommentNotFoundException::new);
+        checkIsUnliked(user, comment);
 
-        commentRepository.decreaseLikesByCommentId(commentId);
-        likeCommentRepository.deleteLikeCommentByUserAndComment(user, comment);
+        decreaseLike(user, comment);
+    }
+
+    @Transactional
+    protected void increaseLike(User user, Comment comment) {
+        comment.increaseLike();
+        Comment likedComment = commentRepository.save(comment);
+        likeCommentRepository.save(new LikeComment(user, likedComment));
+    }
+
+    @Transactional
+    protected void decreaseLike(User user, Comment comment) {
+        comment.decreaseLike();
+        Comment unlikedComment = commentRepository.save(comment);
+        likeCommentRepository.deleteLikeCommentByUserAndComment(user, unlikedComment);
+    }
+
+    private void checkIsLiked(User user, Comment comment) {
+        likeCommentRepository.findByUserAndComment(user, comment)
+                .ifPresent(likeComment -> {
+                    throw new AlreadyLikeException();
+                });
+    }
+
+    private void checkIsUnliked(User user, Comment comment) {
+        likeCommentRepository.findByUserAndComment(user, comment)
+                .orElseThrow(LikeCommentNotFoundException::new);
     }
 }

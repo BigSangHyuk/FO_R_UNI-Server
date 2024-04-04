@@ -48,4 +48,12 @@ public class Comment extends BaseTimeEntity {
     public void edit(@Valid EditCommentInfo editCommentInfo) {
         this.content = editCommentInfo.getContent();
     }
+
+    public void increaseLike() {
+        this.commentLike += 1;
+    }
+
+    public void decreaseLike() {
+        this.commentLike -= 1;
+    }
 }
