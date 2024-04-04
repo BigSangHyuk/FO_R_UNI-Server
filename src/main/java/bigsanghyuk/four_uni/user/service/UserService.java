@@ -51,7 +51,7 @@ public class UserService {
     private static final int EXPIRATION_IN_MINUTES = 43800;
 
     // 회원 가입
-    public boolean register(SignUserInfo info) throws Exception {
+    public void register(SignUserInfo info) throws Exception {
         userRepository.findByEmail(info.getEmail())
                 .ifPresent(user -> {
                     throw new EmailDuplicateException();
@@ -63,7 +63,6 @@ public class UserService {
             log.error("e.getMessage={}", e.getMessage());
             throw new Exception("잘못된 요청입니다.");
         }
-        return true;
     }
 
     // 회원 정보 수정
@@ -186,12 +185,11 @@ public class UserService {
 
     // 비밀번호 변경
     @Transactional
-    public Boolean changePassword(Long userId, ChangePasswordInfo changePasswordInfo) {
+    public void changePassword(Long userId, ChangePasswordInfo changePasswordInfo) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         if (encoder.matches(changePasswordInfo.getOldPassword(), user.getPassword())) { // 메일로 받은 임시 비밀번호랑 적용된 임시 비밀번호랑 같을 때 (발급시에 유저 비밀번호가 바뀜)
             user.updatePassword(encoder.encode(changePasswordInfo.getNewPassword()));
             userRepository.save(user);
-            return true;
         } else {
             throw new PasswordMismatchException();
         }
