@@ -36,7 +36,7 @@ public class UserController {
 
     @Operation(summary = "로그아웃")
     @PostMapping("/log-out")
-    public ResponseEntity<CommonResponse> logout(@RequestAttribute(name = "userId") Long userId, @RequestBody LogoutUserRequest request) throws JsonProcessingException, IllegalAccessException {
+    public ResponseEntity<CommonResponse> logout(@RequestAttribute(name = "userId") Long userId, @RequestBody LogoutUserRequest request) throws JsonProcessingException {
         userService.logout(userId, request.toDomain());
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
