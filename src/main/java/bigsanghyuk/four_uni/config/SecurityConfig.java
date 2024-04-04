@@ -34,8 +34,6 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@Profile("!test")
-public class SecurityConfig {
 public class SecurityConfig implements WebMvcConfigurer {
 
     private final JwtProvider jwtProvider;
