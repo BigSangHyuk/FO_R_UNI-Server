@@ -13,16 +13,6 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE Comment c SET c.commentLike = c.commentLike + 1 WHERE c.id = :commentId")
-    void increaseLikesByCommentId(@Param("commentId") Long commentId);
-
-    @Transactional
-    @Modifying
-    @Query("UPDATE Comment c SET c.commentLike = c.commentLike - 1 WHERE c.id = :commentId")
-    void decreaseLikesByCommentId(@Param("commentId") Long commentId);
-
     @Query(nativeQuery = true,
             value = "SELECT post_id as postId FROM Comments " +
                     "WHERE user_id = :userId AND deleted = FALSE " +
