@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.common.controller;
 
 import bigsanghyuk.four_uni.common.CommonResponse;
 import bigsanghyuk.four_uni.post.scheduler.PostScheduler;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     private final PostScheduler postScheduler;
+
+    @Hidden
+    @Operation(summary = "로드 밸런서 용")
+    @GetMapping("/healthcheck")
+    public String healthCheck() {
+        return "ok";
+    }
 
     @Operation(summary = "게시글 받아오기 테스트", description = "스케쥴러 메소드 강제 실행, 관리자 아이디만")
     @GetMapping("/add-post/test")

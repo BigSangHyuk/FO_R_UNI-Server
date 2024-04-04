@@ -4,6 +4,7 @@ import bigsanghyuk.four_uni.exception.ExceptionMessage;
 import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
 import bigsanghyuk.four_uni.exception.user.PasswordMismatchException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
+import bigsanghyuk.four_uni.exception.user.WrongPasswordException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,5 +33,11 @@ public class UserExceptionHandler {
     public ResponseEntity<ExceptionMessage> handle(PasswordMismatchException e) {
         final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
         return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(WrongPasswordException.class)
+    public ResponseEntity<ExceptionMessage> handle(WrongPasswordException e) {
+        final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
     }
 }

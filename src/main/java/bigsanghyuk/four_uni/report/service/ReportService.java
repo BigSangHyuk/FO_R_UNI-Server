@@ -33,7 +33,7 @@ public class ReportService {
     private final PostRepository postRepository;
     private final ReportRepository reportRepository;
 
-    public boolean reportComment(Long userId, ReportCommentInfo reportCommentInfo) {
+    public void reportComment(Long userId, ReportCommentInfo reportCommentInfo) {
 
         Long commentId = reportCommentInfo.getCommentId();
         ReportReason reason = reportCommentInfo.getReason();
@@ -50,23 +50,21 @@ public class ReportService {
         }
 
         Optional<Report> report = reportRepository.findByUserAndComment(user, comment);
-        Report savedReport;
 
         if (report.isPresent()) {
             Report updatedReport = editReport(report.get(), reason, detail);
-            savedReport = reportRepository.save(updatedReport);
+            reportRepository.save(updatedReport);
         } else {
             comment.setReported(true);
             comment.setCommentReportCount(comment.getCommentReportCount() + 1);
             commentRepository.save(comment);
 
             Report newReport = makeReport(user, comment, null, reason, detail);
-            savedReport = reportRepository.save(newReport);
+            reportRepository.save(newReport);
         }
-        return savedReport.getId() != null;
     }
 
-    public boolean reportPost(Long userId, ReportPostInfo reportPostInfo) {
+    public void reportPost(Long userId, ReportPostInfo reportPostInfo) {
 
         Long postId = reportPostInfo.getPostId();
         ReportReason reason = reportPostInfo.getReason();
@@ -80,42 +78,38 @@ public class ReportService {
         }
 
         Optional<Report> report = reportRepository.findByUserAndPost(user, post);
-        Report savedReport;
 
         if (report.isPresent()) {
             Report updatedReport = editReport(report.get(), reason, detail);
-            savedReport = reportRepository.save(updatedReport);
+            reportRepository.save(updatedReport);
         } else {
             post.setReported(true);
             post.setPostReportCount(post.getPostReportCount() + 1);
             postRepository.save(post);
 
             Report newReport = makeReport(user, null, post, reason, detail);
-            savedReport = reportRepository.save(newReport);
+            reportRepository.save(newReport);
         }
-        return savedReport.getId() != null;
     }
 
-    public boolean reportDeadline(Long userId, CorrectDeadlineInfo correctDeadlineInfo) {
+    public void reportDeadline(Long userId, CorrectDeadlineInfo correctDeadlineInfo) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findById(correctDeadlineInfo.getPostId()).orElseThrow(PostNotFoundException::new);
         LocalDate deadline = correctDeadlineInfo.getDeadline();
 
         Optional<Report> report = reportRepository.findDeadlineReport(user, post);
-        Report savedReport;
 
         if (report.isPresent()) {
             Report updatedReport = editReport(report.get(), deadline);
-            savedReport = reportRepository.save(updatedReport);
+            reportRepository.save(updatedReport);
         } else {
             post.setReported(true);
             post.setPostReportCount(post.getPostReportCount() + 1);
             postRepository.save(post);
 
             Report newReport = makeReport(user, post, deadline);
-            savedReport = reportRepository.save(newReport);
+            reportRepository.save(newReport);
         }
-        return savedReport.getId() != null;
     }
 
     private Report makeReport(User user, Comment comment, Post post, ReportReason reason, String detail) {

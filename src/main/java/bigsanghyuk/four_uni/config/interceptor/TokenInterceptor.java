@@ -19,7 +19,7 @@ public class TokenInterceptor implements HandlerInterceptor {
 
     private final JwtProvider jwtProvider;
 
-    private static final List<String> PERMIT_URLS = List.of("/", "/sign-up", "/sign-in", "/refresh", "/auth/**");
+    private static final List<String> PERMIT_URLS = List.of("/", "/sign-up", "/sign-in", "/refresh", "/auth/**", "/healthcheck");
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

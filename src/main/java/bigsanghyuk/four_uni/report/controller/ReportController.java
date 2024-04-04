@@ -22,21 +22,21 @@ public class ReportController {
     @Operation(summary = "댓글 신고", description = "요청에 commentId, reason, detail 넣어서")
     @PostMapping("/comment")
     public ResponseEntity<CommonResponse> reportComment(@RequestAttribute(name = "userId") Long userId, @RequestBody ReportCommentRequest request) {
-        boolean result = reportService.reportComment(userId, request.toDomain());
-        return ResponseEntity.ok().body(new CommonResponse(result));
+        reportService.reportComment(userId, request.toDomain());
+        return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
     @Operation(summary = "게시글 신고", description = "요청에 postId, reason, detail 넣어서")
     @PostMapping("/post")
     public ResponseEntity<CommonResponse> reportPost(@RequestAttribute(name = "userId") Long userId, @RequestBody ReportPostRequest request) {
-        boolean result = reportService.reportPost(userId, request.toDomain());
-        return ResponseEntity.ok().body(new CommonResponse(result));
+        reportService.reportPost(userId, request.toDomain());
+        return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
     @Operation(summary = "마감날짜 수정 요청", description = "요청에 postId, deadline(yyyy-MM-dd) 넣어서")
     @PostMapping("/deadline")
     public ResponseEntity<CommonResponse> reportDeadline(@RequestAttribute(name = "userId") Long userId, @RequestBody CorrectDeadlineRequest request) {
-        boolean result = reportService.reportDeadline(userId, request.toDomain());
-        return ResponseEntity.ok().body(new CommonResponse(result));
+        reportService.reportDeadline(userId, request.toDomain());
+        return ResponseEntity.ok().body(new CommonResponse(true));
     }
 }

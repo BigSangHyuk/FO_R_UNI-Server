@@ -5,9 +5,7 @@ import bigsanghyuk.four_uni.common.Results;
 import bigsanghyuk.four_uni.comment.domain.entity.CommentRequired;
 import bigsanghyuk.four_uni.comment.dto.request.*;
 import bigsanghyuk.four_uni.comment.dto.request.EditCommentRequest;
-import bigsanghyuk.four_uni.comment.dto.request.LikeCommentRequest;
 import bigsanghyuk.four_uni.comment.dto.request.RegisterCommentRequest;
-import bigsanghyuk.four_uni.comment.dto.request.UnLikeCommentRequest;
 import bigsanghyuk.four_uni.comment.service.CommentService;
 import bigsanghyuk.four_uni.comment.service.LikeCommentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,23 +41,23 @@ public class CommentController {
     }
 
     @Operation(summary = "댓글 삭제", description = "Body에 postId, commentId 넣어서 전달")
-    @DeleteMapping("/comments/{commentId}")
+    @DeleteMapping("/comments")
     public ResponseEntity<CommonResponse> remove(@RequestAttribute(name = "userId") Long userId, @Valid @RequestBody DeleteCommentRequest request) {
         commentService.remove(userId, request.toDomain());
         return new ResponseEntity<>(new CommonResponse(true), HttpStatus.OK);
     }
 
     @Operation(summary = "댓글 좋아요", description = "Body에 commentId 넣어서 전달")
-    @PostMapping("/comments/like")
-    public ResponseEntity<CommonResponse> likeComment(@RequestAttribute(name = "userId") Long userId, @Valid @RequestBody LikeCommentRequest request) {
-        likeCommentService.likeComment(userId, request.toDomain());
+    @PostMapping("/comments/like/{commentId}")
+    public ResponseEntity<CommonResponse> likeComment(@RequestAttribute(name = "userId") Long userId, @PathVariable(name = "commentId") Long commentId) {
+        likeCommentService.likeComment(userId, commentId);
         return new ResponseEntity<>(new CommonResponse(true), HttpStatus.OK);
     }
 
     @Operation(summary = "댓글 좋아요 취소", description = "Body에 commentId 넣어서 전달")
-    @DeleteMapping("/comments/unlike")
-    public ResponseEntity<CommonResponse> unLikeComment(@RequestAttribute(name = "userId") Long userId, @Valid @RequestBody UnLikeCommentRequest request) {
-        likeCommentService.unLikeComment(userId, request.toDomain());
+    @DeleteMapping("/comments/unlike/{commentId}")
+    public ResponseEntity<CommonResponse> unLikeComment(@RequestAttribute(name = "userId") Long userId, @PathVariable(name = "commentId") Long commentId) {
+        likeCommentService.unLikeComment(userId, commentId);
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 

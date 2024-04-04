@@ -35,7 +35,7 @@ public class JwtProvider {
     private final int EXP_MINUTES = 30;   // 30 min
     private final RedisUtil redisUtil;
 
-    private final List<String> notFilteredRoutes = List.of("/", "/sign-up", "/sign-in", "/refresh", "/auth/**");
+    private final List<String> notFilteredRoutes = List.of("/", "/sign-up", "/sign-in", "/refresh", "/auth/**", "/healthcheck");
 
     public String createToken(String email, Long userId, List<Authority> roles) {
         Claims claims = Jwts.claims().setSubject(email);

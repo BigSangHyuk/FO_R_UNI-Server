@@ -27,7 +27,7 @@ public enum CategoryType {
     ARCHI("건축공학, 도시건축학", "ARCHI", 1205),
     KOREAN("국어국문학과", "KOREAN", 286),
     UI("영어영문학과", "UI", 642),
-    GERNAM("독어독문학과", "GERNAM", 289),
+    GERMAN("독어독문학과", "GERMAN", 289),
     INUFRANCE("불어불문학과", "INUFRANCE", 292),
     UNJAPAN("일본지역문화학과", "UNJAPAN", 298),
     INUCHINA("중어중국학과", "INUCHINA", 301),
