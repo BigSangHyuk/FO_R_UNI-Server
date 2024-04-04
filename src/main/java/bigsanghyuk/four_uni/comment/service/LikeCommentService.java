@@ -1,7 +1,5 @@
 package bigsanghyuk.four_uni.comment.service;
 
-import bigsanghyuk.four_uni.comment.domain.LikeCommentInfo;
-import bigsanghyuk.four_uni.comment.domain.UnLikeCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
 import bigsanghyuk.four_uni.comment.domain.entity.LikeComment;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
@@ -25,22 +23,20 @@ public class LikeCommentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void likeComment(Long userId, LikeCommentInfo info) {
+    public void likeComment(Long userId, Long commentId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Comment comment = commentRepository.findById(info.getCommentId()).orElseThrow(CommentNotFoundException::new);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
         checkIsLiked(user, comment);
-
         increaseLike(user, comment);
     }
 
     @Transactional
-    public void unLikeComment(Long userId, UnLikeCommentInfo info) {
+    public void unLikeComment(Long userId, Long commentId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Comment comment = commentRepository.findById(info.getCommentId()).orElseThrow(CommentNotFoundException::new);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
         checkIsUnliked(user, comment);
-
         decreaseLike(user, comment);
     }
 
