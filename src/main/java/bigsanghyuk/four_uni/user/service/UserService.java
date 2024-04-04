@@ -12,6 +12,7 @@ import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
 import bigsanghyuk.four_uni.exception.user.PasswordMismatchException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
+import bigsanghyuk.four_uni.exception.user.WrongPasswordException;
 import bigsanghyuk.four_uni.user.domain.*;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
@@ -100,7 +101,7 @@ public class UserService {
         User user = userRepository.findByEmail(info.getEmail())
                 .orElseThrow(UserNotFoundException::new);
         if (!encoder.matches(info.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("잘못된 계정 정보입니다.");
+            throw new WrongPasswordException();
         }
         return LoginResponse.builder()
                 .id(user.getId())
