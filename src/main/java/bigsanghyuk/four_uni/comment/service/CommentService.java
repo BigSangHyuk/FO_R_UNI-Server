@@ -54,7 +54,7 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    public Comment edit(Long userId, @Valid EditCommentInfo editCommentInfo) {
+    public void edit(Long userId, @Valid EditCommentInfo editCommentInfo) {
         userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         postRepository.findById(editCommentInfo.getPostId()).orElseThrow(PostNotFoundException::new);
         Comment comment = commentRepository.findById(editCommentInfo.getCommentId()).orElseThrow(CommentNotFoundException::new);
@@ -63,7 +63,6 @@ public class CommentService {
 
         comment.edit(editCommentInfo);
         commentRepository.save(comment);
-        return comment;
     }
 
     @Transactional
@@ -74,8 +73,7 @@ public class CommentService {
 
         validateRequest(userId, comment);
 
-        likeCommentRepository.deleteLikeCommentByComment(comment);
-        commentRepository.deleteById(comment.getId());  // soft delete 사용
+        removeComment(comment);
     }
 
     public List<CommentDto> getAllComments(Long postId) {
@@ -141,5 +139,11 @@ public class CommentService {
         } else {
             return;
         }
+    }
+
+    @Transactional
+    protected void removeComment(Comment comment) {
+        likeCommentRepository.deleteLikeCommentByComment(comment);
+        commentRepository.deleteById(comment.getId());  // soft delete 사용
     }
 }
