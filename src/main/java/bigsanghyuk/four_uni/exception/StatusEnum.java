@@ -15,6 +15,7 @@ public enum StatusEnum {
     ALREADY_SCRAPPED(403, "ALREADY_SCRAPPED"),
     BAD_REQUEST(400, "BAD_REQUEST"),
     TOKEN_NOT_FOUND(404, "TOKEN_NOT_FOUND"),
+    SCRAP_NOT_FOUND(404,"SCRAP_NOT_FOUND"),
     RESTRICTED(403, "RESTRICTED");
 
     private final int statusCode;
