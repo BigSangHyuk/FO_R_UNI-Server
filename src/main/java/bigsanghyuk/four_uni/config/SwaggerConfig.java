@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -13,7 +14,12 @@ import org.springframework.context.annotation.Configuration;
 
 @RequiredArgsConstructor
 @Configuration
-@OpenAPIDefinition(info = @Info(title = "FO_R UNI", description = "FO_R UNI APP API 명세", version = "v1"))
+@OpenAPIDefinition(
+        info = @Info(title = "FO_R UNI", description = "FO_R UNI APP API 명세", version = "v1"),
+        servers = {
+                @Server(url = "https://fouruni.site"),
+                @Server(url = "http://localhost:8080")
+        })
 public class SwaggerConfig {
 
     @Bean

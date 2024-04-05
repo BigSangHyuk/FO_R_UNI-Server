@@ -22,7 +22,7 @@ public interface ScrappedRepository extends JpaRepository<Scrapped, Long> {
     //각 user 마다의 scrapped 게시물 리스트를 스크랩된 순서로 반환
     @Query(
             nativeQuery = true,
-            value = "SELECT post_id as postId FROM Scrapped " +
+            value = "SELECT post_id as postId FROM scrapped " +
                     "WHERE user_id = :userId " +
                     "ORDER BY created_at DESC")
     List<ScrappedRequired> findRequired(@Param("userId") Long userId);
