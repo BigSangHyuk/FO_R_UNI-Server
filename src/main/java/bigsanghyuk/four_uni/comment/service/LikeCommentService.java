@@ -26,7 +26,7 @@ public class LikeCommentService {
     public void likeComment(Long userId, Long commentId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
-
+        checkDeleted(comment);
         checkIsLiked(user, comment);
         increaseLike(user, comment);
     }
@@ -35,13 +35,14 @@ public class LikeCommentService {
     public void unLikeComment(Long userId, Long commentId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
-
+        checkDeleted(comment);
         checkIsUnliked(user, comment);
         decreaseLike(user, comment);
     }
 
     @Transactional
     protected void increaseLike(User user, Comment comment) {
+        checkDeleted(comment);
         comment.increaseLike();
         Comment likedComment = commentRepository.save(comment);
         likeCommentRepository.save(new LikeComment(user, likedComment));
@@ -49,6 +50,7 @@ public class LikeCommentService {
 
     @Transactional
     protected void decreaseLike(User user, Comment comment) {
+        checkDeleted(comment);
         comment.decreaseLike();
         Comment unlikedComment = commentRepository.save(comment);
         likeCommentRepository.deleteLikeCommentByUserAndComment(user, unlikedComment);
@@ -64,5 +66,11 @@ public class LikeCommentService {
     private void checkIsUnliked(User user, Comment comment) {
         likeCommentRepository.findByUserAndComment(user, comment)
                 .orElseThrow(LikeCommentNotFoundException::new);
+    }
+
+    private void checkDeleted(Comment comment) {
+        if (comment.isDeleted()) {
+            throw new CommentNotFoundException();
+        }
     }
 }

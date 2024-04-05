@@ -37,6 +37,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query(nativeQuery = true,
             value = "SELECT comment_id as commentId, user_id as userId, post_id as postId, " +
                     "comment_like as commentLike, content as content FROM comments " +
-                    "WHERE comment_id = :commentId")
+                    "WHERE comment_id = :commentId AND deleted = false")
     CommentRequired findCommentRequired(@Param("commentId") Long commentId);
 }

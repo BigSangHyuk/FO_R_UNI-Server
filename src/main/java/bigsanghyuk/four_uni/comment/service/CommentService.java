@@ -136,6 +136,8 @@ public class CommentService {
     private void validateRequest(Long userId, Comment comment) {
         if (!userId.equals(comment.getUser().getId())) {    // 내가 단 댓글이 아니면 예외
             throw new CommentRemoveOtherUserException();
+        } else if (comment.isDeleted()) {
+            throw new CommentNotFoundException();
         } else {
             return;
         }
