@@ -15,21 +15,21 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     //categoryId가 서로 다른 글들을 동시에 조회 (필터에서 사용)
     @Query(
             nativeQuery = true,
-            value = "SELECT post_id as postId, category, title, deadline FROM Posts " +
+            value = "SELECT post_id as postId, category, title, deadline FROM posts " +
                     "WHERE category in :category"
     )
     List<PostRequired> findPostRequiredFiltered(@Param("category") List<String> categoryNames);
 
     @Query(
             nativeQuery = true,
-            value = "SELECT post_id as postId, category, title, deadline FROM Posts " +
+            value = "SELECT post_id as postId, category, title, deadline FROM posts " +
                     "WHERE is_classified = FALSE " +
                     "ORDER BY created_at DESC")
     List<PostRequired> findRequiredIsClassifiedFalse();
 
     @Query(
             nativeQuery = true,
-            value = "SELECT post_id as postId, category, title, deadline FROM Posts " +
+            value = "SELECT post_id as postId, category, title, deadline FROM posts " +
                     "WHERE ((YEAR(deadline) = :year AND MONTH(deadline) = :month) " +
                     "OR (YEAR(deadline) = :prevYear AND MONTH(deadline) = :prevMonth) " +
                     "OR (YEAR(deadline) = :nextYear AND MONTH(deadline) = :nextMonth)) " +
@@ -46,7 +46,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(
             nativeQuery = true,
-            value = "SELECT post_id as postId, category, title, deadline FROM Posts " +
+            value = "SELECT post_id as postId, category, title, deadline FROM posts " +
                     "WHERE post_id = :postId")
    PostRequired findRequiredByPostId(@Param("postId") Long postId);
 }

@@ -14,7 +14,7 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query(nativeQuery = true,
-            value = "SELECT post_id as postId FROM Comments " +
+            value = "SELECT post_id as postId FROM comments " +
                     "WHERE user_id = :userId AND deleted = FALSE " +
                     "ORDER BY comment_id DESC")
     List<CommentProfile> findCommentedPostId(@Param("userId") Long userId);
