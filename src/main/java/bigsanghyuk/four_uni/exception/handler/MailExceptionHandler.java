@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.exception.handler;
 
 import bigsanghyuk.four_uni.exception.ExceptionMessage;
+import bigsanghyuk.four_uni.exception.mail.SendMailFailureException;
 import bigsanghyuk.four_uni.exception.mail.VerificationCodeExpiredException;
 import bigsanghyuk.four_uni.exception.mail.VerificationCodeMismatchException;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 @Slf4j
 @RequiredArgsConstructor
-public class VerificationExceptionHandler {
+public class MailExceptionHandler {
 
     @ExceptionHandler(VerificationCodeExpiredException.class)
     public ResponseEntity<ExceptionMessage> handle(VerificationCodeExpiredException e) {
@@ -25,5 +26,11 @@ public class VerificationExceptionHandler {
     public ResponseEntity<ExceptionMessage> handle(VerificationCodeMismatchException e) {
         final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SendMailFailureException.class)
+    public ResponseEntity<ExceptionMessage> handle(SendMailFailureException e) {
+        final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
