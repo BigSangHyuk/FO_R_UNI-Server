@@ -198,7 +198,6 @@ public class UserService {
     @Transactional
     protected void editUser(User user, EditUserInfo editUserInfo) {
         user.edit(
-                editUserInfo.getName() == null ? user.getName() : editUserInfo.getName(),
                 editUserInfo.getDepartmentType() == null ? user.getDepartmentType() : editUserInfo.getDepartmentType(),
                 editUserInfo.getNickName() == null ? user.getNickName() : editUserInfo.getNickName(),
                 editUserInfo.getImage() == null ? user.getImage() : editUserInfo.getImage()
@@ -208,7 +207,6 @@ public class UserService {
     private EditResponse editResponseBuilder(User user) {
         return EditResponse.builder()
                 .id(user.getId())
-                .name(user.getName())
                 .departmentType(user.getDepartmentType())
                 .nickName(user.getNickName())
                 .image(user.getImage())
@@ -220,7 +218,6 @@ public class UserService {
         User user = User.builder()
                 .email(info.getEmail())
                 .password(encoder.encode(info.getPassword()))
-                .name(info.getName())
                 .departmentType(info.getDepartmentType())
                 .nickName(info.getNickName())
                 .image(info.getImage())
@@ -236,7 +233,6 @@ public class UserService {
         return LoginResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
-                .name(user.getName())
                 .departmentType(user.getDepartmentType())
                 .nickName(user.getNickName())
                 .image(user.getImage())

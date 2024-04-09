@@ -7,12 +7,11 @@ import lombok.Getter;
 @Getter
 public class EditUserRequest {
 
-    private String name;
     private CategoryType departmentType;
     private String nickName;
     private String image;
 
     public EditUserInfo toDomain() {
-        return new EditUserInfo(name, departmentType, nickName, image);
+        return new EditUserInfo(departmentType, nickName, image);
     }
 }

@@ -61,7 +61,6 @@ public class UserControllerTest {
 
         userRepository.save(User.builder()
                 .id(1L)
-                .name("test_name")
                 .email("test_email@test.com")
                 .password(passwordEncoder.encode("test1111"))
                 .departmentType(CategoryType.ISIS) // 컴퓨터 공학부
@@ -82,7 +81,6 @@ public class UserControllerTest {
         //given
         User user = User.builder()
                 .id(2L)
-                .name("test_name2")
                 .email("test_email2@test.com")
                 .password("test2222")
                 .departmentType(CategoryType.ISIS) // 컴퓨터 공학부
