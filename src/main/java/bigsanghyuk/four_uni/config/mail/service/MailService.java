@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.config.mail.service;
 
 import bigsanghyuk.four_uni.config.RedisUtil;
 import bigsanghyuk.four_uni.config.mail.domain.SendMailInfo;
+import bigsanghyuk.four_uni.exception.mail.SendMailFailureException;
 import bigsanghyuk.four_uni.exception.mail.VerificationCodeMismatchException;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -46,13 +47,12 @@ public class MailService {
         return message;
     }
 
-    public void sendMail(String code, String email) throws Exception{
+    public void sendMail(String code, String email) throws Exception {
         try {
             MimeMessage mimeMessage = createMessage(code, email);
             javaMailSender.send(mimeMessage);
         } catch (MailException e) {
-            e.printStackTrace();
-            throw new IllegalAccessException();
+            throw new SendMailFailureException();
         }
     }
 
@@ -63,9 +63,8 @@ public class MailService {
             sendMail(code, email);
             redisUtil.setDataWithExpiration(email, code);
             return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception(e);
+        } catch (MailException e) {
+            throw new SendMailFailureException();
         }
     }
 
@@ -77,7 +76,7 @@ public class MailService {
             javaMailSender.send(mimeMessage);
             return tempPw;
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new SendMailFailureException();
         }
     }
 
