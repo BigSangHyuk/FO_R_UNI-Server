@@ -1,5 +1,6 @@
 package bigsanghyuk.four_uni.config.s3.controller;
 
+import bigsanghyuk.four_uni.config.s3.dto.IcsUploadDto;
 import bigsanghyuk.four_uni.config.s3.dto.ImageUploadDto;
 import bigsanghyuk.four_uni.config.s3.service.S3Uploader;
 import bigsanghyuk.four_uni.post.service.ICalService;
@@ -43,7 +44,7 @@ public class S3Controller {
         try {
             byte[] data = iCalService.getEventInfo(postId);
             String uploadedUrl = s3Uploader.upload(data, "ics");
-            return ResponseEntity.ok().body(uploadedUrl);
+            return ResponseEntity.ok().body(new IcsUploadDto(uploadedUrl));
         } catch (IOException e) {
             log.error("Error occurred while uploading ics: ", e);
             throw new RuntimeException(e);
