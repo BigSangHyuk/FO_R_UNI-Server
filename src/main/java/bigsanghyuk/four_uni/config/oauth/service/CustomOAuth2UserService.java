@@ -35,11 +35,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, originAttributes);
         User user = saveOrUpdate(attributes);
         String email = user.getEmail();
-        List<Authority> authorities = authorityUtils.createAuthorities(email);
-        user.setRoles(authorities);
-        userRepository.save(user);
+//        List<Authority> authorities = authorityUtils.createAuthorities(email);
+//        user.setRoles(authorities);
+        User savedUser = userRepository.save(user);
 
-        return new CustomOAuth2User(registrationId, originAttributes, authorities, email);
+        return new CustomOAuth2User(registrationId, originAttributes, savedUser.getRoles(), email);
     }
 
     private User saveOrUpdate(OAuthAttributes attributes) {
@@ -55,6 +55,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                         .image(attributes.getImage())
                         .departmentType(null)   //null 이라고 생각
                         .name(attributes.getName())
+                        .roles(authorityUtils.createAuthorities(email))
                         .build());
         return userRepository.save(user);
     }
