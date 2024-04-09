@@ -10,16 +10,14 @@ public class OAuthAttributes {
 
     private Map<String, Object> attributes;
     private String nameAttributeKey;
-    private String name;
     private String nickName;
     private String email;
     private String image;
 
     @Builder
-    public OAuthAttributes(Map<String, Object> attributes, String nameAttributeKey, String name, String nickName, String email, String image) {
+    public OAuthAttributes(Map<String, Object> attributes, String nameAttributeKey, String nickName, String email, String image) {
         this.attributes = attributes;
         this.nameAttributeKey = nameAttributeKey;
-        this.name = name;
         this.nickName = nickName;
         this.email = email;
         this.image = image;
@@ -39,8 +37,7 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
-                .name((String) attributes.get("name"))
-                .nickName((String) attributes.get("displayName"))
+                .nickName((String) attributes.get("name"))
                 .email((String) attributes.get("email"))
                 .image((String) attributes.get("picture"))
                 .build();
@@ -52,7 +49,6 @@ public class OAuthAttributes {
                 .attributes(response)
                 .nameAttributeKey(userNameAttributeName)
                 .nickName((String) response.get("nickname"))
-                .name((String) response.get("name"))
                 .email((String) response.get("email"))
                 .image((String) response.get("profile_image"))
                 .build();
@@ -65,7 +61,6 @@ public class OAuthAttributes {
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
                 .nickName((String) kakaoProfile.get("nickname"))
-                .name((String) kakaoAccount.get("name"))
                 .email((String) kakaoAccount.get("email"))
                 .image((String) kakaoProfile.get("profile_image_url"))
                 .build();

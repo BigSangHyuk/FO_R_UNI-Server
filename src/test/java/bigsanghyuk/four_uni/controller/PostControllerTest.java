@@ -108,7 +108,6 @@ public class PostControllerTest {
 
         User user = userRepository.save(User.builder()
                 .id(1L)
-                .name("test_name")
                 .email("test_email@test.com")
                 .password(passwordEncoder.encode("test1111"))
                 .departmentType(CategoryType.ISIS) // 컴퓨터 공학부

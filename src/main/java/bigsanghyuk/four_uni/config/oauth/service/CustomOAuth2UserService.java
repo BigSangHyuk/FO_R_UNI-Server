@@ -47,15 +47,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         User user = userRepository.findByEmail(email)
                 .map(entity -> entity
                         .updateNickName(attributes.getNickName())
-                        .updateImage(attributes.getImage())
-                        .updateName(attributes.getName()))
+                        .updateImage(attributes.getImage()))
                 .orElse(User.builder()
                         .email(email)
                         .nickName(attributes.getNickName())
                         .image(attributes.getImage())
                         .departmentType(null)   //null 이라고 생각
-                        .name(attributes.getName())
-                        .roles(authorityUtils.createAuthorities(email))
                         .build());
         return userRepository.save(user);
     }

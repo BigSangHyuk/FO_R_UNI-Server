@@ -16,7 +16,6 @@ import java.util.List;
 public class EditResponse {
 
     private Long id;
-    private String name;
     private CategoryType departmentType;
     private String nickName;
     private String image;

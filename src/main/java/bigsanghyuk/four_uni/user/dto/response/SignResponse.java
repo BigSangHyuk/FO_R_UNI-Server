@@ -19,7 +19,6 @@ public class SignResponse {
     private Long id;
     private String email;
     private String password;
-    private String name;
     private CategoryType departmentType;
     private String nickName;
     private String image;
@@ -29,7 +28,6 @@ public class SignResponse {
         this.id = user.getId();
         this.email = user.getEmail();
         this.password = user.getPassword();
-        this.name = user.getName();
         this.departmentType = user.getDepartmentType();
         this.nickName = user.getNickName();
         this.image = user.getImage();

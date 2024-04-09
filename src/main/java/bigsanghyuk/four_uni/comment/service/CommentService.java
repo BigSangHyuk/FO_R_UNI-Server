@@ -113,7 +113,6 @@ public class CommentService {
             return UserDto.builder()
                     .userId(userRequired.getUserId())
                     .email(userRequired.getEmail())
-                    .name(userRequired.getName())
                     .nickName(userRequired.getNickName())
                     .image(userRequired.getImage())
                     .build();
