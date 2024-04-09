@@ -54,6 +54,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                         .image(attributes.getImage())
                         .departmentType(null)   //null 이라고 생각
                         .build());
+        List<Authority> authorities = authorityUtils.createAuthorities(email);
+        user.setRoles(authorities);
         return userRepository.save(user);
     }
 }
