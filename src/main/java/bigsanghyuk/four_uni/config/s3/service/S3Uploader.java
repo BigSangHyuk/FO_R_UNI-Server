@@ -3,6 +3,7 @@ package bigsanghyuk.four_uni.config.s3.service;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,6 +35,11 @@ public class S3Uploader {
         return upload(uploadFile, dirName);
     }
 
+    public String upload(byte[] data, String dirName) {
+        String fileName = dirName + "/" + UUID.randomUUID() + ".ics";
+        return putS3Ics(data, fileName);
+    }
+
     private String upload(File uploadFile, String dirName) {
         String fileName = dirName + "/" + UUID.randomUUID() + "-" + uploadFile.getName();
         String uploadImageUrl = putS3(uploadFile, fileName);
@@ -45,6 +52,17 @@ public class S3Uploader {
     private String putS3(File uploadFile, String fileName) {
         amazonS3Client.putObject(
                 new PutObjectRequest(bucket, fileName, uploadFile)
+                        .withCannedAcl(CannedAccessControlList.PublicRead)
+        );
+        return amazonS3Client.getUrl(bucket, fileName).toString();
+    }
+
+    private String putS3Ics(byte[] data, String fileName) {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setHeader("x-amz-expiration", 300);
+        amazonS3Client.putObject(
+                new PutObjectRequest(bucket, fileName, inputStream, metadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead)
         );
         return amazonS3Client.getUrl(bucket, fileName).toString();
