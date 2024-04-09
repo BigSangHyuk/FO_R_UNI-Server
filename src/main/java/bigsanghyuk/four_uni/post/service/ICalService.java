@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Date;
-import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.*;
@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Service
@@ -32,8 +34,9 @@ public class ICalService {
 
     private Calendar createEvent(Long postId) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        LocalDate deadline = post.getDeadline();
 
-        if (post.getDeadline() == null) {
+        if (deadline == null) {
             throw new DeadlineNotFoundException();
         }
 
@@ -42,7 +45,7 @@ public class ICalService {
         VAlarm alarm = new VAlarm();
 
         addProperties(event, post);
-        addAlarm(alarm, event);
+        addAlarm(alarm, event, deadline);
         addProperties(calendar, event);
 
         return calendar;
@@ -70,8 +73,10 @@ public class ICalService {
         event.getProperties().add(new Uid(UUID.randomUUID().toString()));
     }
 
-    private void addAlarm(VAlarm alarm, VEvent event) {
-        alarm.getProperties().add(new Trigger(new Dur(1, 0, 0, 0)));
+    private void addAlarm(VAlarm alarm, VEvent event, LocalDate deadline) {
+        LocalDate dayBefore = deadline.minusDays(1);
+        java.util.Date alarmDate = Date.from(dayBefore.atTime(18, 0).toInstant(ZoneOffset.ofHours(9)));
+        alarm.getProperties().add(new Trigger(new DateTime(alarmDate)));
         event.getAlarms().add(alarm);
     }
 }
