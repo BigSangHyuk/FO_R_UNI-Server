@@ -147,13 +147,14 @@ public class UserService {
 
     // Access Token 갱신
     public TokenDto refreshAccessToken(TokenDto tokenDto) throws Exception {
-        String email = jwtProvider.getEmail(tokenDto.getAccessToken());
-        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        Long userId = tokenRepository.findIdByRefreshToken(tokenDto.getRefreshToken())
+                .orElseThrow(TokenNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Token token = validRefreshToken(user, tokenDto.getRefreshToken());
         if (token != null) {
-            return tokenDtoBuilder(email, user, token);
+            return tokenDtoBuilder(user, token);
         } else {
-            throw new Exception("로그인이 필요합니다.");
+            throw new TokenNotFoundException();
         }
     }
 
@@ -244,9 +245,9 @@ public class UserService {
                 .build();
     }
 
-    private TokenDto tokenDtoBuilder(String email, User user, Token token) {
+    private TokenDto tokenDtoBuilder(User user, Token token) {
         return TokenDto.builder()
-                .accessToken(jwtProvider.createToken(email, user.getId(), user.getRoles()))
+                .accessToken(jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles()))
                 .refreshToken(token.getRefreshToken())
                 .build();
     }

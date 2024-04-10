@@ -59,11 +59,7 @@ public class JwtProvider {
 
     // 토큰에 담겨 있는 유저 Email
     public String getEmail(String token) {
-        try {
-            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
-        } catch (ExpiredJwtException e) {
-            return parseClaims(token).getSubject();
-        }
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
     // authorization 헤더에서 인증
@@ -90,11 +86,7 @@ public class JwtProvider {
     }
 
     private Claims parseClaims(String token) {
-        try {
-            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
-        }
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
 
     private HashMap<String, Object> getParsedTokenHashMap(String token) {
