@@ -10,11 +10,12 @@ import java.util.Optional;
 
 
 public interface UserRepository extends JpaRepository<User, Long> {
+
     Optional<User> findByEmail(String email);
 
     @Query(
             nativeQuery = true,
-            value = "SELECT user_id as userId, email, name, nick_name as nickName, image FROM users " +
+            value = "SELECT user_id as userId, email, nick_name as nickName, image FROM users " +
                     "WHERE user_id = :userId")
     Optional<UserRequired> getUserRequired(@Param("userId") Long userId);
 }
