@@ -147,8 +147,8 @@ public class UserService {
 
     // Access Token 갱신
     public TokenDto refreshAccessToken(TokenDto tokenDto) throws Exception {
-        Long userId = tokenRepository.findIdByRefreshToken(tokenDto.getRefreshToken())
-                .orElseThrow(TokenNotFoundException::new);
+        Long userId = tokenRepository.findByRefreshToken(tokenDto.getRefreshToken())
+                .orElseThrow(TokenNotFoundException::new).getId();
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Token token = validRefreshToken(user, tokenDto.getRefreshToken());
         if (token != null) {
