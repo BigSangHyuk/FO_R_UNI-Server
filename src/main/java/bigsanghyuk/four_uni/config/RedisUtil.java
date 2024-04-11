@@ -1,5 +1,6 @@
 package bigsanghyuk.four_uni.config;
 
+import bigsanghyuk.four_uni.exception.mail.VerificationCodeExpiredException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,12 @@ public class RedisUtil {
     private final StringRedisTemplate blackListRedisTemplate;
 
     public String getData(String email) {
-        ValueOperations<String,String> valueOperations = stringRedisTemplate.opsForValue();
-        return valueOperations.get(email);
+        ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
+        String code = valueOperations.get(email);
+        if (code == null) {
+            throw new VerificationCodeExpiredException();
+        }
+        return code;
     }
 
     public void setData(String key, String value) {

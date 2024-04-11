@@ -1,11 +1,10 @@
 package bigsanghyuk.four_uni.post.controller;
 
+import bigsanghyuk.four_uni.comment.dto.CommentDto;
 import bigsanghyuk.four_uni.common.CommonResponse;
 import bigsanghyuk.four_uni.common.Results;
-import bigsanghyuk.four_uni.comment.dto.CommentDto;
 import bigsanghyuk.four_uni.comment.service.CommentService;
 import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
-import bigsanghyuk.four_uni.post.dto.request.ScrapRequest;
 import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
 import bigsanghyuk.four_uni.post.service.PostService;
 import bigsanghyuk.four_uni.post.service.ScrappedService;
@@ -39,10 +38,10 @@ public class PostController {
 
     @Operation(summary = "게시글과 댓글 함께 조회", description = "조회하고자 하는 게시글 아이디를 경로변수로 전달, 댓글 깊이 1 고정")
     @GetMapping("/posts/{postId}")
-    public ResponseEntity<Details> getPostWithComments(@PathVariable(name = "postId") Long postId) {
+    public ResponseEntity<Detail> getPostWithComments(@PathVariable(name = "postId") Long postId) {
         GetDetailResponse detail = postService.getDetail(postId);
         List<CommentDto> comments = commentService.getAllComments(postId);
-        return ResponseEntity.ok().body(new Details(detail, comments));
+        return ResponseEntity.ok().body(new Detail(detail, comments));
     }
 
     @Operation(summary = "미분류 게시글 조회", description = "최소 항목")
@@ -95,12 +94,12 @@ public class PostController {
     }
 
     @Getter
-    public static class Details {
+    private static class Detail<T> {
 
-        private GetDetailResponse detail;
-        private List<CommentDto> comments;
+        private T detail;
+        private List<T> comments;
 
-        public Details(GetDetailResponse detail, List<CommentDto> comments) {
+        private Detail(T detail, List<T> comments) {
             this.detail = detail;
             this.comments = comments;
         }

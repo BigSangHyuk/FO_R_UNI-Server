@@ -9,7 +9,6 @@ import lombok.Getter;
 public class SignUserInfo {
     private String email;
     private String password;
-    private String name;
     private CategoryType departmentType;
     private String nickName;
     private String image;

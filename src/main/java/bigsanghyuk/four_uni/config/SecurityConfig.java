@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.config;
 
 import bigsanghyuk.four_uni.config.filter.CorsFilter;
 import bigsanghyuk.four_uni.config.filter.JwtAuthenticationFilter;
+import bigsanghyuk.four_uni.config.filter.JwtExceptionFilter;
 import bigsanghyuk.four_uni.config.interceptor.TokenInterceptor;
 import bigsanghyuk.four_uni.config.jwt.JwtProvider;
 import bigsanghyuk.four_uni.config.oauth.CustomAuthorityUtils;
@@ -13,7 +14,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -68,7 +68,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/sign-up", "/sign-in", "/refresh", "/swagger-ui/**", "/v3/api-docs/**", "/auth/**", "/healthcheck").permitAll()
                         .requestMatchers("/admins/**", "/add-post/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/users/**", "/posts/**", "/comments/**", "/reports/**", "/log-out", "/leave", "/images").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                        .requestMatchers("/users/**", "/posts/**", "/comments/**", "/reports/**", "/log-out", "/leave", "/images", "/ics").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
                         .anyRequest().denyAll())
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(new OAuth2UserSuccessHandler(jwtProvider, authorityUtils, userService, userRepository))
@@ -80,6 +80,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class)
                 // 인증 필터
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtExceptionFilter(), JwtAuthenticationFilter.class)
                 // 에러 핸들링
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint((request, response, authException) -> {

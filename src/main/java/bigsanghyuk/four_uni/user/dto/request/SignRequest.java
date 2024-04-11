@@ -14,12 +14,11 @@ public class SignRequest {
     private String email;
     @NotNull
     private String password;
-    private String name;
     private CategoryType departmentType;
     private String nickName;
     private String image;
 
     public SignUserInfo toDomain() {
-        return new SignUserInfo(email, password, name, departmentType, nickName, image);
+        return new SignUserInfo(email, password, departmentType, nickName, image);
     }
 }
