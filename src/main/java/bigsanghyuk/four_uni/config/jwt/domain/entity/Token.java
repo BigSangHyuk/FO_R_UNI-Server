@@ -1,4 +1,4 @@
-package bigsanghyuk.four_uni.config.jwt.domain;
+package bigsanghyuk.four_uni.config.jwt.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Id;

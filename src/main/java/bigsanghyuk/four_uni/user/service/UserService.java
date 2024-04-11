@@ -2,12 +2,14 @@ package bigsanghyuk.four_uni.user.service;
 
 import bigsanghyuk.four_uni.config.RedisUtil;
 import bigsanghyuk.four_uni.config.jwt.JwtProvider;
-import bigsanghyuk.four_uni.config.jwt.domain.Token;
-import bigsanghyuk.four_uni.config.jwt.domain.TokenRepository;
+import bigsanghyuk.four_uni.config.jwt.domain.AccessTokenReissueInfo;
+import bigsanghyuk.four_uni.config.jwt.domain.entity.Token;
+import bigsanghyuk.four_uni.config.jwt.repository.TokenRepository;
 import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
 import bigsanghyuk.four_uni.config.mail.domain.SendMailInfo;
 import bigsanghyuk.four_uni.config.mail.service.MailService;
 import bigsanghyuk.four_uni.config.s3.service.S3Uploader;
+import bigsanghyuk.four_uni.exception.jwt.RefreshTokenMismatchException;
 import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
 import bigsanghyuk.four_uni.exception.user.PasswordMismatchException;
@@ -132,29 +134,20 @@ public class UserService {
     }
 
     // Refresh Token 검증
-    public Token validRefreshToken(User user, String refreshToken) {
+    private Token validRefreshToken(User user, String refreshToken) {
         Token token = tokenRepository.findById(user.getId()).orElseThrow(TokenNotFoundException::new);
-        if (token.getRefreshToken() == null) {
-            return null;
-        } else {
-            if (token.getExpiration() < 30) {   //30 minutes
-                token.setExpiration(EXPIRATION_IN_MINUTES);
-                tokenRepository.save(token);
-            }
-            return !token.getRefreshToken().equals(refreshToken) ? null : token;
-        }
+        return !token.getRefreshToken().equals(refreshToken) ? null : token;
     }
 
     // Access Token 갱신
-    public TokenDto refreshAccessToken(TokenDto tokenDto) throws Exception {
-        String email = jwtProvider.getEmail(tokenDto.getAccessToken());
-        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
-        Token token = validRefreshToken(user, tokenDto.getRefreshToken());
-        if (token != null) {
-            return tokenDtoBuilder(email, user, token);
-        } else {
-            throw new Exception("로그인이 필요합니다.");
+    public TokenDto refreshAccessToken(AccessTokenReissueInfo info) {
+        User user = userRepository.findById(info.getUserId())
+                .orElseThrow(UserNotFoundException::new);
+        Token token = validRefreshToken(user, info.getRefreshToken());
+        if (token == null) {    // validRefreshToken 통과 못한 경우
+            throw new RefreshTokenMismatchException();
         }
+        return tokenDtoBuilder(user, token);
     }
 
     @Transactional
@@ -238,15 +231,17 @@ public class UserService {
                 .image(user.getImage())
                 .roles(user.getRoles())
                 .token(TokenDto.builder()
+                        .userId(user.getId())
                         .accessToken(jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles()))
                         .refreshToken(createRefreshToken(user))
                         .build())
                 .build();
     }
 
-    private TokenDto tokenDtoBuilder(String email, User user, Token token) {
+    private TokenDto tokenDtoBuilder(User user, Token token) {
         return TokenDto.builder()
-                .accessToken(jwtProvider.createToken(email, user.getId(), user.getRoles()))
+                .userId(user.getId())
+                .accessToken(jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles()))
                 .refreshToken(token.getRefreshToken())
                 .build();
     }

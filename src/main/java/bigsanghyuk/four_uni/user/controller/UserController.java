@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.user.controller;
 
 import bigsanghyuk.four_uni.common.CommonResponse;
 import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
+import bigsanghyuk.four_uni.config.jwt.dto.request.AccessTokenReissueRequest;
 import bigsanghyuk.four_uni.user.dto.request.*;
 import bigsanghyuk.four_uni.user.dto.response.EditResponse;
 import bigsanghyuk.four_uni.user.dto.response.LoginResponse;
@@ -11,7 +12,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -78,10 +78,10 @@ public class UserController {
         return ResponseEntity.ok().body(response);
     }
 
-    @Operation(summary = "토큰 재발급 요청", description = "body 에 accessToken, refreshToken 담아서 요청")
+    @Operation(summary = "access 토큰 재발급 요청", description = "body에 userId, refreshToken만 담아서 요청")
     @PatchMapping("/refresh")
-    public ResponseEntity<TokenDto> refresh(@RequestBody TokenDto tokenDto) throws Exception {
-        TokenDto newTokenDto = userService.refreshAccessToken(tokenDto);
+    public ResponseEntity<TokenDto> refresh(@RequestBody AccessTokenReissueRequest request) {
+        TokenDto newTokenDto = userService.refreshAccessToken(request.toDomain());
         return ResponseEntity.ok().body(newTokenDto);
     }
 }
