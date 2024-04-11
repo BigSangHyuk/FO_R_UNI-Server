@@ -148,4 +148,24 @@ public class UserControllerTest {
                 .andDo(print());
         assertTrue(responseBody.contains("비밀번호가 일치하지 않습니다."));
     }
+
+    @Test
+    public void 존재하지_않는_이메일로_인한_로그인_실패() throws Exception {
+        //given
+        LoginUserInfo info = new LoginUserInfo("test_email2@test.com", "test1111");
+
+        //when
+        ResultActions resultActions = mockMvc.perform(post("/sign-in")
+                .content(objectMapper.writeValueAsString(info))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+
+        MvcResult mvcResult = resultActions.andReturn();
+        String responseBody = mvcResult.getResponse().getContentAsString(UTF_8);
+
+        // then
+        resultActions.andExpect(status().is4xxClientError())
+                .andDo(print());
+        assertTrue(responseBody.contains("존재하지 않는 사용자입니다."));
+    }
 }
