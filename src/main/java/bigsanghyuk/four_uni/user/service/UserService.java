@@ -239,6 +239,7 @@ public class UserService {
                 .image(user.getImage())
                 .roles(user.getRoles())
                 .token(TokenDto.builder()
+                        .userId(user.getId())
                         .accessToken(jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles()))
                         .refreshToken(createRefreshToken(user))
                         .build())
@@ -247,6 +248,7 @@ public class UserService {
 
     private TokenDto tokenDtoBuilder(User user, Token token) {
         return TokenDto.builder()
+                .userId(user.getId())
                 .accessToken(jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles()))
                 .refreshToken(token.getRefreshToken())
                 .build();
