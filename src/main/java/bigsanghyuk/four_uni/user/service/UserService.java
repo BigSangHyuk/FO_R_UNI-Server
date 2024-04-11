@@ -2,8 +2,9 @@ package bigsanghyuk.four_uni.user.service;
 
 import bigsanghyuk.four_uni.config.RedisUtil;
 import bigsanghyuk.four_uni.config.jwt.JwtProvider;
-import bigsanghyuk.four_uni.config.jwt.domain.Token;
-import bigsanghyuk.four_uni.config.jwt.domain.TokenRepository;
+import bigsanghyuk.four_uni.config.jwt.domain.AccessTokenReissueInfo;
+import bigsanghyuk.four_uni.config.jwt.domain.entity.Token;
+import bigsanghyuk.four_uni.config.jwt.repository.TokenRepository;
 import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
 import bigsanghyuk.four_uni.config.mail.domain.SendMailInfo;
 import bigsanghyuk.four_uni.config.mail.service.MailService;
@@ -138,10 +139,10 @@ public class UserService {
     }
 
     // Access Token 갱신
-    public TokenDto refreshAccessToken(TokenDto tokenDto) {
-        User user = userRepository.findById(tokenDto.getUserId())
+    public TokenDto refreshAccessToken(AccessTokenReissueInfo info) {
+        User user = userRepository.findById(info.getUserId())
                 .orElseThrow(UserNotFoundException::new);
-        Token token = validRefreshToken(user, tokenDto.getRefreshToken());
+        Token token = validRefreshToken(user, info.getRefreshToken());
         return tokenDtoBuilder(user, token);
     }
 
