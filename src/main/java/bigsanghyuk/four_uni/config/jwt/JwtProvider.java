@@ -2,6 +2,7 @@ package bigsanghyuk.four_uni.config.jwt;
 
 import bigsanghyuk.four_uni.config.RedisUtil;
 import bigsanghyuk.four_uni.config.jwt.service.JpaUserDetailsService;
+import bigsanghyuk.four_uni.exception.StatusEnum;
 import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import io.jsonwebtoken.*;
@@ -80,8 +81,12 @@ public class JwtProvider {
             }
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
-        } catch (Exception e) {
-            return false;
+        } catch (SignatureException e) {
+            throw new JwtException(StatusEnum.WRONG_TYPE_TOKEN.getCode());
+        } catch (MalformedJwtException e) {
+            throw new JwtException(StatusEnum.MALFORMED_TOKEN.getCode());
+        } catch (ExpiredJwtException e) {
+            throw new JwtException(StatusEnum.ACCESS_TOKEN_EXPIRED.getCode());
         }
     }
 
