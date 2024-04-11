@@ -132,30 +132,17 @@ public class UserService {
     }
 
     // Refresh Token 검증
-    public Token validRefreshToken(User user, String refreshToken) {
+    private Token validRefreshToken(User user, String refreshToken) {
         Token token = tokenRepository.findById(user.getId()).orElseThrow(TokenNotFoundException::new);
-        if (token.getRefreshToken() == null) {
-            return null;
-        } else {
-            if (token.getExpiration() < 30) {   //30 minutes
-                token.setExpiration(EXPIRATION_IN_MINUTES);
-                tokenRepository.save(token);
-            }
-            return !token.getRefreshToken().equals(refreshToken) ? null : token;
-        }
+        return !token.getRefreshToken().equals(refreshToken) ? null : token;
     }
 
     // Access Token 갱신
-    public TokenDto refreshAccessToken(TokenDto tokenDto) throws Exception {
-        Long userId = tokenRepository.findByRefreshToken(tokenDto.getRefreshToken())
-                .orElseThrow(TokenNotFoundException::new).getId();
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    public TokenDto refreshAccessToken(TokenDto tokenDto) {
+        User user = userRepository.findById(tokenDto.getUserId())
+                .orElseThrow(UserNotFoundException::new);
         Token token = validRefreshToken(user, tokenDto.getRefreshToken());
-        if (token != null) {
-            return tokenDtoBuilder(user, token);
-        } else {
-            throw new TokenNotFoundException();
-        }
+        return tokenDtoBuilder(user, token);
     }
 
     @Transactional
