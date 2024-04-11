@@ -1,5 +1,6 @@
 package bigsanghyuk.four_uni.controller;
 
+import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
 import bigsanghyuk.four_uni.user.domain.SignUserInfo;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.enums.CategoryType;
@@ -85,11 +86,9 @@ public class UserControllerTest {
         //given
         SignUserInfo info = new SignUserInfo("test_email2@test.com", "test2222", CategoryType.ISIS, "test_nickname2", "test_image_url2");
 
-        String content = objectMapper.writeValueAsString(info);
-
         // when, then
         mockMvc.perform(post("/sign-up")
-                    .content(content)
+                    .content(objectMapper.writeValueAsString(info))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -101,11 +100,9 @@ public class UserControllerTest {
         //given
         SignUserInfo info = new SignUserInfo("test_email@test.com", "test2222", CategoryType.ISIS, "test_nickname3", "test_image_url3");
 
-        String content = objectMapper.writeValueAsString(info);
-
         // when
         ResultActions resultActions = mockMvc.perform(post("/sign-up")
-                .content(content)
+                .content(objectMapper.writeValueAsString(info))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
 
@@ -118,20 +115,17 @@ public class UserControllerTest {
         assertTrue(responseBody.contains("이미 존재하는 이메일입니다."));
     }
 
+    @Test
+    public void 로그인_성공() throws Exception {
+        //given
+        LoginUserInfo info = new LoginUserInfo("test_email@test.com", "test1111");
 
-//    @Test
-//    @DisplayName("로그인")
-//    public void signIn() throws Exception {
-//        //given
-//        LoginUserInfo info = new LoginUserInfo("test_email@test.com", "test1111");
-//
-//        //when, then
-//        mockMvc.perform(post("/sign-in")
-//                        .content(objectMapper.writeValueAsString(info))
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andDo(print())
-//                .andExpect(status().isOk());
-//    }
+        //when, then
+        mockMvc.perform(post("/sign-in")
+                        .content(objectMapper.writeValueAsString(info))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
 }
