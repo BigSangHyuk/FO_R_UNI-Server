@@ -9,6 +9,7 @@ import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
 import bigsanghyuk.four_uni.config.mail.domain.SendMailInfo;
 import bigsanghyuk.four_uni.config.mail.service.MailService;
 import bigsanghyuk.four_uni.config.s3.service.S3Uploader;
+import bigsanghyuk.four_uni.exception.jwt.RefreshTokenMismatchException;
 import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
 import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
 import bigsanghyuk.four_uni.exception.user.PasswordMismatchException;
@@ -143,6 +144,9 @@ public class UserService {
         User user = userRepository.findById(info.getUserId())
                 .orElseThrow(UserNotFoundException::new);
         Token token = validRefreshToken(user, info.getRefreshToken());
+        if (token == null) {    // validRefreshToken 통과 못한 경우
+            throw new RefreshTokenMismatchException();
+        }
         return tokenDtoBuilder(user, token);
     }
 
