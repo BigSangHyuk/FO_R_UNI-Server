@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.controller;
 
 import bigsanghyuk.four_uni.config.jwt.JwtProvider;
+import bigsanghyuk.four_uni.user.domain.ChangePasswordInfo;
 import bigsanghyuk.four_uni.user.domain.EditUserInfo;
 import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
 import bigsanghyuk.four_uni.user.domain.SignUserInfo;
@@ -71,6 +72,9 @@ public class UserControllerTest {
 
     @Autowired
     private WebApplicationContext wac;
+
+    @Autowired
+    private PasswordEncoder encoder;
 
     @BeforeEach
     public void init() {
@@ -206,7 +210,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void 회원_정보_수정_성공() throws Exception {
+    void 회원_정보_수정() throws Exception {
         //given
         User user = new User(3L, "test_email3@test.com", "test3333", CategoryType.ISIS, "testNickName", "testImageUrl", Collections.singletonList(Authority.builder().name("ROLE_USER").build()));
         userRepository.save(user);
@@ -227,5 +231,26 @@ public class UserControllerTest {
                 .andDo(print());
 
         assertThat(userRepository.findByNickName("testChangeNickName")).isNotEmpty();
+    }
+
+    @Test
+    void 비밀번호_변경_성공() throws Exception {
+        User user = new User(4L, "test_email4@test.com", encoder.encode("test4444"), CategoryType.ISIS, "testNickName", "testImageUrl", Collections.singletonList(Authority.builder().name("ROLE_USER").build()));
+        userRepository.save(user);
+
+        Authentication atc = new TestingAuthenticationToken("test_email4@test.com", null, "ROLE_USER");
+        String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
+
+        ChangePasswordInfo info = new ChangePasswordInfo("test4444", "newTestPassword");
+
+        //when, then
+        mockMvc.perform(patch("/users/password")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .content(objectMapper.writeValueAsString(info))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .with(authentication(atc)))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 }
