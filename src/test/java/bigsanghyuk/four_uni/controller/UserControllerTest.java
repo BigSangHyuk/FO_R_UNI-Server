@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.controller;
 
 import bigsanghyuk.four_uni.config.jwt.JwtProvider;
+import bigsanghyuk.four_uni.user.domain.EditUserInfo;
 import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
 import bigsanghyuk.four_uni.user.domain.SignUserInfo;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -36,10 +38,12 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import java.util.Collections;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -188,20 +192,43 @@ public class UserControllerTest {
         User user = new User(2L, "test_email2@test.com", "test2222", CategoryType.ISIS, "testNickName", "testImageUrl", Collections.singletonList(Authority.builder().name("ROLE_USER").build()));
         userRepository.save(user);
 
-        Authentication atc = new TestingAuthenticationToken("test_email2@test.com", null, "ROLE_ADMIN");
-
-        String accessToken = jwtProvider.createToken("test_email2@test.com", 2L, Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()));
+        Authentication atc = new TestingAuthenticationToken("test_email2@test.com", null, "ROLE_USER");
+        String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
 
         //when, then
         mockMvc.perform(delete("/leave")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .content(String.valueOf(user.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .with(authentication(atc)))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        Assertions.assertThat(userRepository.findByEmail("test_email2@test.com").isEmpty());
+    }
+
+    @Test
+    void 회원_정보_수정_성공() throws Exception {
+        //given
+        User user = new User(3L, "test_email3@test.com", "test3333", CategoryType.ISIS, "testNickName", "testImageUrl", Collections.singletonList(Authority.builder().name("ROLE_USER").build()));
+        userRepository.save(user);
+
+        Authentication atc = new TestingAuthenticationToken("test_email3@test.com", null, "ROLE_USER");
+        String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
+
+        EditUserInfo info = new EditUserInfo(CategoryType.ARCHI, "testChangeNickName", null);
+
+        //when, then
+        mockMvc.perform(patch("/users/edit")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                        .content(String.valueOf(user.getId()))
+                        .content(objectMapper.writeValueAsString(info))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .with(authentication(atc)))
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        Assertions.assertThat(userRepository.findByEmail("test_email2@test.com").isEmpty());
+        assertThat(userRepository.findByNickName("testChangeNickName")).isNotEmpty();
     }
 }
