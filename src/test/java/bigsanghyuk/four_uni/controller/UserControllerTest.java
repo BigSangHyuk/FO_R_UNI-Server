@@ -104,7 +104,7 @@ public class UserControllerTest {
         //given
         SignUserInfo info = new SignUserInfo("test_email2@test.com", "test2222", CategoryType.ISIS, "test_nickname2", "test_image_url2");
 
-        // when, then
+        //when, then
         mockMvc.perform(post("/sign-up")
                     .content(objectMapper.writeValueAsString(info))
                     .contentType(MediaType.APPLICATION_JSON)
@@ -118,7 +118,7 @@ public class UserControllerTest {
         //given
         SignUserInfo info = new SignUserInfo("test_email@test.com", "test2222", CategoryType.ISIS, "test_nickname3", "test_image_url3");
 
-        // when
+        //when
         ResultActions resultActions = mockMvc.perform(post("/sign-up")
                 .content(objectMapper.writeValueAsString(info))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -235,6 +235,7 @@ public class UserControllerTest {
 
     @Test
     void 비밀번호_변경_성공() throws Exception {
+        //given
         User user = new User(4L, "test_email4@test.com", encoder.encode("test4444"), CategoryType.ISIS, "testNickName", "testImageUrl", Collections.singletonList(Authority.builder().name("ROLE_USER").build()));
         userRepository.save(user);
 
@@ -252,5 +253,33 @@ public class UserControllerTest {
                 .with(authentication(atc)))
                 .andExpect(status().isOk())
                 .andDo(print());
+    }
+
+    @Test
+    void 이전_비밀번호_불일치로_인해_실패() throws Exception {
+        //given
+        User user = new User(4L, "test_email4@test.com", encoder.encode("test4444"), CategoryType.ISIS, "testNickName", "testImageUrl", Collections.singletonList(Authority.builder().name("ROLE_USER").build()));
+        userRepository.save(user);
+
+        Authentication atc = new TestingAuthenticationToken("test_email4@test.com", null, "ROLE_USER");
+        String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
+
+        ChangePasswordInfo info = new ChangePasswordInfo("test3333", "newTestPassword");
+
+        //when
+        ResultActions resultActions = mockMvc.perform(patch("/users/password")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .content(objectMapper.writeValueAsString(info))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .with(authentication(atc)));
+
+        MvcResult mvcResult = resultActions.andReturn();
+        String responseBody = mvcResult.getResponse().getContentAsString(UTF_8);
+
+        // then
+        resultActions.andExpect(status().is4xxClientError())
+                .andDo(print());
+        assertTrue(responseBody.contains("이전 비밀번호와 일치하지 않습니다."));
     }
 }
