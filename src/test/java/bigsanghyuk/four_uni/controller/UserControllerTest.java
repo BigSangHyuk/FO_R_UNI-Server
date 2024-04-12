@@ -282,4 +282,22 @@ public class UserControllerTest {
                 .andDo(print());
         assertTrue(responseBody.contains("이전 비밀번호와 일치하지 않습니다."));
     }
+
+    @Test
+    void 일반_유저_본인_정보_조회() throws Exception {
+        User user = new User(5L, "test_email5@test.com", encoder.encode("test5555"), CategoryType.ISIS, "testNickName", "testImageUrl", Collections.singletonList(Authority.builder().name("ROLE_USER").build()));
+        userRepository.save(user);
+
+        Authentication atc = new TestingAuthenticationToken("test_email5@test.com", null, "ROLE_USER");
+        String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
+
+        //when, then
+        mockMvc.perform(get("/users/info")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .with(authentication(atc)))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
 }
