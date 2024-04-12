@@ -1,13 +1,16 @@
 package bigsanghyuk.four_uni.controller;
 
+import bigsanghyuk.four_uni.config.jwt.JwtProvider;
 import bigsanghyuk.four_uni.user.domain.LoginUserInfo;
 import bigsanghyuk.four_uni.user.domain.SignUserInfo;
+import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.enums.CategoryType;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
 import bigsanghyuk.four_uni.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -27,8 +33,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import java.util.Collections;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -54,6 +64,9 @@ public class UserControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private JwtProvider jwtProvider;
 
     @Autowired
     private WebApplicationContext wac;
@@ -116,7 +129,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void 로그인_성공() throws Exception {
+    void 로그인_성공() throws Exception {
         //given
         LoginUserInfo info = new LoginUserInfo("test_email@test.com", "test1111");
 
@@ -130,7 +143,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void 비밀번호_불일치로_로그인_실패() throws Exception {
+    void 비밀번호_불일치로_로그인_실패() throws Exception {
         //given
         LoginUserInfo info = new LoginUserInfo("test_email@test.com", "test2222");
 
@@ -150,7 +163,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void 존재하지_않는_이메일로_인한_로그인_실패() throws Exception {
+    void 존재하지_않는_이메일로_인한_로그인_실패() throws Exception {
         //given
         LoginUserInfo info = new LoginUserInfo("test_email2@test.com", "test1111");
 
@@ -167,5 +180,28 @@ public class UserControllerTest {
         resultActions.andExpect(status().is4xxClientError())
                 .andDo(print());
         assertTrue(responseBody.contains("존재하지 않는 사용자입니다."));
+    }
+
+    @Test
+    void 탈퇴_성공() throws Exception {
+        //given
+        User user = new User(2L, "test_email2@test.com", "test2222", CategoryType.ISIS, "testNickName", "testImageUrl", Collections.singletonList(Authority.builder().name("ROLE_USER").build()));
+        userRepository.save(user);
+
+        Authentication atc = new TestingAuthenticationToken("test_email2@test.com", null, "ROLE_ADMIN");
+
+        String accessToken = jwtProvider.createToken("test_email2@test.com", 2L, Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()));
+
+        //when, then
+        mockMvc.perform(delete("/leave")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .content(String.valueOf(user.getId()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(authentication(atc)))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        Assertions.assertThat(userRepository.findByEmail("test_email2@test.com").isEmpty());
     }
 }
