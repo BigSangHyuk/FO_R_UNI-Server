@@ -90,6 +90,7 @@ public class UserControllerTest {
                 .departmentType(CategoryType.ISIS) // 컴퓨터 공학부
                 .image("test_image_url")
                 .nickName("test_nickname")
+                .roles(Collections.singletonList(Authority.builder().name("ROLE_USER").build()))
                 .build());
     }
 
@@ -285,6 +286,7 @@ public class UserControllerTest {
 
     @Test
     void 일반_유저_본인_정보_조회() throws Exception {
+        //given
         User user = new User(5L, "test_email5@test.com", encoder.encode("test5555"), CategoryType.ISIS, "testNickName", "testImageUrl", Collections.singletonList(Authority.builder().name("ROLE_USER").build()));
         userRepository.save(user);
 
