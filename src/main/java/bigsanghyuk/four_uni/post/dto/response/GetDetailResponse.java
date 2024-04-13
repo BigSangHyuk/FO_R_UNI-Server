@@ -1,6 +1,5 @@
 package bigsanghyuk.four_uni.post.dto.response;
 
-import bigsanghyuk.four_uni.user.enums.CategoryType;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -13,7 +12,7 @@ import java.util.List;
 public class GetDetailResponse {
 
     private Long id;
-    private CategoryType categoryType;
+    private String category;
     private String title;
     private String content;
     private List<String> imageUrl;

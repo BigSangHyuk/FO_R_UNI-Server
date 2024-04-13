@@ -19,7 +19,7 @@ public class SignResponse {
     private Long id;
     private String email;
     private String password;
-    private CategoryType departmentType;
+    private String department;
     private String nickName;
     private String image;
     private List<Authority> roles = new ArrayList<>();
