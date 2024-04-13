@@ -2,7 +2,6 @@ package bigsanghyuk.four_uni.user.dto.response;
 
 import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
-import bigsanghyuk.four_uni.user.enums.CategoryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +17,7 @@ public class LoginResponse {
 
     private Long id;
     private String email;
-    private CategoryType departmentType;
+    private String department;
     private String nickName;
     private String image;
     private List<Authority> roles = new ArrayList<>();

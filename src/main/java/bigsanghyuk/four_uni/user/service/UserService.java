@@ -119,7 +119,7 @@ public class UserService {
     // 유저 상세 정보 조회
     public SignResponse getUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        return new SignResponse(user);
+        return signResponseBuilder(user);
     }
 
     // Refresh Token 생성
@@ -200,7 +200,19 @@ public class UserService {
     private EditResponse editResponseBuilder(User user) {
         return EditResponse.builder()
                 .id(user.getId())
-                .departmentType(user.getDepartmentType())
+                .department(user.getDepartmentType().getValue())
+                .nickName(user.getNickName())
+                .image(user.getImage())
+                .roles(user.getRoles())
+                .build();
+    }
+
+    private SignResponse signResponseBuilder(User user) {
+        return SignResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .department(user.getDepartmentType().getValue())
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())
@@ -226,7 +238,7 @@ public class UserService {
         return LoginResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
-                .departmentType(user.getDepartmentType())
+                .department(user.getDepartmentType().getValue())
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())

@@ -173,7 +173,7 @@ public class PostService {
     private GetDetailResponse detailBuilder(Post post) {
         return GetDetailResponse.builder()
                 .id(post.getId())
-                .categoryType(post.getCategoryType())
+                .category(post.getCategoryType().getValue())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .imageUrl(post.getImageUrl())
