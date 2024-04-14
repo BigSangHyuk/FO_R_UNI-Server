@@ -10,6 +10,7 @@ import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
 import bigsanghyuk.four_uni.post.service.PostService;
+import bigsanghyuk.four_uni.post.service.ScrappedService;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.enums.CategoryType;
@@ -63,6 +64,9 @@ public class PostControllerTest {
     private PostService postService;
 
     @Autowired
+    private ScrappedService scrappedService;
+
+    @Autowired
     private PostRepository postRepository;
 
     @Autowired
@@ -106,6 +110,7 @@ public class PostControllerTest {
                         .noticeUrl("testNoticeUrl")
                 .build());
 
+        // 관리자용 유저
         User user = userRepository.save(User.builder()
                 .id(1L)
                 .email("test_email@test.com")
@@ -166,7 +171,6 @@ public class PostControllerTest {
     }
 
     @Test
-    @DisplayName("게시글과 댓글 함께 조회하는 테스트")
     void 게시글_댓글_함께_조회() throws Exception {
         //given
         Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_ADMIN");
@@ -183,29 +187,37 @@ public class PostControllerTest {
                 .andDo(print());
     }
 
-//    @Test
-//    @DisplayName("스크랩 추가 테스트")
-//    void scrapSuccess() throws Exception {
-//        //given
-//        Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_ADMIN");
-//
-//        String accessToken = jwtProvider.createToken("test_email@test.com", 1L, Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()));
-//
-//        Post post = postRepository.save(new Post(2L, CategoryType.ISIS, false, "testPostTitle2", "testContent2", Collections.singletonList("testImageUrl2"), 0, 0, false, LocalDate.now(), LocalDate.now(), "testNoticeUrl2"));
-//
-//        //when, then
-//        ResultActions actions = mockMvc.perform(post("/posts/scrap/{postId}", post.getId())
-//                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON)
-//                .with(authentication(atc))
-//        );
-//
-//        actions
-//                .andExpect(status().isOk())
-//                .andDo(print());
-//    }
-//
+    @Test
+    void 스크랩_추가_성공() throws Exception {
+        //given
+        User user = userRepository.save(User.builder()
+                .id(2L)
+                .email("test_email2@test.com")
+                .password(passwordEncoder.encode("test2222"))
+                .departmentType(CategoryType.ISIS) // 컴퓨터 공학부
+                .image("test_image_url2")
+                .nickName("test_nickname2")
+                .roles(Collections.singletonList(Authority.builder().name("ROLE_USER").build()))
+                .build());
+
+        Authentication atc = new TestingAuthenticationToken("test_email2@test.com", null, "ROLE_USER");
+        String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
+
+        Post post = postRepository.save(new Post(2L, CategoryType.ISIS, false, "testPostTitle2", "testContent2", Collections.singletonList("testImageUrl2"), 0, 0, false, LocalDate.now(), LocalDate.now(), "testNoticeUrl2"));
+
+        scrappedService.unScrap(user.getId(), post.getId()); // 해당 라인을 지우고 2번 실행 시 이미 스크랩된 글인지 아닌지 알 수 있다. -> scrappedRepository에 남아있기 때문
+        //when, then
+        mockMvc.perform(post("/posts/scrap/{postId}", post.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(authentication(atc)))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        Assertions.assertThat(scrappedRepository.findAll().contains(post.getId()));
+    }
+
 //    @Test
 //    @DisplayName("스크랩 취소 테스트")
 //    void unScrapSuccess() throws Exception {
