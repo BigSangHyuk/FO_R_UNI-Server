@@ -24,48 +24,54 @@ public class FcmService {
         String message = makeMessage(fcmSendDto);
         RestTemplate restTemplate = new RestTemplate();
 
-        /*
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + getAccessToken());
 
         HttpEntity<?> entity = new HttpEntity<>(message, headers);
-        */
 
-        HttpEntity<?> entity = new HttpEntity<>(message);
-
-        String API_URL = "<https://fcm.googleapis.com/v1/projects/fouruni-2024/messages:send>";
+        String API_URL = "https://fcm.googleapis.com/v1/projects/fouruni-2024/messages:send";
         ResponseEntity<?> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
 
-        log.info("response.getStatusCode()={}", response.getStatusCode());
         return response.getStatusCode() == HttpStatus.OK;
     }
 
     private String makeMessage(FcmSendDto fcmSendDto) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        Notification notification = Notification.builder()
-                .title(fcmSendDto.getTitle())
-                .body(fcmSendDto.getBody())
-                .image(null)
-                .build();
-        Message message = Message.builder()
-                .token(fcmSendDto.getToken())
-                .notification(notification)
-                .build();
-        FcmMessageDto messageDto = FcmMessageDto.builder()
-                .message(message)
-                .validateOnly(false).build();
+        Notification notification = notificationBuilder(fcmSendDto);
+        Message message = messageBuilder(fcmSendDto.getToken(), notification);
+        FcmMessageDto messageDto = messageDtoBuilder(message);
         return objectMapper.writeValueAsString(messageDto);
     }
 
-    /*
     private String getAccessToken() throws IOException {
         String firebaseConfigPath = "firebase/fouruni-2024-firebase-adminsdk-65ucu-8c302a7bed.json";
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
-                .createScoped(List.of("<https://www.googleapis.com/auth/cloud-platform>"));
+                .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
         googleCredentials.refreshIfExpired();
         return googleCredentials.getAccessToken().getTokenValue();
     }
-     */
+
+    private Notification notificationBuilder(FcmSendDto fcmSendDto) {
+        return Notification.builder()
+                .title(fcmSendDto.getTitle())
+                .body(fcmSendDto.getBody())
+                .image(null)
+                .build();
+    }
+
+    private Message messageBuilder(String token, Notification notification) {
+        return Message.builder()
+                .token(token)
+                .notification(notification)
+                .build();
+    }
+
+    private FcmMessageDto messageDtoBuilder(Message message) {
+        return FcmMessageDto.builder()
+                .message(message)
+                .validateOnly(false)
+                .build();
+    }
 }
