@@ -15,7 +15,7 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "FCM", description = "Push 알림 API")
+@Tag(name = "fcm", description = "Push 알림 API")
 public class FcmController {
 
     private final FcmService fcmService;
