@@ -12,7 +12,7 @@ permissions:
     pattern: "**"
     owner: ubuntu
     group: ubuntu
-    mode: +x
+    mode: 755
 
 hooks:
   AfterInstall:
