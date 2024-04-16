@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./var.sh
+source ${HOME}/var.sh
 echo "> env variable setting complete"
 
 touch crontab_delete
