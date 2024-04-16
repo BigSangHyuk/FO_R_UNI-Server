@@ -4,15 +4,15 @@ files:
   - source: /
     destination: /home/ubuntu/server/
 permissions:
-  - object: /
-    pattern: "**"
-    owner: ubuntu
-    group: ubuntu
+#  - object: /
+#    pattern: "**"
+#    owner: ubuntu
+#    group: ubuntu
   - object: scripts/start.sh
     pattern: "**"
     owner: ubuntu
     group: ubuntu
-    mode: +x
+    mode: 755
 
 hooks:
   AfterInstall:
