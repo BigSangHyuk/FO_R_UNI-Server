@@ -8,6 +8,11 @@ permissions:
     pattern: "**"
     owner: ubuntu
     group: ubuntu
+  - object: scripts/start.sh
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
+    mode: +x
 
 hooks:
   AfterInstall:
