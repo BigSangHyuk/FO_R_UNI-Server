@@ -132,8 +132,6 @@ public class PostControllerTest {
                 .commentReportCount(0)
                 .deleted(false)
                 .build());
-
-        scrappedRepository.save(new Scrapped(user, post));
     }
 
     @Test
@@ -204,16 +202,14 @@ public class PostControllerTest {
         String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
 
         Post post = postRepository.save(new Post(2L, CategoryType.ISIS, false, "testPostTitle2", "testContent2", Collections.singletonList("testImageUrl2"), 0, 0, false, LocalDate.now(), LocalDate.now(), "testNoticeUrl2"));
-
-        scrappedService.unScrap(user.getId(), post.getId()); // 해당 라인을 지우고 2번 실행 시 이미 스크랩된 글인지 아닌지 알 수 있다. -> scrappedRepository에 남아있기 때문
         //when, then
         mockMvc.perform(post("/posts/scrap/{postId}", post.getId())
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .with(authentication(atc)))
-                .andExpect(status().isOk())
-                .andDo(print());
+                        .andExpect(status().isOk())
+                        .andDo(print());
 
         Assertions.assertThat(scrappedRepository.findAll().contains(post.getId()));
     }
