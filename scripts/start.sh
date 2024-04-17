@@ -8,6 +8,9 @@ crontab crontab_delete
 rm crontab_delete
 echo "> cron delete complete"
 
+cp -r ${HOME}/properties/firebase ${HOME}/server/src/main/resources
+echo "> json 파일 복사"
+
 chmod u+x ${HOME}/server/gradlew
 echo "> gradlew 실행 권한 부여"
 
