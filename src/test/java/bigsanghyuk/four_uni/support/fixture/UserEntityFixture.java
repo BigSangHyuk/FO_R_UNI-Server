@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.List;
 
 public enum UserEntityFixture {
-    USER_ADMIN("testEmail@test.com", "testPassword", CategoryType.ISIS, "testNickName", "testImageUrl", Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build())),
-    USER_NORMAL("testEmail2@test.com", "testPassword2", CategoryType.ISIS, "testNickName2", "testImageUrl2", Collections.singletonList(Authority.builder().name("ROLE_USER").build()));
+    USER_NORMAL("test_email@test.com", "testPassword", CategoryType.ISIS, "testNickName", "testImageUrl", Collections.singletonList(Authority.builder().name("ROLE_USER").build())),
+    USER_ADMIN("test_email@test.com2", "testPassword2", CategoryType.ISIS, "testNickName2", "testImageUrl2", Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()));
 
     private final String email;
     private final String password;
