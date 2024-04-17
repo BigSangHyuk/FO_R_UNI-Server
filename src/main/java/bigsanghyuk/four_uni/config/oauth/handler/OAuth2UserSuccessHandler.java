@@ -43,7 +43,7 @@ public class OAuth2UserSuccessHandler extends SimpleUrlAuthenticationSuccessHand
 
         String accessToken = createAccessToken(email, user.getId(), authorities);
         String refreshToken = createRefreshToken(email);
-        Map<String, TokenDto> tokenDtoMap = makeTokenMap(accessToken, refreshToken);
+        Map<String, TokenDto> tokenDtoMap = makeTokenDto(user.getId(), accessToken, refreshToken);
 
         String json = toJson(tokenDtoMap);
         responseJson(response, json);
@@ -58,9 +58,10 @@ public class OAuth2UserSuccessHandler extends SimpleUrlAuthenticationSuccessHand
         return userService.createRefreshToken(user);
     }
 
-    private Map<String, TokenDto> makeTokenMap(String accessToken, String refreshToken) {
+    private Map<String, TokenDto> makeTokenDto(Long userId, String accessToken, String refreshToken) {
         HashMap<String, TokenDto> map = new HashMap<>();
         TokenDto tokenDto = TokenDto.builder()
+                .userId(userId)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
