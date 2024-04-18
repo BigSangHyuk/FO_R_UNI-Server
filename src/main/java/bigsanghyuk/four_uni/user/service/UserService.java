@@ -217,7 +217,6 @@ public class UserService {
         return SignResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
-                .password(user.getPassword())
                 .department(user.getDepartmentType().getValue())
                 .nickName(user.getNickName())
                 .image(user.getImage())
