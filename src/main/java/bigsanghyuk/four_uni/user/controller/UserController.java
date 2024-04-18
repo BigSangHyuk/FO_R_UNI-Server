@@ -12,8 +12,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,15 +54,22 @@ public class UserController {
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
-    @Operation(summary = "회원 정보 수정")
+    @Operation(summary = "회원 정보 변경")
     @PatchMapping("/users/edit")
     public ResponseEntity<EditResponse> editUser(@RequestAttribute(name = "userId") Long userId, @RequestBody EditUserRequest request) {
         EditResponse response = userService.edit(userId, request.toDomain());
         return ResponseEntity.ok().body(response);
     }
 
+    @Operation(summary = "프로필 사진 변경", description = "multipart/form-data 전송")
+    @PutMapping(value = "/users/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EditResponse> changeProfileImage(@RequestAttribute(name = "userId") Long userId, @RequestParam(name = "images") MultipartFile multipartFile) throws IOException {
+        EditResponse response = userService.changeProfileImage(userId, multipartFile);
+        return ResponseEntity.ok().body(response);
+    }
+
     @Operation(summary = "비밀번호 변경", description = "body에 이전 비밀번호 (임시 비밀번호), 신규 비밀번호 전달")
-    @PatchMapping("/users/password")
+    @PutMapping("/users/password")
     public ResponseEntity<CommonResponse> changePassword(@RequestAttribute(name = "userId") Long userId, @RequestBody ChangePasswordRequest request) {
         userService.changePassword(userId, request.toDomain());
         return ResponseEntity.ok().body(new CommonResponse(true));

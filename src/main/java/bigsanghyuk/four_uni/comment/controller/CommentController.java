@@ -30,28 +30,28 @@ public class CommentController {
     @PostMapping("/comments")
     public ResponseEntity<CommonResponse> register(@RequestAttribute(name = "userId") Long userId, @Valid @RequestBody RegisterCommentRequest request) {
         commentService.write(userId, request.toDomain());
-        return new ResponseEntity<>(new CommonResponse(true), HttpStatus.OK);
+        return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
     @Operation(summary = "댓글 수정", description = "Body에 postId, commentId, 수정 내용 넣어서 전달")
-    @PatchMapping("/comments")
+    @PutMapping("/comments")
     public ResponseEntity<CommonResponse> edit(@RequestAttribute(name = "userId") Long userId, @Valid @RequestBody EditCommentRequest request) {
         commentService.edit(userId, request.toDomain());
-        return new ResponseEntity<>(new CommonResponse(true), HttpStatus.OK);
+        return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
     @Operation(summary = "댓글 삭제", description = "Body에 postId, commentId 넣어서 전달")
     @DeleteMapping("/comments")
     public ResponseEntity<CommonResponse> remove(@RequestAttribute(name = "userId") Long userId, @Valid @RequestBody DeleteCommentRequest request) {
         commentService.remove(userId, request.toDomain());
-        return new ResponseEntity<>(new CommonResponse(true), HttpStatus.OK);
+        return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
     @Operation(summary = "댓글 좋아요", description = "Body에 commentId 넣어서 전달")
     @PostMapping("/comments/like/{commentId}")
     public ResponseEntity<CommonResponse> likeComment(@RequestAttribute(name = "userId") Long userId, @PathVariable(name = "commentId") Long commentId) {
         likeCommentService.likeComment(userId, commentId);
-        return new ResponseEntity<>(new CommonResponse(true), HttpStatus.OK);
+        return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
     @Operation(summary = "댓글 좋아요 취소", description = "Body에 commentId 넣어서 전달")

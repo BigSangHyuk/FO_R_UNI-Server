@@ -33,10 +33,9 @@ public class User extends BaseTimeEntity {
     @Builder.Default
     private List<Authority> roles = new ArrayList<>();
 
-    public void edit(CategoryType departmentType, String nickName, String image) {
+    public void edit(CategoryType departmentType, String nickName) {
         this.departmentType = departmentType;
         this.nickName = nickName;
-        this.image = image;
     }
 
     public void setRoles(List<Authority> role) {

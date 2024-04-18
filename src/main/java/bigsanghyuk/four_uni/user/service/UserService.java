@@ -11,10 +11,7 @@ import bigsanghyuk.four_uni.config.mail.service.MailService;
 import bigsanghyuk.four_uni.config.s3.service.S3Uploader;
 import bigsanghyuk.four_uni.exception.jwt.RefreshTokenMismatchException;
 import bigsanghyuk.four_uni.exception.jwt.TokenNotFoundException;
-import bigsanghyuk.four_uni.exception.user.EmailDuplicateException;
-import bigsanghyuk.four_uni.exception.user.PasswordMismatchException;
-import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
-import bigsanghyuk.four_uni.exception.user.WrongPasswordException;
+import bigsanghyuk.four_uni.exception.user.*;
 import bigsanghyuk.four_uni.user.domain.*;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
@@ -30,7 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -71,16 +70,25 @@ public class UserService {
     @Transactional
     public EditResponse edit(Long userId, EditUserInfo info) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-
-        if (info.getImage() != null) {  // 새로운 이미지 등록 요청이 있고 이전 이미지가 s3에 업로드 되있었다면
-            String oldImageUrl = user.getImage();
-            s3Uploader.delete(oldImageUrl); // s3의 이미지 삭제
-            user.updateImage(null);
-        }
         editUser(user, info);
         User savedUser = userRepository.save(user);
-
         return editResponseBuilder(savedUser);
+    }
+
+    @Transactional
+    public EditResponse changeProfileImage(Long userId, MultipartFile file) throws IOException {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        String uploadedUrl = s3Uploader.upload(file, "static");
+        deleteOldImageInS3(user);
+        user.updateImage(uploadedUrl);
+        User savedUser = userRepository.save(user);
+        return editResponseBuilder(savedUser);
+    }
+
+    private void deleteOldImageInS3(User user) {
+        String oldImageUrl = user.getImage(); // 새로운 이미지 등록 요청이 있고 이전 이미지가 s3에 업로드 되있었다면
+        s3Uploader.delete(oldImageUrl); // 기존 s3의 이미지 (이전 프로필 사진) 삭제
+        user.updateImage(null);
     }
 
     // 로그인
@@ -192,8 +200,7 @@ public class UserService {
     protected void editUser(User user, EditUserInfo editUserInfo) {
         user.edit(
                 editUserInfo.getDepartmentType() == null ? user.getDepartmentType() : editUserInfo.getDepartmentType(),
-                editUserInfo.getNickName() == null ? user.getNickName() : editUserInfo.getNickName(),
-                editUserInfo.getImage() == null ? user.getImage() : editUserInfo.getImage()
+                editUserInfo.getNickName() == null ? user.getNickName() : editUserInfo.getNickName()
         );
     }
 
@@ -211,7 +218,6 @@ public class UserService {
         return SignResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
-                .password(user.getPassword())
                 .department(user.getDepartmentType().getValue())
                 .nickName(user.getNickName())
                 .image(user.getImage())
