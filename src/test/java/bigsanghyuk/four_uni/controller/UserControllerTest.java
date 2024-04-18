@@ -272,7 +272,7 @@ public class UserControllerTest {
         ChangePasswordInfo info = new ChangePasswordInfo(user.getPassword(), passwordEncoder.encode("newPassword"));
 
         //when
-        ResultActions resultActions = mockMvc.perform(patch("/users/password")
+        ResultActions resultActions = mockMvc.perform(put("/users/password")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .content(objectMapper.writeValueAsString(info))
                 .contentType(MediaType.APPLICATION_JSON)
