@@ -76,12 +76,13 @@ public class UserService {
     }
 
     @Transactional
-    public void changeProfileImage(Long userId, MultipartFile file) throws IOException {
+    public EditResponse changeProfileImage(Long userId, MultipartFile file) throws IOException {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         String uploadedUrl = s3Uploader.upload(file, "static");
         deleteOldImageInS3(user);
         user.updateImage(uploadedUrl);
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return editResponseBuilder(savedUser);
     }
 
     private void deleteOldImageInS3(User user) {

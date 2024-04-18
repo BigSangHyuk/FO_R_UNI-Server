@@ -62,10 +62,10 @@ public class UserController {
     }
 
     @Operation(summary = "프로필 사진 변경", description = "multipart/form-data 전송")
-    @PatchMapping(value = "/users/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CommonResponse> changeProfileImage(@RequestAttribute(name = "userId") Long userId, @RequestParam(name = "images") MultipartFile multipartFile) throws IOException {
-        userService.changeProfileImage(userId, multipartFile);
-        return ResponseEntity.ok().body(new CommonResponse(true));
+    @PutMapping(value = "/users/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EditResponse> changeProfileImage(@RequestAttribute(name = "userId") Long userId, @RequestParam(name = "images") MultipartFile multipartFile) throws IOException {
+        EditResponse response = userService.changeProfileImage(userId, multipartFile);
+        return ResponseEntity.ok().body(response);
     }
 
     @Operation(summary = "비밀번호 변경", description = "body에 이전 비밀번호 (임시 비밀번호), 신규 비밀번호 전달")
