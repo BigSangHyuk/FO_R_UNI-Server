@@ -218,7 +218,7 @@ public class UserControllerTest {
         Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_USER");
         String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
 
-        EditUserInfo info = new EditUserInfo(CategoryType.ARCHI, "testChangeNickName", null);
+        EditUserInfo info = new EditUserInfo(CategoryType.ARCHI, "testChangeNickName");
 
         //when, then
         mockMvc.perform(patch("/users/edit")

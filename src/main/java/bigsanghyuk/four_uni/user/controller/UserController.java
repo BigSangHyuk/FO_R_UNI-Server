@@ -3,6 +3,7 @@ package bigsanghyuk.four_uni.user.controller;
 import bigsanghyuk.four_uni.common.CommonResponse;
 import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
 import bigsanghyuk.four_uni.config.jwt.dto.request.AccessTokenReissueRequest;
+import bigsanghyuk.four_uni.config.s3.service.S3Uploader;
 import bigsanghyuk.four_uni.user.dto.request.*;
 import bigsanghyuk.four_uni.user.dto.response.EditResponse;
 import bigsanghyuk.four_uni.user.dto.response.LoginResponse;
@@ -12,8 +13,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final S3Uploader s3Uploader;
 
     @Operation(summary = "회원 등록")
     @PostMapping("/sign-up")
@@ -55,6 +61,13 @@ public class UserController {
     public ResponseEntity<EditResponse> editUser(@RequestAttribute(name = "userId") Long userId, @RequestBody EditUserRequest request) {
         EditResponse response = userService.edit(userId, request.toDomain());
         return ResponseEntity.ok().body(response);
+    }
+
+    @Operation(summary = "프로필 사진 변경", description = "multipart/form-data 전송")
+    @PatchMapping(value = "/users/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CommonResponse> changeProfileImage(@RequestAttribute(name = "userId") Long userId, @RequestParam(name = "images") MultipartFile multipartFile) throws IOException {
+        userService.changeProfileImage(userId, multipartFile);
+        return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
     @Operation(summary = "비밀번호 변경", description = "body에 이전 비밀번호 (임시 비밀번호), 신규 비밀번호 전달")
