@@ -3,7 +3,6 @@ package bigsanghyuk.four_uni.user.controller;
 import bigsanghyuk.four_uni.common.CommonResponse;
 import bigsanghyuk.four_uni.config.jwt.dto.TokenDto;
 import bigsanghyuk.four_uni.config.jwt.dto.request.AccessTokenReissueRequest;
-import bigsanghyuk.four_uni.config.s3.service.S3Uploader;
 import bigsanghyuk.four_uni.user.dto.request.*;
 import bigsanghyuk.four_uni.user.dto.response.EditResponse;
 import bigsanghyuk.four_uni.user.dto.response.LoginResponse;
@@ -26,7 +25,6 @@ import java.io.IOException;
 public class UserController {
 
     private final UserService userService;
-    private final S3Uploader s3Uploader;
 
     @Operation(summary = "회원 등록")
     @PostMapping("/sign-up")
@@ -56,7 +54,7 @@ public class UserController {
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
-    @Operation(summary = "회원 정보 수정")
+    @Operation(summary = "회원 정보 변경")
     @PatchMapping("/users/edit")
     public ResponseEntity<EditResponse> editUser(@RequestAttribute(name = "userId") Long userId, @RequestBody EditUserRequest request) {
         EditResponse response = userService.edit(userId, request.toDomain());
@@ -71,7 +69,7 @@ public class UserController {
     }
 
     @Operation(summary = "비밀번호 변경", description = "body에 이전 비밀번호 (임시 비밀번호), 신규 비밀번호 전달")
-    @PatchMapping("/users/password")
+    @PutMapping("/users/password")
     public ResponseEntity<CommonResponse> changePassword(@RequestAttribute(name = "userId") Long userId, @RequestBody ChangePasswordRequest request) {
         userService.changePassword(userId, request.toDomain());
         return ResponseEntity.ok().body(new CommonResponse(true));
