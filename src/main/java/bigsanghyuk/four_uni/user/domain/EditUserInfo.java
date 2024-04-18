@@ -10,5 +10,4 @@ public class EditUserInfo {
 
     private CategoryType departmentType;
     private String nickName;
-    private String image;
 }

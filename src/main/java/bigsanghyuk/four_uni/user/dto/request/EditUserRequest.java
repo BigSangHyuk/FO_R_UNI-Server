@@ -9,9 +9,8 @@ public class EditUserRequest {
 
     private CategoryType departmentType;
     private String nickName;
-    private String image;
 
     public EditUserInfo toDomain() {
-        return new EditUserInfo(departmentType, nickName, image);
+        return new EditUserInfo(departmentType, nickName);
     }
 }

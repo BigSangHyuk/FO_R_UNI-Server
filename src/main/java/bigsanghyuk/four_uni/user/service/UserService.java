@@ -70,15 +70,8 @@ public class UserService {
     @Transactional
     public EditResponse edit(Long userId, EditUserInfo info) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-
-        if (info.getImage() != null) {  // 새로운 이미지 등록 요청이 있고 이전 이미지가 s3에 업로드 되있었다면
-            String oldImageUrl = user.getImage();
-            s3Uploader.delete(oldImageUrl); // s3의 이미지 삭제
-            user.updateImage(null);
-        }
         editUser(user, info);
         User savedUser = userRepository.save(user);
-
         return editResponseBuilder(savedUser);
     }
 
@@ -206,8 +199,7 @@ public class UserService {
     protected void editUser(User user, EditUserInfo editUserInfo) {
         user.edit(
                 editUserInfo.getDepartmentType() == null ? user.getDepartmentType() : editUserInfo.getDepartmentType(),
-                editUserInfo.getNickName() == null ? user.getNickName() : editUserInfo.getNickName(),
-                editUserInfo.getImage() == null ? user.getImage() : editUserInfo.getImage()
+                editUserInfo.getNickName() == null ? user.getNickName() : editUserInfo.getNickName()
         );
     }
 
