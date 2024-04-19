@@ -7,8 +7,9 @@ import bigsanghyuk.four_uni.config.jwt.JwtProvider;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
-import bigsanghyuk.four_uni.post.service.PostService;
 import bigsanghyuk.four_uni.post.service.ScrappedService;
+import bigsanghyuk.four_uni.support.fixture.PostEntityFixture;
+import bigsanghyuk.four_uni.support.fixture.UserEntityFixture;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.enums.CategoryType;
@@ -61,9 +62,6 @@ public class PostControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private PostService postService;
-
-    @Autowired
     private ScrappedService scrappedService;
 
     @Autowired
@@ -94,50 +92,14 @@ public class PostControllerTest {
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
-
-        postRepository.save(Post.builder()
-                        .id(1L)
-                        .categoryType(CategoryType.ISIS)
-                        .reported(false)
-                        .title("testPostTitle")
-                        .content("testContent")
-                        .imageUrl(Collections.singletonList("testImageUrl"))
-                        .views(0)
-                        .postReportCount(0)
-                        .isClassified(false)
-                        .postedAt(LocalDate.now())
-                        .deadline(LocalDate.now())
-                        .noticeUrl("testNoticeUrl")
-                .build());
-
-        User user = userRepository.save(User.builder()
-                .id(1L)
-                .email("test_email@test.com")
-                .password(passwordEncoder.encode("test1111"))
-                .departmentType(CategoryType.ISIS) // 컴퓨터 공학부
-                .image("test_image_url")
-                .nickName("test_nickname")
-                .roles(Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()))
-                .build());
-
-        commentRepository.save(Comment.builder()
-                .id(1L)
-                .user(user)
-                .postId(1L)
-                .reported(false)
-                .parent(null)
-                .commentLike(0)
-                .content("testComment")
-                .commentReportCount(0)
-                .deleted(false)
-                .build());
     }
 
     @Test
     void 게시글_등록() throws Exception {
         //given
+        User user = userRepository.save(new User(1L, "test_email@test.com", passwordEncoder.encode("test2222"), CategoryType.ISIS, "test_nickname3", "test_image_url3", Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build())));
         Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_ADMIN");
-        String accessToken = jwtProvider.createToken("test_email@test.com", 1L, Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()));
+        String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()));
 
         String testData =
                 "[\n" +
@@ -170,21 +132,13 @@ public class PostControllerTest {
     @Test
     void 게시글_댓글_함께_조회() throws Exception {
         //given
-        User user = userRepository.save(User.builder()
-                .id(2L)
-                .email("test_email2@test.com")
-                .password(passwordEncoder.encode("test2222"))
-                .departmentType(CategoryType.ISIS) // 컴퓨터 공학부
-                .image("test_image_url2")
-                .nickName("test_nickname2")
-                .roles(Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()))
-                .build());
+        User user = userRepository.save(UserEntityFixture.USER_NORMAL.UserEntity_생성());
 
-        Authentication atc = new TestingAuthenticationToken("test_email2@test.com", null, "ROLE_ADMIN");
+        Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_USER");
         String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
 
-        Post post = postRepository.save(new Post(2L, CategoryType.ISIS, false, "testPostTitle4", "testContent4", Collections.singletonList("testImageUrl4"), 0, 0, false, LocalDate.now(), LocalDate.now(), "testNoticeUrl4"));
-        commentRepository.save(new Comment(2L, user, post.getId(), false, null, 0, "testContent", 0, false));
+        Post post = postRepository.save(PostEntityFixture.POST_ISIS.PostEntity_생성());
+        commentRepository.save(new Comment(1L, user, post.getId(), false, null, 0, "testContent", 0, false));
 
         //when, then
         mockMvc.perform(get("/posts/{postId}", post.getId())

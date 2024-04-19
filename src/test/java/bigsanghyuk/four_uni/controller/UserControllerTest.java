@@ -57,9 +57,6 @@ public class UserControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
