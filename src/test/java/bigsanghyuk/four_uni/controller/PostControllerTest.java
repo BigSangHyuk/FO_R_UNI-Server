@@ -237,6 +237,30 @@ public class PostControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    void 댓글_남긴_글_조회() throws Exception {
+        //given
+        User user = userRepository.save(UserEntityFixture.USER_NORMAL.UserEntity_생성(7L));
+
+        Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_USER");
+        String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
+
+        Post postIs = postRepository.save(PostEntityFixture.POST_ISIS.PostEntity_생성());
+        commentRepository.save(new Comment(2L, user, postIs.getId(), false, null, 0, "testContent", 0, false));
+
+        Post postAcademy = postRepository.save(PostEntityFixture.POST_ACADEMY.PostEntity_생성());
+        commentRepository.save(new Comment(3L, user, postAcademy.getId(), false, null, 3, "testContent2", 0, false));
+
+        //when, then
+        mockMvc.perform(get("/posts/commented")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(authentication(atc)))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
 /*
 사용할 Json 형태의 게시글
 [
