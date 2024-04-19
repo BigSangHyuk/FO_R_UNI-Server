@@ -5,7 +5,6 @@ import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.config.TestSecurityConfig;
 import bigsanghyuk.four_uni.config.jwt.JwtProvider;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
-import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
 import bigsanghyuk.four_uni.post.service.ScrappedService;
@@ -131,7 +130,7 @@ public class PostControllerTest {
         Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_USER");
         String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
 
-        Post post = postRepository.save(PostEntityFixture.POST_ISIS.PostEntity_생성(2L));
+        Post post = postRepository.save(PostEntityFixture.POST_ISIS.PostEntity_생성());
         commentRepository.save(new Comment(1L, user, post.getId(), false, null, 0, "testContent", 0, false));
 
         //when, then
@@ -152,7 +151,7 @@ public class PostControllerTest {
         Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_USER");
         String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
 
-        Post post = postRepository.save(PostEntityFixture.POST_ISIS.PostEntity_생성(3L));
+        Post post = postRepository.save(PostEntityFixture.POST_ISIS.PostEntity_생성());
 
         //when, then
         mockMvc.perform(post("/posts/scrap/{postId}", post.getId())
@@ -174,7 +173,7 @@ public class PostControllerTest {
         Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_USER");
         String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
 
-        Post post = postRepository.save(PostEntityFixture.POST_ACADEMY.PostEntity_생성(4L));
+        Post post = postRepository.save(PostEntityFixture.POST_ACADEMY.PostEntity_생성());
         scrappedService.scrap(user.getId(), post.getId());
 
         //when
@@ -202,7 +201,7 @@ public class PostControllerTest {
         Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_USER");
         String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
 
-        Post post = postRepository.save(PostEntityFixture.POST_ACADEMY.PostEntity_생성(5L));
+        Post post = postRepository.save(PostEntityFixture.POST_ACADEMY.PostEntity_생성());
         scrappedService.scrap(user.getId(), post.getId());
 
         //when, then
@@ -215,6 +214,27 @@ public class PostControllerTest {
                 .andDo(print());
 
         Assertions.assertThat(scrappedRepository.findAll().isEmpty());
+    }
+
+    @Test
+    void 게시글_필터_조회() throws Exception {
+        //given
+        User user = userRepository.save(UserEntityFixture.USER_NORMAL.UserEntity_생성(6L));
+
+        Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_USER");
+        String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
+
+        postRepository.save(PostEntityFixture.POST_ACADEMY.PostEntity_생성());
+        postRepository.save(PostEntityFixture.POST_ACADEMY_2.PostEntity_생성());
+
+        //when, then
+        mockMvc.perform(get("/posts/filtered?id=246")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(authentication(atc)))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
 /*
