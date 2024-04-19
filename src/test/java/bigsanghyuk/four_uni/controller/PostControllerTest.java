@@ -176,20 +176,12 @@ public class PostControllerTest {
     @Test
     void 이미_스크랩한_글_예외() throws Exception {
         //given
-        User user = userRepository.save(User.builder()
-                .id(4L)
-                .email("test_email4@test.com")
-                .password(passwordEncoder.encode("test4444"))
-                .departmentType(CategoryType.ISIS) // 컴퓨터 공학부
-                .image("test_image_url4")
-                .nickName("test_nickname4")
-                .roles(Collections.singletonList(Authority.builder().name("ROLE_USER").build()))
-                .build());
+        User user = userRepository.save(UserEntityFixture.USER_NORMAL.UserEntity_생성(4L));
 
-        Authentication atc = new TestingAuthenticationToken("test_email4@test.com", null, "ROLE_USER");
+        Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_USER");
         String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
 
-        Post post = postRepository.save(new Post(4L, CategoryType.ISIS, false, "testPostTitle4", "testContent4", Collections.singletonList("testImageUrl4"), 0, 0, false, LocalDate.now(), LocalDate.now(), "testNoticeUrl4"));
+        Post post = postRepository.save(PostEntityFixture.POST_ACADEMY.PostEntity_생성(4L));
         scrappedService.scrap(user.getId(), post.getId());
 
         //when
