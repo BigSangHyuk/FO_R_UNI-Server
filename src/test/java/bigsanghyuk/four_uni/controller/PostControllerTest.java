@@ -5,6 +5,7 @@ import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.config.TestSecurityConfig;
 import bigsanghyuk.four_uni.config.jwt.JwtProvider;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
+import bigsanghyuk.four_uni.post.domain.entity.Scrapped;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
 import bigsanghyuk.four_uni.post.service.ScrappedService;
@@ -42,8 +43,7 @@ import java.util.Collections;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -194,27 +194,28 @@ public class PostControllerTest {
                 .andDo(print());
         assertTrue(responseBody.contains("이미 스크랩한 글입니다."));
     }
+    @Test
+    void 스크랩_취소_테스트() throws Exception {
+        //given
+        User user = userRepository.save(UserEntityFixture.USER_NORMAL.UserEntity_생성(5L));
 
-//    @Test
-//    @DisplayName("스크랩 취소 테스트")
-//    void unScrapSuccess() throws Exception {
-//        //given
-//        Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_ADMIN");
-//
-//        String accessToken = jwtProvider.createToken("test_email@test.com", 1L, Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()));
-//
-//        //when, then
-//        ResultActions actions = mockMvc.perform(delete("/posts/unscrap/{postId}", 1)
-//                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON)
-//                .with(authentication(atc))
-//        );
-//
-//        actions
-//                .andExpect(status().isOk())
-//                .andDo(print());
-//    }
+        Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_USER");
+        String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
+
+        Post post = postRepository.save(PostEntityFixture.POST_ACADEMY.PostEntity_생성(5L));
+        scrappedService.scrap(user.getId(), post.getId());
+
+        //when, then
+        mockMvc.perform(delete("/posts/unscrap/{postId}", post.getId())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .with(authentication(atc)))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        Assertions.assertThat(scrappedRepository.findAll().isEmpty());
+    }
 
 /*
 사용할 Json 형태의 게시글
