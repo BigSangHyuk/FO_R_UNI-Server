@@ -12,11 +12,9 @@ import bigsanghyuk.four_uni.support.fixture.PostEntityFixture;
 import bigsanghyuk.four_uni.support.fixture.UserEntityFixture;
 import bigsanghyuk.four_uni.user.domain.entity.Authority;
 import bigsanghyuk.four_uni.user.domain.entity.User;
-import bigsanghyuk.four_uni.user.enums.CategoryType;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +27,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -40,7 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
-import java.time.LocalDate;
 import java.util.Collections;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -76,9 +72,6 @@ public class PostControllerTest {
 
     @Autowired
     private ScrappedRepository scrappedRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
     
     @Autowired
     private JwtProvider jwtProvider;
