@@ -16,6 +16,7 @@ import bigsanghyuk.four_uni.user.enums.CategoryType;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -97,7 +98,7 @@ public class PostControllerTest {
     @Test
     void 게시글_등록() throws Exception {
         //given
-        User user = userRepository.save(new User(1L, "test_email@test.com", passwordEncoder.encode("test2222"), CategoryType.ISIS, "test_nickname3", "test_image_url3", Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build())));
+        User user = userRepository.save(UserEntityFixture.USER_ADMIN.UserEntity_생성(1L));
         Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_ADMIN");
         String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), Collections.singletonList(Authority.builder().name("ROLE_ADMIN").build()));
 
@@ -132,12 +133,12 @@ public class PostControllerTest {
     @Test
     void 게시글_댓글_함께_조회() throws Exception {
         //given
-        User user = userRepository.save(UserEntityFixture.USER_NORMAL.UserEntity_생성());
+        User user = userRepository.save(UserEntityFixture.USER_NORMAL.UserEntity_생성(2L));
 
         Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_USER");
         String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
 
-        Post post = postRepository.save(PostEntityFixture.POST_ISIS.PostEntity_생성());
+        Post post = postRepository.save(PostEntityFixture.POST_ISIS.PostEntity_생성(2L));
         commentRepository.save(new Comment(1L, user, post.getId(), false, null, 0, "testContent", 0, false));
 
         //when, then
@@ -153,20 +154,12 @@ public class PostControllerTest {
     @Test
     void 스크랩_추가_성공() throws Exception {
         //given
-        User user = userRepository.save(User.builder()
-                .id(3L)
-                .email("test_email3@test.com")
-                .password(passwordEncoder.encode("test3333"))
-                .departmentType(CategoryType.ISIS) // 컴퓨터 공학부
-                .image("test_image_url3")
-                .nickName("test_nickname3")
-                .roles(Collections.singletonList(Authority.builder().name("ROLE_USER").build()))
-                .build());
+        User user = userRepository.save(UserEntityFixture.USER_NORMAL.UserEntity_생성(3L));
 
-        Authentication atc = new TestingAuthenticationToken("test_email3@test.com", null, "ROLE_USER");
+        Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_USER");
         String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
 
-        Post post = postRepository.save(new Post(3L, CategoryType.ISIS, false, "testPostTitle3", "testContent3", Collections.singletonList("testImageUrl3"), 0, 0, false, LocalDate.now(), LocalDate.now(), "testNoticeUrl3"));
+        Post post = postRepository.save(PostEntityFixture.POST_ISIS.PostEntity_생성(3L));
 
         //when, then
         mockMvc.perform(post("/posts/scrap/{postId}", post.getId())
