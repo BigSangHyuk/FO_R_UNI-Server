@@ -12,6 +12,7 @@ import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
 import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
+import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.enums.CategoryType;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -68,6 +69,20 @@ public class PostService {
         List<Long> categoryIds = stringToCategoryIds(ids);
         List<String> categoryNames = getCategoryNames(categoryIds);
         return postRepository.findPostRequiredFiltered(categoryNames);
+    }
+
+    public List<PostRequired> getFilteredRequiredByMonth(String date, String ids, Long userId) {
+        List<Long> categoryIds = new ArrayList<>();
+        if (ids != null) {
+            categoryIds = stringToCategoryIds(ids);
+        }
+        if (userId != null) {
+            Long userDeptId = getUserDeptId(userId);
+            categoryIds.add(userDeptId);
+        }
+        List<String> categoryNames = getCategoryNames(categoryIds);
+        Map<String, Integer> map = makeDateMap(date);
+        return postRepository.findFiltered(categoryNames, map.get("year"), map.get("month"));
     }
 
     public List<PostRequired> getScrappedRequired(Long userId) {
@@ -194,6 +209,19 @@ public class PostService {
             infos.add(found);
         }
         return infos;
+    }
+
+    private Map<String, Integer> makeDateMap(String date) {
+        HashMap<String, Integer> map = new HashMap<>();
+        String[] yearAndMonth = date.split("-");
+        map.put("year", Integer.parseInt(yearAndMonth[0]));
+        map.put("month", Integer.parseInt(yearAndMonth[1]));
+        return map;
+    }
+
+    private Long getUserDeptId(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        return Long.valueOf(user.getDepartmentType().getId());
     }
 
     @Getter

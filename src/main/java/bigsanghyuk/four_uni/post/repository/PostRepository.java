@@ -23,6 +23,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(
             nativeQuery = true,
             value = "SELECT post_id as postId, category, title, deadline FROM posts " +
+                    "WHERE category in :category " +
+                    "AND YEAR(deadline) = :year AND MONTH(deadline) = :month " +
+                    "AND is_classified = TRUE " +
+                    "ORDER BY deadline"
+    )
+    List<PostRequired> findFiltered(@Param("category") List<String> categoryNames, @Param("year") int year, @Param("month") int month);
+
+    @Query(
+            nativeQuery = true,
+            value = "SELECT post_id as postId, category, title, deadline FROM posts " +
                     "WHERE is_classified = FALSE " +
                     "ORDER BY created_at DESC")
     List<PostRequired> findRequiredIsClassifiedFalse();
