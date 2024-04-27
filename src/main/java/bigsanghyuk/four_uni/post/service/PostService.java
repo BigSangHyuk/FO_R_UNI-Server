@@ -10,6 +10,7 @@ import bigsanghyuk.four_uni.post.domain.entity.ScrappedRequired;
 import bigsanghyuk.four_uni.post.dto.request.RegisterPostRequest;
 import bigsanghyuk.four_uni.post.dto.response.GetDetailResponse;
 import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
+import bigsanghyuk.four_uni.post.dto.response.GetRequiredResponse;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
 import bigsanghyuk.four_uni.user.domain.entity.User;
@@ -56,8 +57,9 @@ public class PostService {
         return success;
     }
 
-    public List<PostRequired> getUnclassifiedRequired() {
-        return postRepository.findRequiredIsClassifiedFalse();
+    public List<GetRequiredResponse> getUnclassifiedRequired() {
+        List<PostRequired> required = postRepository.findRequiredIsClassifiedFalse();
+        return convertToDto(required);
     }
 
     public GetDetailResponse getDetail(Long postId) {
@@ -65,7 +67,7 @@ public class PostService {
         return detailBuilder(post);
     }
 
-    public List<PostRequired> getFilteredRequiredByMonth(String date, String ids, Long userId) {
+    public List<GetRequiredResponse> getFilteredRequiredByMonth(String date, String ids, Long userId) {
         List<Long> categoryIds = new ArrayList<>();
         if (ids != null) {
             categoryIds = stringToCategoryIds(ids);
@@ -76,22 +78,26 @@ public class PostService {
         }
         List<String> categoryNames = getCategoryNames(categoryIds);
         Map<String, Integer> map = makeDateMap(date);
-        return postRepository.findFiltered(categoryNames, map.get("year"), map.get("month"));
+        List<PostRequired> required = postRepository.findFiltered(categoryNames, map.get("year"), map.get("month"));
+        return convertToDto(required);
     }
 
-    public List<PostRequired> getScrappedRequired(Long userId) {
+    public List<GetRequiredResponse> getScrappedRequired(Long userId) {
         userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         List<ScrappedRequired> required = scrappedRepository.findRequired(userId);
-        return getScrappedInfo(required);
+        List<PostRequired> result = getScrappedInfo(required);
+        return convertToDto(result);
     }
 
-    public List<PostRequired> getCommentedPostRequired(Long userId) {
+    public List<GetRequiredResponse> getCommentedPostRequired(Long userId) {
         List<CommentProfile> commentedPostId = commentRepository.findCommentedPostId(userId);
-        return getCommented(commentedPostId);
+        List<PostRequired> required = getCommented(commentedPostId);
+        return convertToDto(required);
     }
 
-    public List<PostRequired> getByKeyword(String keyword) {
-        return postRepository.findRequiredByKeyword(keyword);
+    public List<GetRequiredResponse> getByKeyword(String keyword) {
+        List<PostRequired> required = postRepository.findRequiredByKeyword(keyword);
+        return convertToDto(required);
     }
 
     private List<PostRequired> getCommented(List<CommentProfile> commentedPostId) {
@@ -206,6 +212,24 @@ public class PostService {
     private Long getUserDeptId(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         return Long.valueOf(user.getDepartmentType().getId());
+    }
+
+    private List<GetRequiredResponse> convertToDto(List<PostRequired> postRequired) {
+        List<GetRequiredResponse> dtos = new ArrayList<>();
+        for (PostRequired post : postRequired) {
+            dtos.add(getRequiredResponseBuilder(post));
+        }
+        return dtos;
+    }
+
+    private GetRequiredResponse getRequiredResponseBuilder(PostRequired postRequired) {
+        return GetRequiredResponse.builder()
+                .postId(postRequired.getPostId())
+                .category(postRequired.getCategory().getValue())
+                .title(postRequired.getTitle())
+                .content(postRequired.getContent())
+                .deadline(postRequired.getDeadline())
+                .build();
     }
 
     @Getter
