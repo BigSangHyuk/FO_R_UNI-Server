@@ -215,10 +215,11 @@ public class UserService {
     }
 
     private SignResponse signResponseBuilder(User user) {
+        String department = (user.getDepartmentType() == null ? null : user.getDepartmentType().getValue());
         return SignResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
-                .department(user.getDepartmentType().getValue())
+                .department(department)
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())
