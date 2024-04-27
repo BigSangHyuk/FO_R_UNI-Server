@@ -10,7 +10,9 @@ import java.util.List;
 public enum PostEntityFixture {
 
     POST_ACADEMY(CategoryType.ACADEMY, false, "test_학사", "testcontent", Collections.singletonList("testImageUrl"), 0, 0, false, LocalDate.now(), LocalDate.now(), "testNoticeUrl"),
-    POST_ISIS(CategoryType.ISIS, false, "test_컴퓨터공학부", "testcontent2", Collections.singletonList("testImageUrl2"), 0, 0, false, LocalDate.now(), LocalDate.now(), "testNoticeUrl2");
+    POST_ACADEMY_2(CategoryType.ACADEMY, false, "test_학사2", "testcontent2", Collections.singletonList("testImageUrl2"), 0, 0, false, LocalDate.now(), LocalDate.now(), "testNoticeUrl2"),
+
+    POST_ISIS(CategoryType.ISIS, false, "test_컴퓨터공학부", "testcontent3", Collections.singletonList("testImageUrl3"), 0, 0, false, LocalDate.now(), LocalDate.now(), "testNoticeUrl3");
 
     private final CategoryType categoryType;
     private final boolean reported;
