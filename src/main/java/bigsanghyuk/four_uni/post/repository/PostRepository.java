@@ -33,5 +33,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             nativeQuery = true,
             value = "SELECT post_id as postId, category, title, deadline FROM posts " +
                     "WHERE post_id = :postId")
-   PostRequired findRequiredByPostId(@Param("postId") Long postId);
+    PostRequired findRequiredByPostId(@Param("postId") Long postId);
+
+    @Query(
+            nativeQuery = true,
+            value = "SELECT post_id as postId, category, title, SUBSTRING(content, 1, 100) as content, deadline FROM posts " +
+                    "WHERE title LIKE %?1% OR content LIKE %?1% " +
+                    "ORDER BY created_at DESC"
+    )
+    List<PostRequired> findRequiredByKeyword(String keyword);
 }

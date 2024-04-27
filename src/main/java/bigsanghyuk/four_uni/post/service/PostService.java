@@ -90,6 +90,10 @@ public class PostService {
         return getCommented(commentedPostId);
     }
 
+    public List<PostRequired> getByKeyword(String keyword) {
+        return postRepository.findRequiredByKeyword(keyword);
+    }
+
     private List<PostRequired> getCommented(List<CommentProfile> commentedPostId) {
         LinkedList<PostRequired> result = new LinkedList<>();
         for (CommentProfile commentRequired : commentedPostId) {

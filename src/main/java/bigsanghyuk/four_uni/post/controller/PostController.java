@@ -87,6 +87,13 @@ public class PostController {
         return ResponseEntity.ok().body(new Results<>(postsRequired, postsRequired.size()));
     }
 
+    @Operation(summary = "키워드로 검색", description = "검색어 전달, 게시글 등록순 반환, 본문 내용은 100자 까지만")
+    @GetMapping("/posts/search")
+    public ResponseEntity<Results<List<PostRequired>>> getByKeyword(@RequestParam(name = "keyword", required = true) String keyword) {
+        List<PostRequired> postsRequired = postService.getByKeyword(keyword);
+        return ResponseEntity.ok().body(new Results<>(postsRequired, postsRequired.size()));
+    }
+
     @Getter
     private static class Detail<T> {
 
