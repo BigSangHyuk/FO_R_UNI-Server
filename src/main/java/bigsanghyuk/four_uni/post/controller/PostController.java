@@ -51,13 +51,6 @@ public class PostController {
         return ResponseEntity.ok().body(new Results<>(result, result.size()));
     }
 
-    @Operation(summary = "게시글 필터 조회", description = "/posts/filter?id=1-2-3-4 이런 식으로 전달, 최소 항목")
-    @GetMapping("/posts/filtered")
-    public ResponseEntity<Results<List<PostRequired>>> getByFilteredRequired(@RequestParam(name = "id") String id) {
-        List<PostRequired> filteredPosts = postService.getFilteredRequired(id);
-        return ResponseEntity.ok().body(new Results<>(filteredPosts, filteredPosts.size()));
-    }
-
     @Operation(summary = "스크랩 추가", description = "요청에 postId 담아서 전송")
     @PostMapping("/posts/scrap/{postId}")
     public ResponseEntity<CommonResponse> scrap(@RequestAttribute(name = "userId") Long userId, @PathVariable(name = "postId") Long postId) {
@@ -84,13 +77,6 @@ public class PostController {
     public ResponseEntity<Results<List<PostRequired>>> getPostCommented(@RequestAttribute(name = "userId") Long userId) {
         List<PostRequired> commentedPosts = postService.getCommentedPostRequired(userId);
         return ResponseEntity.ok().body(new Results<>(commentedPosts, commentedPosts.size()));
-    }
-
-    @Operation(summary = "해당하는 기간의 게시글 조회", description = "2024-03 형식으로 연 월 전달하면 해당 달 앞, 뒤 1달까지의 글 반환, 최소 항목")
-    @GetMapping("/posts/date")
-    public ResponseEntity<List<PostRequired>> getPostByDateRequiredData(@RequestParam(name = "target") String date) {
-        List<PostRequired> postsRequired = postService.getPostsByDateRequired(date);
-        return ResponseEntity.ok().body(postsRequired);
     }
 
     @Operation(summary = "필터로 해당 월 게시글 조회", description = "2024-04 형식으로 조회하려는 기간 전달, 필터는 /filter?id=1-2-3-4 으로 대시로 구분, 유저의 과 포함하지 않을 시 dept=false로 전달")

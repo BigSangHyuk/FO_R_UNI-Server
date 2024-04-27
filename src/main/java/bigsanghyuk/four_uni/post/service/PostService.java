@@ -65,12 +65,6 @@ public class PostService {
         return detailBuilder(post);
     }
 
-    public List<PostRequired> getFilteredRequired(String ids) {
-        List<Long> categoryIds = stringToCategoryIds(ids);
-        List<String> categoryNames = getCategoryNames(categoryIds);
-        return postRepository.findPostRequiredFiltered(categoryNames);
-    }
-
     public List<PostRequired> getFilteredRequiredByMonth(String date, String ids, Long userId) {
         List<Long> categoryIds = new ArrayList<>();
         if (ids != null) {
@@ -103,20 +97,6 @@ public class PostService {
             result.add(postRepository.findRequiredByPostId(postId));
         }
         return result;
-    }
-
-    public List<PostRequired> getPostsByDateRequired(String date) { //date format example: 2024-03
-        StringTokenizer st = new StringTokenizer(date, "-");
-        DateFilter filter = new DateFilter(st);
-
-        return postRepository.findRequiredByCurrentAndAdjacentMonths(
-                filter.getCurrentMonth().getYear(),
-                filter.getCurrentMonth().getMonthValue(),
-                filter.getPrevMonth().getYear(),
-                filter.getPrevMonth().getMonthValue(),
-                filter.getNextMonth().getYear(),
-                filter.getNextMonth().getMonthValue()
-        );
     }
 
     private List<String> getCategoryNames(List<Long> categoryIds) {
