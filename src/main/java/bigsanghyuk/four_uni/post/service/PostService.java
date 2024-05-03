@@ -3,6 +3,7 @@ package bigsanghyuk.four_uni.post.service;
 import bigsanghyuk.four_uni.comment.domain.entity.CommentProfile;
 import bigsanghyuk.four_uni.comment.repository.CommentRepository;
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
+import bigsanghyuk.four_uni.exception.post.WrongDateFormatException;
 import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
 import bigsanghyuk.four_uni.post.domain.RegisterPostInfo;
 import bigsanghyuk.four_uni.post.domain.entity.Post;
@@ -13,7 +14,6 @@ import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
 import bigsanghyuk.four_uni.post.dto.response.GetRequiredResponse;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
-import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.enums.CategoryType;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -41,6 +42,7 @@ public class PostService {
     private final ScrappedRepository scrappedRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private static final String DATE_FORMAT_REGEX = "\\d{4}-\\d{2}";
 
     public int getAddPostResult(String data) throws JsonProcessingException {
         int success = 0;
@@ -196,6 +198,11 @@ public class PostService {
 
     private Map<String, Integer> makeDateMap(String date) {
         HashMap<String, Integer> map = new HashMap<>();
+
+        if (!Pattern.matches(DATE_FORMAT_REGEX, date)) {
+            throw new WrongDateFormatException();
+        }
+
         String[] yearAndMonth = date.split("-");
         map.put("year", Integer.parseInt(yearAndMonth[0]));
         map.put("month", Integer.parseInt(yearAndMonth[1]));
