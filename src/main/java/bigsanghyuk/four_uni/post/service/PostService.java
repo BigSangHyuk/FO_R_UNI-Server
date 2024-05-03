@@ -67,15 +67,8 @@ public class PostService {
         return detailBuilder(post);
     }
 
-    public List<GetRequiredResponse> getFilteredRequiredByMonth(String date, String ids, Long userId) {
-        List<Long> categoryIds = new ArrayList<>();
-        if (ids != null) {
-            categoryIds = stringToCategoryIds(ids);
-        }
-        if (userId != null) {
-            Long userDeptId = getUserDeptId(userId);
-            categoryIds.add(userDeptId);
-        }
+    public List<GetRequiredResponse> getFilteredRequiredByMonth(String date, String ids) {
+        List<Long> categoryIds = stringToCategoryIds(ids);
         List<String> categoryNames = getCategoryNames(categoryIds);
         Map<String, Integer> map = makeDateMap(date);
         List<PostRequired> required = postRepository.findFiltered(categoryNames, map.get("year"), map.get("month"));
@@ -207,11 +200,6 @@ public class PostService {
         map.put("year", Integer.parseInt(yearAndMonth[0]));
         map.put("month", Integer.parseInt(yearAndMonth[1]));
         return map;
-    }
-
-    private Long getUserDeptId(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        return Long.valueOf(user.getDepartmentType().getId());
     }
 
     private List<GetRequiredResponse> convertToDto(List<PostRequired> postRequired) {
