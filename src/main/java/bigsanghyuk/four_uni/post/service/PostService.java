@@ -122,6 +122,9 @@ public class PostService {
         List<Long> result = new ArrayList<>();
         String[] tokens = input.split("-");
         for (String token : tokens) {
+            if (token.isEmpty()) {
+                continue;
+            }
             result.add(Long.parseLong(token));
         }
         return result;
