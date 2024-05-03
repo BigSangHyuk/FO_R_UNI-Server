@@ -1,6 +1,7 @@
 package bigsanghyuk.four_uni.exception.handler;
 
 import bigsanghyuk.four_uni.exception.ExceptionMessage;
+import bigsanghyuk.four_uni.exception.post.WrongDateFormatException;
 import bigsanghyuk.four_uni.exception.post.DeadlineNotFoundException;
 import bigsanghyuk.four_uni.exception.post.PostNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -25,5 +26,11 @@ public class PostExceptionHandler {
     public ResponseEntity<ExceptionMessage> handle(DeadlineNotFoundException e) {
         final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(WrongDateFormatException.class)
+    public ResponseEntity<ExceptionMessage> handle(WrongDateFormatException e) {
+        final ExceptionMessage message = ExceptionMessage.of(e.getStatus(), e.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
 }

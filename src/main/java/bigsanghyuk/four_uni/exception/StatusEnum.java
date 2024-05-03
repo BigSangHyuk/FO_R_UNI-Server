@@ -25,7 +25,8 @@ public enum StatusEnum {
     MALFORMED_TOKEN(400, "MALFORMED_TOKEN"),
     REFRESH_TOKEN_MISMATCH(400, "REFRESH_TOKEN_MISMATCH"),
     SEND_MAIL_FAILED(500, "SEND_MAIL_FAILED"),
-    RESTRICTED(403, "RESTRICTED");
+    RESTRICTED(403, "RESTRICTED"),
+    WRONG_DATE_FORMAT(400, "WRONG_DATE_FORMAT");
 
     private final int statusCode;
     private final String code;
