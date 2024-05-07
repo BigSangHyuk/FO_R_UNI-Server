@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +22,8 @@ public class CommentDto {
     private Boolean isDeleted;
     private Long parentId;
     private List<CommentDto> children;
+    private LocalDateTime createdAt;
+//    private String createdAt;
 
     public CommentDto(Comment comment) {
         this.id = comment.getId();
@@ -29,5 +33,7 @@ public class CommentDto {
         this.isDeleted = comment.isDeleted() ? true : null;
         this.parentId = comment.getParent() != null ? comment.getParent().getId() : null;
         this.children = new ArrayList<>();
+        this.createdAt = comment.getCreatedAt();
+//        this.createdAt = comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy년 M월 d일 H시 m분"));
     }
 }
