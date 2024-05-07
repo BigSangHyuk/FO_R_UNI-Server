@@ -23,7 +23,6 @@ public class CommentDto {
     private Long parentId;
     private List<CommentDto> children;
     private LocalDateTime createdAt;
-//    private String createdAt;
 
     public CommentDto(Comment comment) {
         this.id = comment.getId();
@@ -34,6 +33,5 @@ public class CommentDto {
         this.parentId = comment.getParent() != null ? comment.getParent().getId() : null;
         this.children = new ArrayList<>();
         this.createdAt = comment.getCreatedAt();
-//        this.createdAt = comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy년 M월 d일 H시 m분"));
     }
 }
