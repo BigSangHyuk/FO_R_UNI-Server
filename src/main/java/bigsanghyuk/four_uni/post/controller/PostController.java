@@ -79,11 +79,10 @@ public class PostController {
         return ResponseEntity.ok().body(new Results<>(commentedPosts, commentedPosts.size()));
     }
 
-    @Operation(summary = "필터로 해당 월 게시글 조회", description = "2024-04 형식으로 조회하려는 기간 전달, 필터는 /filter?id=1-2-3-4 으로 대시로 구분, 유저의 과 포함하지 않을 시 dept=false로 전달")
+    @Operation(summary = "필터로 해당 월 게시글 조회", description = "2024-04 형식으로 조회하려는 기간 전달, 필터는 /filter?id=1-2-3-4 으로 대시로 구분")
     @GetMapping("/posts/filter")
-    public ResponseEntity<Results<List<GetRequiredResponse>>> getByFilterAndMonth(@RequestAttribute(name = "userId") Long userIdInToken, @RequestParam(name = "date") String date, @RequestParam(name = "id", required = false) String id, @RequestParam(name = "dept", defaultValue = "true") boolean dept) {
-        Long userId = dept ? userIdInToken : null;
-        List<GetRequiredResponse> postsRequired = postService.getFilteredRequiredByMonth(date, id, userId);
+    public ResponseEntity<Results<List<GetRequiredResponse>>> getByFilterAndMonth(@RequestParam(name = "date") String date, @RequestParam(name = "id", required = false) String id) {
+        List<GetRequiredResponse> postsRequired = postService.getFilteredRequiredByMonth(date, id);
         return ResponseEntity.ok().body(new Results<>(postsRequired, postsRequired.size()));
     }
 

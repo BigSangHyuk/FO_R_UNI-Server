@@ -217,7 +217,7 @@ public class PostControllerTest {
     }
 
     @Test
-    void 게시글_필터_조회() throws Exception {
+    void 키워드로_검색() throws Exception {
         //given
         User user = userRepository.save(UserEntityFixture.USER_NORMAL.UserEntity_생성(6L));
 
@@ -228,10 +228,11 @@ public class PostControllerTest {
         postRepository.save(PostEntityFixture.POST_ACADEMY_2.PostEntity_생성());
 
         //when, then
-        mockMvc.perform(get("/posts/filtered?id=246")
+        mockMvc.perform(get("/posts/search")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
+                        .param("keyword", "학사")
                         .with(authentication(atc)))
                 .andExpect(status().isOk())
                 .andDo(print());

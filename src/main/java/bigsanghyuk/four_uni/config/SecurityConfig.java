@@ -3,6 +3,7 @@ package bigsanghyuk.four_uni.config;
 import bigsanghyuk.four_uni.config.filter.CorsFilter;
 import bigsanghyuk.four_uni.config.filter.JwtAuthenticationFilter;
 import bigsanghyuk.four_uni.config.filter.JwtExceptionFilter;
+import bigsanghyuk.four_uni.config.interceptor.LogInterceptor;
 import bigsanghyuk.four_uni.config.interceptor.TokenInterceptor;
 import bigsanghyuk.four_uni.config.jwt.JwtProvider;
 import bigsanghyuk.four_uni.config.oauth.CustomAuthorityUtils;
@@ -97,6 +98,14 @@ public class SecurityConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new LogInterceptor())
+                .order(1)
+                .addPathPatterns("/**")
+                .excludePathPatterns(
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/refresh"
+                );
         registry.addInterceptor(new TokenInterceptor(jwtProvider))
                 .excludePathPatterns(
                         "/swagger-ui/**",
