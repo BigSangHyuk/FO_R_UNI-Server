@@ -1,5 +1,6 @@
 package bigsanghyuk.four_uni.comment.controller;
 
+import bigsanghyuk.four_uni.comment.dto.CommentDto;
 import bigsanghyuk.four_uni.common.CommonResponse;
 import bigsanghyuk.four_uni.common.Results;
 import bigsanghyuk.four_uni.comment.domain.entity.CommentRequired;
@@ -11,6 +12,7 @@ import bigsanghyuk.four_uni.comment.service.LikeCommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +67,13 @@ public class CommentController {
     @GetMapping("/comments/liked")
     public ResponseEntity<Results<List<CommentRequired>>> getLikedCommentsRequiredData(@RequestAttribute(name = "userId") Long userId) {
         List<CommentRequired> comments = commentService.getLikedComment(userId);
+        return ResponseEntity.ok().body(new Results<>(comments, comments.size()));
+    }
+
+    @Operation(summary = "postId로 댓글 조회", description = "queryParam에 postId 전달")
+    @GetMapping("/comments/{postId}")
+    public ResponseEntity<Results<List<CommentDto>>> getCommentsByPostId(@PathVariable(name = "postId") Long postId) {
+        List<CommentDto> comments = commentService.getAllComments(postId);
         return ResponseEntity.ok().body(new Results<>(comments, comments.size()));
     }
 }
