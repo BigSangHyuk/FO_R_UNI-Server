@@ -102,6 +102,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .order(1)
                 .addPathPatterns("/**")
                 .excludePathPatterns(
+                        "/",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
                         "/refresh",
