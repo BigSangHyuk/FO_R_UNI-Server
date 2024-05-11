@@ -16,6 +16,8 @@ public interface ScrappedRepository extends JpaRepository<Scrapped, Long> {
 
     Optional<Scrapped> findByUserAndPost(User user, Post post);
 
+    Boolean existsByUserAndPost(User user, Post post);
+
     @Transactional
     void deleteScrappedByUserAndPost(User user, Post post);
 

@@ -14,6 +14,7 @@ import bigsanghyuk.four_uni.post.domain.entity.PostRequired;
 import bigsanghyuk.four_uni.post.dto.response.GetRequiredResponse;
 import bigsanghyuk.four_uni.post.repository.PostRepository;
 import bigsanghyuk.four_uni.post.repository.ScrappedRepository;
+import bigsanghyuk.four_uni.user.domain.entity.User;
 import bigsanghyuk.four_uni.user.enums.CategoryType;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -64,9 +65,11 @@ public class PostService {
         return convertToDto(required);
     }
 
-    public GetDetailResponse getDetail(Long postId) {
+    public GetDetailResponse getDetail(Long userId, Long postId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        return detailBuilder(post);
+        boolean isScrapped = scrappedRepository.existsByUserAndPost(user, post);
+        return new GetDetailResponse(post, isScrapped);
     }
 
     public List<GetRequiredResponse> getFilteredRequiredByMonth(String date, String ids) {
@@ -171,23 +174,6 @@ public class PostService {
                             .build());
             return 1;
         }
-    }
-
-    private GetDetailResponse detailBuilder(Post post) {
-        return GetDetailResponse.builder()
-                .id(post.getId())
-                .category(post.getCategoryType().getValue())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .imageUrl(post.getImageUrl())
-                .views(post.getViews())
-                .isClassified(post.isClassified())
-                .postedAt(post.getPostedAt())
-                .deadline(post.getDeadline())
-                .noticeUrl(post.getNoticeUrl())
-                .reported(post.isReported())
-                .postReportCount(post.getPostReportCount())
-                .build();
     }
 
     private List<PostRequired> getScrappedInfo(List<ScrappedRequired> required) {
