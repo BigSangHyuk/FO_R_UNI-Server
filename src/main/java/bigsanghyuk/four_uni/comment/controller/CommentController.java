@@ -72,8 +72,8 @@ public class CommentController {
 
     @Operation(summary = "postId로 댓글 조회", description = "queryParam에 postId 전달")
     @GetMapping("/comments/{postId}")
-    public ResponseEntity<Results<List<CommentDto>>> getCommentsByPostId(@PathVariable(name = "postId") Long postId) {
-        List<CommentDto> comments = commentService.getAllComments(postId);
+    public ResponseEntity<Results<List<CommentDto>>> getCommentsByPostId(@RequestAttribute(name = "userId") Long userId, @PathVariable(name = "postId") Long postId) {
+        List<CommentDto> comments = commentService.getAllComments(userId, postId);
         return ResponseEntity.ok().body(new Results<>(comments, comments.size()));
     }
 }

@@ -20,10 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -75,21 +72,25 @@ public class CommentService {
         removeComment(comment);
     }
 
-    public List<CommentDto> getAllComments(Long postId) {
+    public List<CommentDto> getAllComments(Long userId, Long postId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        List<Long> likedCommentIds = likeCommentRepository.findCommentIds(user);
+
         List<Comment> parents = commentRepository.findParents(postId);
         List<Comment> children = new ArrayList<>();
         for (Comment parent : parents) {
             children.addAll(commentRepository.findByParent(parent));
         }
         parents.addAll(children);
-        return convertToCommentDto(parents);
+        return convertToCommentDto(likedCommentIds, parents);
     }
 
-    private List<CommentDto> convertToCommentDto(List<Comment> parents) {
+    private List<CommentDto> convertToCommentDto(List<Long> likedCommentIds, List<Comment> parents) {
         List<CommentDto> getCommentData = new ArrayList<>();
         Map<Long, CommentDto> map = new HashMap<>();
+        HashSet<Long> set = new HashSet<>(likedCommentIds);
         for (Comment parent : parents) {
-            CommentDto dto = new CommentDto(parent);
+            CommentDto dto = new CommentDto(parent, set);
             map.put(dto.getId(), dto);
             if (dto.getParentId() != null) {
                 map.get(dto.getParentId()).getChildren().add(dto);

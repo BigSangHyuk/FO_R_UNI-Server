@@ -1,5 +1,6 @@
 package bigsanghyuk.four_uni.post.dto.response;
 
+import bigsanghyuk.four_uni.post.domain.entity.Post;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -22,5 +23,22 @@ public class GetDetailResponse {
     private LocalDate deadline;
     private String noticeUrl;
     private boolean reported;
+    private boolean isScrapped;
     private int postReportCount;
+
+    public GetDetailResponse(Post post, boolean isScrapped) {
+        this.id = post.getId();
+        this.category = post.getCategoryType().getValue();
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.imageUrl = post.getImageUrl();
+        this.views = post.getViews();
+        this.isClassified = post.isClassified();
+        this.postedAt = post.getPostedAt();
+        this.deadline = post.getDeadline();
+        this.noticeUrl = post.getNoticeUrl();
+        this.reported = post.isReported();
+        this.isScrapped = isScrapped;
+        this.postReportCount = post.getPostReportCount();
+    }
 }
