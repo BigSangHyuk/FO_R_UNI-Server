@@ -173,23 +173,6 @@ public class PostService {
         }
     }
 
-    private GetDetailResponse detailBuilder(Post post) {
-        return GetDetailResponse.builder()
-                .id(post.getId())
-                .category(post.getCategoryType().getValue())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .imageUrl(post.getImageUrl())
-                .views(post.getViews())
-                .isClassified(post.isClassified())
-                .postedAt(post.getPostedAt())
-                .deadline(post.getDeadline())
-                .noticeUrl(post.getNoticeUrl())
-                .reported(post.isReported())
-                .postReportCount(post.getPostReportCount())
-                .build();
-    }
-
     private List<PostRequired> getScrappedInfo(List<ScrappedRequired> required) {
         LinkedList<PostRequired> infos = new LinkedList<>();
         for (ScrappedRequired scrappedRequired : required) {
