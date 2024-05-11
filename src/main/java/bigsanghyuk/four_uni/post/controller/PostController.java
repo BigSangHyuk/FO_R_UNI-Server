@@ -38,9 +38,9 @@ public class PostController {
 
     @Operation(summary = "게시글과 댓글 함께 조회", description = "조회하고자 하는 게시글 아이디를 경로변수로 전달, 댓글 깊이 1 고정")
     @GetMapping("/posts/{postId}")
-    public ResponseEntity<Detail> getPostWithComments(@PathVariable(name = "postId") Long postId) {
+    public ResponseEntity<Detail> getPostWithComments(@RequestAttribute(name = "userId") Long userId, @PathVariable(name = "postId") Long postId) {
         GetDetailResponse detail = postService.getDetail(postId);
-        List<CommentDto> comments = commentService.getAllComments(postId);
+        List<CommentDto> comments = commentService.getAllComments(userId, postId);
         return ResponseEntity.ok().body(new Detail(detail, comments));
     }
 
