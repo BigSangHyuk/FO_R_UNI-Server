@@ -246,6 +246,7 @@ public class UserService {
                 .id(user.getId())
                 .email(user.getEmail())
                 .department(user.getDepartmentType().getValue())
+                .deptId(user.getDepartmentType().getId())
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())

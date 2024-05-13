@@ -18,6 +18,7 @@ public class LoginResponse {
     private Long id;
     private String email;
     private String department;
+    private Integer deptId;
     private String nickName;
     private String image;
     private List<Authority> roles = new ArrayList<>();
