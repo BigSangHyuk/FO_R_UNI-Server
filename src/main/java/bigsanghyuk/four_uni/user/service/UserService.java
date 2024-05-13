@@ -220,6 +220,7 @@ public class UserService {
                 .id(user.getId())
                 .email(user.getEmail())
                 .department(department)
+                .deptId(user.getDepartmentType().getId())
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())
