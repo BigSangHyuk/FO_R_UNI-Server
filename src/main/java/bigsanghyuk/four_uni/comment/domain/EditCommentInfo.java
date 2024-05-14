@@ -9,7 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EditCommentInfo {
 
-    private Long postId;
-    private Long commentId;
     private String content;
 }

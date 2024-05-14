@@ -10,11 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EditCommentRequest {
 
-    private Long postId;
-    private Long commentId;
     private String content;
 
     public EditCommentInfo toDomain() {
-        return new EditCommentInfo(postId, commentId, content);
+        return new EditCommentInfo(content);
     }
 }

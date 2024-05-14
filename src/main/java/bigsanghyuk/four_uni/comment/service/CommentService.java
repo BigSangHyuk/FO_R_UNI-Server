@@ -1,6 +1,5 @@
 package bigsanghyuk.four_uni.comment.service;
 
-import bigsanghyuk.four_uni.comment.domain.DeleteCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.RegisterCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
@@ -50,12 +49,11 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    public void edit(Long userId, @Valid EditCommentInfo editCommentInfo) {
-        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        postRepository.findById(editCommentInfo.getPostId()).orElseThrow(PostNotFoundException::new);
-        Comment comment = commentRepository.findById(editCommentInfo.getCommentId()).orElseThrow(CommentNotFoundException::new);
+    public void edit(Long userId, Long commentId, @Valid EditCommentInfo editCommentInfo) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
-        validateRequest(userId, comment);
+        validateRequest(user, comment);
 
         comment.edit(editCommentInfo);
         commentRepository.save(comment);
@@ -63,10 +61,10 @@ public class CommentService {
 
     @Transactional
     public void remove(Long userId, Long commentId) {
-        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
-        validateRequest(userId, comment);
+        validateRequest(user, comment);
 
         removeComment(comment);
     }
@@ -111,8 +109,8 @@ public class CommentService {
         return comments;
     }
 
-    private void validateRequest(Long userId, Comment comment) {
-        if (!userId.equals(comment.getUser().getId())) {    // 내가 단 댓글이 아니면 예외
+    private void validateRequest(User user, Comment comment) {
+        if (!user.equals(comment.getUser())) {    // 내가 단 댓글이 아니면 예외
             throw new CommentRemoveOtherUserException();
         } else if (comment.isDeleted()) {
             throw new CommentNotFoundException();
