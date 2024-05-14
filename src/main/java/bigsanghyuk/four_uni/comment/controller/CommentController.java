@@ -35,10 +35,10 @@ public class CommentController {
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
-    @Operation(summary = "댓글 수정", description = "Body에 postId, commentId, 수정 내용 넣어서 전달")
-    @PutMapping("/comments")
-    public ResponseEntity<CommonResponse> edit(@RequestAttribute(name = "userId") Long userId, @Valid @RequestBody EditCommentRequest request) {
-        commentService.edit(userId, request.toDomain());
+    @Operation(summary = "댓글 수정", description = "queryParam에 commentId, Body에 postId, 수정 내용 넣어서 전달")
+    @PutMapping("/comments/{commentId}")
+    public ResponseEntity<CommonResponse> edit(@RequestAttribute(name = "userId") Long userId, @PathVariable(name = "commentId") Long commentId, @Valid @RequestBody EditCommentRequest request) {
+        commentService.edit(userId, commentId, request.toDomain());
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 

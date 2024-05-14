@@ -1,6 +1,5 @@
 package bigsanghyuk.four_uni.comment.service;
 
-import bigsanghyuk.four_uni.comment.domain.DeleteCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.EditCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.RegisterCommentInfo;
 import bigsanghyuk.four_uni.comment.domain.entity.Comment;
@@ -50,10 +49,9 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    public void edit(Long userId, @Valid EditCommentInfo editCommentInfo) {
+    public void edit(Long userId, Long commentId, @Valid EditCommentInfo editCommentInfo) {
         userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        postRepository.findById(editCommentInfo.getPostId()).orElseThrow(PostNotFoundException::new);
-        Comment comment = commentRepository.findById(editCommentInfo.getCommentId()).orElseThrow(CommentNotFoundException::new);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
         validateRequest(userId, comment);
 
