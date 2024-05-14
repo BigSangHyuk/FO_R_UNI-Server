@@ -1,9 +1,13 @@
 package bigsanghyuk.four_uni.config.mail.service;
 
 import bigsanghyuk.four_uni.config.RedisUtil;
+import bigsanghyuk.four_uni.config.mail.domain.InquireMailInfo;
 import bigsanghyuk.four_uni.config.mail.domain.SendMailInfo;
 import bigsanghyuk.four_uni.exception.mail.SendMailFailureException;
 import bigsanghyuk.four_uni.exception.mail.VerificationCodeMismatchException;
+import bigsanghyuk.four_uni.exception.user.UserNotFoundException;
+import bigsanghyuk.four_uni.user.domain.entity.User;
+import bigsanghyuk.four_uni.user.repository.UserRepository;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -21,9 +25,12 @@ public class MailService {
 
     @Value("${mail.username}")
     private String username;
+    @Value("${mail.admin}")
+    private String admin;
 
     private final JavaMailSender javaMailSender;
     private final RedisUtil redisUtil;
+    private final UserRepository userRepository;
 
     private MimeMessage createMessage(String code, String email) throws Exception{
         MimeMessage message = javaMailSender.createMimeMessage();
@@ -45,6 +52,29 @@ public class MailService {
                 "입니다.");
         message.setFrom(username);
         return message;
+    }
+
+    private MimeMessage createInquiry(Long userId, String inquiry) throws MessagingException {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        MimeMessage message = javaMailSender.createMimeMessage();
+        message.addRecipients(Message.RecipientType.TO, admin);
+        message.setSubject("FO_R UNI[문의] " + user.getEmail());
+        message.setText(user.getDepartmentType().getValue() +
+                "의 " + user.getNickName() +
+                " (" + user.getEmail() +
+                ") 님께서 문의를 보냈습니다.\n\n" +
+                "문의내용\n\n" + inquiry);
+        message.setFrom(username);
+        return message;
+    }
+
+    public void sendMail(Long userId, InquireMailInfo inquireMailInfo) throws MessagingException {
+        try {
+            MimeMessage mimeMessage = createInquiry(userId, inquireMailInfo.getInquiry());
+            javaMailSender.send(mimeMessage);
+        } catch (MailException e) {
+            throw new SendMailFailureException();
+        }
     }
 
     public void sendMail(String code, String email) throws Exception {
@@ -89,15 +119,20 @@ public class MailService {
     }
 
     public String getTempPw() {
-        char[] charSet = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        char[] integerSet = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        char[] charSet = new char[]{
                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
                 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
         char[] specialSet = new char[]{'!', '@', '#', '$', '%', '^', '+', '*', '=', '-'};
         StringBuilder str = new StringBuilder();
         int idx;
-        for (int i = 0; i < 9; i++) {
-            idx = (int) (charSet.length * Math.random());
+        for (int i = 0; i < 6; i++) {
+            idx = (int) (integerSet.length * Math.random());
             str.append(charSet[idx]);
+        }
+        for (int i = 0; i < 2; i++) {
+            idx = (int) (charSet.length * Math.random());
+            str.append(integerSet[idx]);
         }
         str.append(specialSet[(int) (specialSet.length * Math.random())]);
         return str.toString();
