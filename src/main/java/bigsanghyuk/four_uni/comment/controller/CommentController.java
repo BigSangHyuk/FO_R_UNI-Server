@@ -42,21 +42,21 @@ public class CommentController {
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
-    @Operation(summary = "댓글 삭제", description = "Body에 postId, commentId 넣어서 전달")
-    @DeleteMapping("/comments")
-    public ResponseEntity<CommonResponse> remove(@RequestAttribute(name = "userId") Long userId, @Valid @RequestBody DeleteCommentRequest request) {
-        commentService.remove(userId, request.toDomain());
+    @Operation(summary = "댓글 삭제", description = "queryParam에 commentId 전달")
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<CommonResponse> remove(@RequestAttribute(name = "userId") Long userId, @PathVariable(name = "commentId") Long commentId) {
+        commentService.remove(userId, commentId);
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
-    @Operation(summary = "댓글 좋아요", description = "Body에 commentId 넣어서 전달")
+    @Operation(summary = "댓글 좋아요", description = "queryParam에 commentId 전달")
     @PostMapping("/comments/like/{commentId}")
     public ResponseEntity<CommonResponse> likeComment(@RequestAttribute(name = "userId") Long userId, @PathVariable(name = "commentId") Long commentId) {
         likeCommentService.likeComment(userId, commentId);
         return ResponseEntity.ok().body(new CommonResponse(true));
     }
 
-    @Operation(summary = "댓글 좋아요 취소", description = "Body에 commentId 넣어서 전달")
+    @Operation(summary = "댓글 좋아요 취소", description = "queryParam에 commentId 전달")
     @DeleteMapping("/comments/unlike/{commentId}")
     public ResponseEntity<CommonResponse> unLikeComment(@RequestAttribute(name = "userId") Long userId, @PathVariable(name = "commentId") Long commentId) {
         likeCommentService.unLikeComment(userId, commentId);
