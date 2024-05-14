@@ -26,8 +26,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             nativeQuery = true,
             value = "SELECT post_id as postId, category, title, deadline FROM posts " +
                     "WHERE is_classified = FALSE " +
+                    "AND category in :category " +
                     "ORDER BY created_at DESC")
-    List<PostRequired> findRequiredIsClassifiedFalse();
+    List<PostRequired> findRequiredIsClassifiedFalse(@Param("category") List<String> categoryNames);
 
     @Query(
             nativeQuery = true,

@@ -46,8 +46,8 @@ public class PostController {
 
     @Operation(summary = "미분류 게시글 조회", description = "최소 항목")
     @GetMapping("/posts/unclassified")
-    public ResponseEntity<Results<List<GetRequiredResponse>>> getUnclassifiedRequiredData() {
-        List<GetRequiredResponse> result = postService.getUnclassifiedRequired();
+    public ResponseEntity<Results<List<GetRequiredResponse>>> getUnclassifiedRequiredData(@RequestAttribute(name = "userId") Long userId) {
+        List<GetRequiredResponse> result = postService.getUnclassifiedByUserDept(userId);
         return ResponseEntity.ok().body(new Results<>(result, result.size()));
     }
 
