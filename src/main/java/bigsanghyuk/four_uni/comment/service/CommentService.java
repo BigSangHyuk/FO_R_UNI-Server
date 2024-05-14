@@ -50,10 +50,10 @@ public class CommentService {
     }
 
     public void edit(Long userId, Long commentId, @Valid EditCommentInfo editCommentInfo) {
-        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
-        validateRequest(userId, comment);
+        validateRequest(user, comment);
 
         comment.edit(editCommentInfo);
         commentRepository.save(comment);
@@ -61,10 +61,10 @@ public class CommentService {
 
     @Transactional
     public void remove(Long userId, Long commentId) {
-        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
-        validateRequest(userId, comment);
+        validateRequest(user, comment);
 
         removeComment(comment);
     }
@@ -109,8 +109,8 @@ public class CommentService {
         return comments;
     }
 
-    private void validateRequest(Long userId, Comment comment) {
-        if (!userId.equals(comment.getUser().getId())) {    // 내가 단 댓글이 아니면 예외
+    private void validateRequest(User user, Comment comment) {
+        if (!user.equals(comment.getUser())) {    // 내가 단 댓글이 아니면 예외
             throw new CommentRemoveOtherUserException();
         } else if (comment.isDeleted()) {
             throw new CommentNotFoundException();
