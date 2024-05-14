@@ -62,10 +62,9 @@ public class CommentService {
     }
 
     @Transactional
-    public void remove(Long userId, @Valid DeleteCommentInfo deleteCommentInfo) {
+    public void remove(Long userId, Long commentId) {
         userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        postRepository.findById(deleteCommentInfo.getPostId()).orElseThrow(PostNotFoundException::new);
-        Comment comment = commentRepository.findById(deleteCommentInfo.getCommentId()).orElseThrow(CommentNotFoundException::new);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
 
         validateRequest(userId, comment);
 

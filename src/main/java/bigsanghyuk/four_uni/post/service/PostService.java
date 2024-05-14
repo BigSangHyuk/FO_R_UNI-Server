@@ -44,6 +44,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private static final String DATE_FORMAT_REGEX = "\\d{4}-\\d{2}";
+    private static final String CATEGORY = "246-247-2611-249-250-252-253";
 
     public int getAddPostResult(String data) throws JsonProcessingException {
         int success = 0;
@@ -60,9 +61,21 @@ public class PostService {
         return success;
     }
 
-    public List<GetRequiredResponse> getUnclassifiedRequired() {
-        List<PostRequired> required = postRepository.findRequiredIsClassifiedFalse();
+    public List<GetRequiredResponse> getUnclassifiedByUserDept(Long userId) {
+        String data = returnCategoryIdString(userId);
+        List<String> categoryNames = convertToCategoryNames(data);
+        List<PostRequired> required = postRepository.findRequiredIsClassifiedFalse(categoryNames);
         return convertToDto(required);
+    }
+
+    private List<String> convertToCategoryNames(String data) {
+        List<Long> categoryIds = stringToCategoryIds(data);
+        return getCategoryNames(categoryIds);
+    }
+
+    private String returnCategoryIdString(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        return CATEGORY + "-" + user.getDepartmentType().getId();
     }
 
     public GetDetailResponse getDetail(Long userId, Long postId) {
@@ -73,8 +86,7 @@ public class PostService {
     }
 
     public List<GetRequiredResponse> getFilteredRequiredByMonth(String date, String ids) {
-        List<Long> categoryIds = stringToCategoryIds(ids);
-        List<String> categoryNames = getCategoryNames(categoryIds);
+        List<String> categoryNames = convertToCategoryNames(ids);
         Map<String, Integer> map = makeDateMap(date);
         List<PostRequired> required = postRepository.findFiltered(categoryNames, map.get("year"), map.get("month"));
         return convertToDto(required);
