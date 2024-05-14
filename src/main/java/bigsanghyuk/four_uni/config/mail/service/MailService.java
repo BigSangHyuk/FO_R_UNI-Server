@@ -119,15 +119,20 @@ public class MailService {
     }
 
     public String getTempPw() {
-        char[] charSet = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        char[] integerSet = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        char[] charSet = new char[]{
                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
                 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
         char[] specialSet = new char[]{'!', '@', '#', '$', '%', '^', '+', '*', '=', '-'};
         StringBuilder str = new StringBuilder();
         int idx;
-        for (int i = 0; i < 9; i++) {
-            idx = (int) (charSet.length * Math.random());
+        for (int i = 0; i < 6; i++) {
+            idx = (int) (integerSet.length * Math.random());
             str.append(charSet[idx]);
+        }
+        for (int i = 0; i < 2; i++) {
+            idx = (int) (charSet.length * Math.random());
+            str.append(integerSet[idx]);
         }
         str.append(specialSet[(int) (specialSet.length * Math.random())]);
         return str.toString();
