@@ -19,7 +19,6 @@ import bigsanghyuk.four_uni.user.enums.CategoryType;
 import bigsanghyuk.four_uni.user.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -105,8 +104,10 @@ public class PostService {
         return convertToDto(required);
     }
 
-    public List<GetRequiredResponse> getByKeyword(String keyword) {
-        List<PostRequired> required = postRepository.findRequiredByKeyword(keyword);
+    public List<GetRequiredResponse> getByKeyword(Long userId, String keyword, Boolean classified) {
+        String data = returnCategoryIdString(userId);
+        List<String> categoryNames = convertToCategoryNames(data);
+        List<PostRequired> required = postRepository.findRequiredByKeyword(keyword, classified, categoryNames);
         return convertToDto(required);
     }
 
@@ -226,23 +227,5 @@ public class PostService {
                 .content(postRequired.getContent())
                 .deadline(postRequired.getDeadline())
                 .build();
-    }
-
-    @Getter
-    static class DateFilter {
-
-        private int targetYear;
-        private int targetMonth;
-        private LocalDate currentMonth;
-        private LocalDate prevMonth;
-        private LocalDate nextMonth;
-
-        public DateFilter(StringTokenizer st) {
-            this.targetYear = Integer.parseInt(st.nextToken());
-            this.targetMonth = Integer.parseInt(st.nextToken());
-            this.currentMonth = LocalDate.of(targetYear, targetMonth, 1);
-            this.prevMonth = currentMonth.minusMonths(1);
-            this.nextMonth = currentMonth.plusMonths(1);
-        }
     }
 }
