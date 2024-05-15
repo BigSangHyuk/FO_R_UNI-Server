@@ -127,11 +127,11 @@ public class MailService {
         StringBuilder str = new StringBuilder();
         int idx;
         for (int i = 0; i < 6; i++) {
-            idx = (int) (integerSet.length * Math.random());
+            idx = (int) (charSet.length * Math.random());
             str.append(charSet[idx]);
         }
         for (int i = 0; i < 2; i++) {
-            idx = (int) (charSet.length * Math.random());
+            idx = (int) (integerSet.length * Math.random());
             str.append(integerSet[idx]);
         }
         str.append(specialSet[(int) (specialSet.length * Math.random())]);
