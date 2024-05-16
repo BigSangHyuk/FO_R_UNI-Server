@@ -219,7 +219,8 @@ public class UserService {
         return SignResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
-                .department(department)
+                .department(user.getDepartmentType() == null ? null : user.getDepartmentType().getValue())
+                .departmentSub(user.getDepartmentTypeSub() == null ? null : user.getDepartmentTypeSub().getValue())
                 .deptId(user.getDepartmentType().getId())
                 .nickName(user.getNickName())
                 .image(user.getImage())
@@ -232,6 +233,7 @@ public class UserService {
                 .email(info.getEmail())
                 .password(encoder.encode(info.getPassword()))
                 .departmentType(info.getDepartmentType())
+                .departmentTypeSub(info.getDepartmentTypeSub())
                 .nickName(info.getNickName())
                 .image(info.getImage())
                 .build();

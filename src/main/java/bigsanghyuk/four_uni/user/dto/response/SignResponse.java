@@ -18,6 +18,7 @@ public class SignResponse {
     private Long id;
     private String email;
     private String department;
+    private String departmentSub;
     private Integer deptId;
     private String nickName;
     private String image;

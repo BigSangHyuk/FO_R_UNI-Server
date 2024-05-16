@@ -10,6 +10,7 @@ public class SignUserInfo {
     private String email;
     private String password;
     private CategoryType departmentType;
+    private CategoryType departmentTypeSub;
     private String nickName;
     private String image;
 }

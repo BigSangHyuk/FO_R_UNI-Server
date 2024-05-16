@@ -15,10 +15,11 @@ public class SignRequest {
     @NotNull
     private String password;
     private CategoryType departmentType;
+    private CategoryType departmentTypeSub;
     private String nickName;
     private String image;
 
     public SignUserInfo toDomain() {
-        return new SignUserInfo(email, password, departmentType, nickName, image);
+        return new SignUserInfo(email, password, departmentType, departmentTypeSub, nickName, image);
     }
 }
