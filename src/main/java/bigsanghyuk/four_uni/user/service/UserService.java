@@ -200,6 +200,7 @@ public class UserService {
     protected void editUser(User user, EditUserInfo editUserInfo) {
         user.edit(
                 editUserInfo.getDepartmentType() == null ? user.getDepartmentType() : editUserInfo.getDepartmentType(),
+                editUserInfo.getDepartmentTypeSub() == null ? user.getDepartmentTypeSub() : editUserInfo.getDepartmentTypeSub(),
                 editUserInfo.getNickName() == null ? user.getNickName() : editUserInfo.getNickName()
         );
     }
@@ -208,6 +209,7 @@ public class UserService {
         return EditResponse.builder()
                 .id(user.getId())
                 .department(user.getDepartmentType().getValue())
+                .departmentSub(user.getDepartmentTypeSub() == null ? null : user.getDepartmentTypeSub().getValue())
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())
@@ -215,7 +217,6 @@ public class UserService {
     }
 
     private SignResponse signResponseBuilder(User user) {
-        String department = (user.getDepartmentType() == null ? null : user.getDepartmentType().getValue());
         return SignResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())

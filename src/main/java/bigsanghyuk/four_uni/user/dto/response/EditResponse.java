@@ -16,6 +16,7 @@ public class EditResponse {
 
     private Long id;
     private String department;
+    private String departmentSub;
     private String nickName;
     private String image;
     private List<Authority> roles = new ArrayList<>();
