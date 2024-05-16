@@ -249,6 +249,7 @@ public class UserService {
                 .id(user.getId())
                 .email(user.getEmail())
                 .department(user.getDepartmentType().getValue())
+                .departmentSub(user.getDepartmentTypeSub() == null ? null : user.getDepartmentTypeSub().getValue())
                 .deptId(user.getDepartmentType().getId())
                 .nickName(user.getNickName())
                 .image(user.getImage())
