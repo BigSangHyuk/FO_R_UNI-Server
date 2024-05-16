@@ -25,6 +25,9 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "department")
     private CategoryType departmentType;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "department_sub")
+    private CategoryType departmentTypeSub;
 
     private String nickName;
     private String image;
