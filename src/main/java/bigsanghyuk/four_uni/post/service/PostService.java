@@ -234,6 +234,7 @@ public class PostService {
                 .title(postRequired.getTitle())
                 .content(postRequired.getContent())
                 .deadline(postRequired.getDeadline())
+                .postedAt(postRequired.getPostedAt())
                 .build();
     }
 }

@@ -14,7 +14,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(
             nativeQuery = true,
-            value = "SELECT post_id as postId, category, title, deadline FROM posts " +
+            value = "SELECT post_id as postId, category, title, deadline, posted_at as postedAt FROM posts " +
                     "WHERE category in :category " +
                     "AND YEAR(deadline) = :year AND MONTH(deadline) = :month " +
                     "AND is_classified = TRUE " +
@@ -24,7 +24,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(
             nativeQuery = true,
-            value = "SELECT post_id as postId, category, title, deadline FROM posts " +
+            value = "SELECT post_id as postId, category, title, deadline, posted_at as postedAt FROM posts " +
                     "WHERE is_classified = FALSE " +
                     "AND category in :category " +
                     "ORDER BY created_at DESC")
@@ -32,13 +32,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(
             nativeQuery = true,
-            value = "SELECT post_id as postId, category, title, deadline FROM posts " +
+            value = "SELECT post_id as postId, category, title, deadline, posted_at as postedAt FROM posts " +
                     "WHERE post_id = :postId")
     PostRequired findRequiredByPostId(@Param("postId") Long postId);
 
     @Query(
             nativeQuery = true,
-            value = "SELECT post_id as postId, category, title, SUBSTRING(content, 1, 100) as content, deadline FROM posts " +
+            value = "SELECT post_id as postId, category, title, SUBSTRING(content, 1, 100) as content, deadline, posted_at as postedAt FROM posts " +
                     "WHERE (title LIKE CONCAT('%', :keyword, '%') OR content LIKE CONCAT('%', :keyword, '%')) " +
                     "AND is_classified = :classified " +
                     "AND category in :category " +
@@ -48,7 +48,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(
             nativeQuery = true,
-            value = "SELECT post_id as postId, category, title, SUBSTRING(content, 1, 100) as content, deadline FROM posts " +
+            value = "SELECT post_id as postId, category, title, SUBSTRING(content, 1, 100) as content, deadline, posted_at as postedAt FROM posts " +
                     "WHERE (title LIKE CONCAT('%', :keyword, '%') OR content LIKE CONCAT('%', :keyword, '%')) " +
                     "AND deadline IS NOT NULL AND category in :category " +
                     "ORDER BY created_at DESC"
@@ -57,7 +57,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(
             nativeQuery = true,
-            value = "SELECT post_id as postId, category, title, deadline FROM posts " +
+            value = "SELECT post_id as postId, category, title, deadline, posted_at as postedAt FROM posts " +
                     "WHERE (title LIKE CONCAT('%', :keyword, '%') OR content LIKE CONCAT('%', :keyword, '%')) " +
                     "AND deadline IS NOT NULL AND category in :category " +
                     "ORDER BY CASE WHEN deadline >= CURDATE() THEN 0 ELSE 1 END, deadline, created_at"
