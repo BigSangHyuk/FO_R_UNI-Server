@@ -111,6 +111,14 @@ public class PostService {
         return convertToDto(required);
     }
 
+    public List<GetRequiredResponse> getByKeywordSorted(Long userId, String orderBy, String keyword) {
+        String data = returnCategoryIdString(userId);
+        List<String> categoryNames = convertToCategoryNames(data);
+        List<PostRequired> required = orderBy.equals("deadline") ? postRepository.findByKeywordDeadline(keyword, categoryNames) : postRepository.findByKeywordLatest(keyword, categoryNames);
+        // 정렬 기준이 deadline 이면 마감기한 임박순으로 정렬, 이외 케이스는 (latest) 최신순 정렬
+        return convertToDto(required);
+    }
+
     private List<PostRequired> getCommented(List<CommentProfile> commentedPostId) {
         LinkedList<PostRequired> result = new LinkedList<>();
         for (CommentProfile commentRequired : commentedPostId) {
