@@ -9,5 +9,6 @@ import lombok.Getter;
 public class EditUserInfo {
 
     private CategoryType departmentType;
+    private CategoryType departmentTypeSec;
     private String nickName;
 }
