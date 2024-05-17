@@ -25,6 +25,9 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "department")
     private CategoryType departmentType;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "department_sec")
+    private CategoryType departmentTypeSec;
 
     private String nickName;
     private String image;
@@ -33,8 +36,9 @@ public class User extends BaseTimeEntity {
     @Builder.Default
     private List<Authority> roles = new ArrayList<>();
 
-    public void edit(CategoryType departmentType, String nickName) {
+    public void edit(CategoryType departmentType, CategoryType departmentTypeSec, String nickName) {
         this.departmentType = departmentType;
+        this.departmentTypeSec = departmentTypeSec;
         this.nickName = nickName;
     }
 

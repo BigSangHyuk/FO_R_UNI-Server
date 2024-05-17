@@ -13,4 +13,5 @@ public interface PostRequired {
     String getTitle();
     String getContent();
     LocalDate getDeadline();
+    LocalDate getPostedAt();
 }

@@ -200,6 +200,7 @@ public class UserService {
     protected void editUser(User user, EditUserInfo editUserInfo) {
         user.edit(
                 editUserInfo.getDepartmentType() == null ? user.getDepartmentType() : editUserInfo.getDepartmentType(),
+                editUserInfo.getDepartmentTypeSec() == null ? user.getDepartmentTypeSec() : editUserInfo.getDepartmentTypeSec(),
                 editUserInfo.getNickName() == null ? user.getNickName() : editUserInfo.getNickName()
         );
     }
@@ -207,7 +208,10 @@ public class UserService {
     private EditResponse editResponseBuilder(User user) {
         return EditResponse.builder()
                 .id(user.getId())
-                .department(user.getDepartmentType().getValue())
+                .department(user.getDepartmentType() == null ? null : user.getDepartmentType().getValue())
+                .departmentSec(user.getDepartmentTypeSec() == null ? null : user.getDepartmentTypeSec().getValue())
+                .deptId(user.getDepartmentType() == null ? null : user.getDepartmentType().getId())
+                .deptIdSec(user.getDepartmentTypeSec() == null?null:user.getDepartmentTypeSec().getId())
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())
@@ -215,12 +219,13 @@ public class UserService {
     }
 
     private SignResponse signResponseBuilder(User user) {
-        String department = (user.getDepartmentType() == null ? null : user.getDepartmentType().getValue());
         return SignResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
-                .department(department)
+                .department(user.getDepartmentType() == null ? null : user.getDepartmentType().getValue())
+                .departmentSec(user.getDepartmentTypeSec() == null ? null : user.getDepartmentTypeSec().getValue())
                 .deptId(user.getDepartmentType().getId())
+                .deptIdSec(user.getDepartmentTypeSec().getId())
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())
@@ -232,6 +237,7 @@ public class UserService {
                 .email(info.getEmail())
                 .password(encoder.encode(info.getPassword()))
                 .departmentType(info.getDepartmentType())
+                .departmentTypeSec(info.getDepartmentTypeSec())
                 .nickName(info.getNickName())
                 .image(info.getImage())
                 .build();
@@ -246,8 +252,10 @@ public class UserService {
         return LoginResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
-                .department(user.getDepartmentType().getValue())
+                .department(user.getDepartmentType() == null ? null : user.getDepartmentType().getValue())
+                .departmentSec(user.getDepartmentTypeSec() == null ? null : user.getDepartmentTypeSec().getValue())
                 .deptId(user.getDepartmentType().getId())
+                .deptIdSec(user.getDepartmentTypeSec().getId())
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())

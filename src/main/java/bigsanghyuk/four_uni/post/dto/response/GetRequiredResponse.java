@@ -19,4 +19,5 @@ public class GetRequiredResponse {
     private String title;
     private String content;
     private LocalDate deadline;
+    private LocalDate postedAt;
 }
