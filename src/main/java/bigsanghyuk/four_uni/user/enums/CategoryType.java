@@ -4,7 +4,7 @@ import lombok.Getter;
 
 public enum CategoryType {
 
-    NOT_SELECTED("선택 안됨", "NOT_SELECTED", null),
+    NOT_SELECTED("선택 안됨", "NOT_SELECTED", -1),  // getId() null 방지, 사실상 더미값
     ACADEMY("학사", "ACADEMY", 246),
     CREDIT_EXCHANGE("학점교류", "CREDIT_EXCHANGE", 247),
     GENERAL("일반/행사/모집", "GENERAL", 2611),
