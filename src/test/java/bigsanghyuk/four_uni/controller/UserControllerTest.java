@@ -88,7 +88,7 @@ public class UserControllerTest {
     @Test
     void 회원가입_성공() throws Exception {
         //given
-        SignUserInfo info = new SignUserInfo("test_email2@test.com",  passwordEncoder.encode("test2222"), CategoryType.ISIS, "test_nickname2", "test_image_url2");
+        SignUserInfo info = new SignUserInfo("test_email2@test.com",  passwordEncoder.encode("test2222"), CategoryType.ISIS, null, "test_nickname2", "test_image_url2");
 
         //when, then
         mockMvc.perform(post("/sign-up")
@@ -102,8 +102,8 @@ public class UserControllerTest {
     @Test
     void 이미_존재하는_이메일로_회원가입시_예외발생() throws Exception {
         //given
-        userRepository.save(new User(1L, "test_email@test.com", passwordEncoder.encode("test2222"), CategoryType.ISIS, "test_nickname3", "test_image_url3", Collections.singletonList(Authority.builder().name("ROLE_USER").build())));
-        SignUserInfo info = new SignUserInfo("test_email@test.com", passwordEncoder.encode("test2222"), CategoryType.ISIS, "test_nickname4", "test_image_url4");
+        userRepository.save(new User(1L, "test_email@test.com", passwordEncoder.encode("test2222"), CategoryType.ISIS, null, "test_nickname3", "test_image_url3", Collections.singletonList(Authority.builder().name("ROLE_USER").build())));
+        SignUserInfo info = new SignUserInfo("test_email@test.com", passwordEncoder.encode("test2222"), CategoryType.ISIS, null, "test_nickname4", "test_image_url4");
 
         //when
         ResultActions resultActions = mockMvc.perform(post("/sign-up")
@@ -123,7 +123,7 @@ public class UserControllerTest {
     @Test
     void 로그인_성공() throws Exception {
         //given
-        User user = userRepository.save(new User(1L, "test_email@test.com", passwordEncoder.encode("test2222"), CategoryType.ISIS, "test_nickname3", "test_image_url3", Collections.singletonList(Authority.builder().name("ROLE_USER").build())));
+        User user = userRepository.save(new User(1L, "test_email@test.com", passwordEncoder.encode("test2222"), CategoryType.ISIS, null, "test_nickname3", "test_image_url3", Collections.singletonList(Authority.builder().name("ROLE_USER").build())));
 
         LoginUserInfo info = new LoginUserInfo(user.getEmail(), "test2222");
 
@@ -147,7 +147,7 @@ public class UserControllerTest {
     @Test
     void 비밀번호_불일치로_로그인_실패() throws Exception {
         //given
-        userRepository.save(new User(1L, "test_email@test.com", passwordEncoder.encode("test2222"), CategoryType.ISIS, "test_nickname3", "test_image_url3", Collections.singletonList(Authority.builder().name("ROLE_USER").build())));
+        userRepository.save(new User(1L, "test_email@test.com", passwordEncoder.encode("test2222"), CategoryType.ISIS, null, "test_nickname3", "test_image_url3", Collections.singletonList(Authority.builder().name("ROLE_USER").build())));
         LoginUserInfo info = new LoginUserInfo("test_email@test.com", passwordEncoder.encode("test"));
 
         //when
@@ -168,7 +168,7 @@ public class UserControllerTest {
     @Test
     void 존재하지_않는_이메일로_인한_로그인_실패() throws Exception {
         //given
-        userRepository.save(new User(1L, "test_email@test.com", passwordEncoder.encode("test2222"), CategoryType.ISIS, "test_nickname3", "test_image_url3", Collections.singletonList(Authority.builder().name("ROLE_USER").build())));
+        userRepository.save(new User(1L, "test_email@test.com", passwordEncoder.encode("test2222"), CategoryType.ISIS, null, "test_nickname3", "test_image_url3", Collections.singletonList(Authority.builder().name("ROLE_USER").build())));
         LoginUserInfo info = new LoginUserInfo("test_email2@test.com", passwordEncoder.encode("testPassword"));
 
         //when
@@ -215,7 +215,7 @@ public class UserControllerTest {
         Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_USER");
         String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
 
-        EditUserInfo info = new EditUserInfo(CategoryType.ARCHI, "testChangeNickName");
+        EditUserInfo info = new EditUserInfo(CategoryType.ARCHI, null, "testChangeNickName");
 
         //when, then
         mockMvc.perform(patch("/users/edit")
@@ -261,7 +261,7 @@ public class UserControllerTest {
     @Test
     void 이전_비밀번호_불일치로_인해_실패() throws Exception {
         //given
-        User user = userRepository.save(new User(1L, "test_email@test.com", passwordEncoder.encode("test2222"), CategoryType.ISIS, "test_nickname3", "test_image_url3", Collections.singletonList(Authority.builder().name("ROLE_USER").build())));
+        User user = userRepository.save(new User(1L, "test_email@test.com", passwordEncoder.encode("test2222"), CategoryType.ISIS, null, "test_nickname3", "test_image_url3", Collections.singletonList(Authority.builder().name("ROLE_USER").build())));
 
         Authentication atc = new TestingAuthenticationToken("test_email@test.com", null, "ROLE_USER");
         String accessToken = jwtProvider.createToken(user.getEmail(), user.getId(), user.getRoles());
