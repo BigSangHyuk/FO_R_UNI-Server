@@ -252,6 +252,7 @@ public class UserService {
                 .department(user.getDepartmentType().getValue())
                 .departmentSub(user.getDepartmentTypeSub() == null ? null : user.getDepartmentTypeSub().getValue())
                 .deptId(user.getDepartmentType().getId())
+                .deptIdSub(user.getDepartmentTypeSub() == null ? null: user.getDepartmentTypeSub().getId())
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())

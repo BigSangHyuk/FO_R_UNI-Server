@@ -20,6 +20,7 @@ public class LoginResponse {
     private String department;
     private String departmentSub;
     private Integer deptId;
+    private Integer deptIdSub;
     private String nickName;
     private String image;
     private List<Authority> roles = new ArrayList<>();
