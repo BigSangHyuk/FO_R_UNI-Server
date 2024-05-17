@@ -8,10 +8,10 @@ import lombok.Getter;
 public class EditUserRequest {
 
     private CategoryType departmentType;
-    private CategoryType departmentTypeSub;
+    private CategoryType departmentTypeSec;
     private String nickName;
 
     public EditUserInfo toDomain() {
-        return new EditUserInfo(departmentType, departmentTypeSub, nickName);
+        return new EditUserInfo(departmentType, departmentTypeSec, nickName);
     }
 }

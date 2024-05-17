@@ -200,7 +200,7 @@ public class UserService {
     protected void editUser(User user, EditUserInfo editUserInfo) {
         user.edit(
                 editUserInfo.getDepartmentType() == null ? user.getDepartmentType() : editUserInfo.getDepartmentType(),
-                editUserInfo.getDepartmentTypeSub() == null ? user.getDepartmentTypeSub() : editUserInfo.getDepartmentTypeSub(),
+                editUserInfo.getDepartmentTypeSec() == null ? user.getDepartmentTypeSec() : editUserInfo.getDepartmentTypeSec(),
                 editUserInfo.getNickName() == null ? user.getNickName() : editUserInfo.getNickName()
         );
     }
@@ -209,7 +209,7 @@ public class UserService {
         return EditResponse.builder()
                 .id(user.getId())
                 .department(user.getDepartmentType().getValue())
-                .departmentSub(user.getDepartmentTypeSub() == null ? null : user.getDepartmentTypeSub().getValue())
+                .departmentSec(user.getDepartmentTypeSec() == null ? null : user.getDepartmentTypeSec().getValue())
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())
@@ -221,7 +221,7 @@ public class UserService {
                 .id(user.getId())
                 .email(user.getEmail())
                 .department(user.getDepartmentType() == null ? null : user.getDepartmentType().getValue())
-                .departmentSub(user.getDepartmentTypeSub() == null ? null : user.getDepartmentTypeSub().getValue())
+                .departmentSec(user.getDepartmentTypeSec() == null ? null : user.getDepartmentTypeSec().getValue())
                 .deptId(user.getDepartmentType().getId())
                 .nickName(user.getNickName())
                 .image(user.getImage())
@@ -234,7 +234,7 @@ public class UserService {
                 .email(info.getEmail())
                 .password(encoder.encode(info.getPassword()))
                 .departmentType(info.getDepartmentType())
-                .departmentTypeSub(info.getDepartmentTypeSub())
+                .departmentTypeSec(info.getDepartmentTypeSec())
                 .nickName(info.getNickName())
                 .image(info.getImage())
                 .build();
@@ -250,9 +250,9 @@ public class UserService {
                 .id(user.getId())
                 .email(user.getEmail())
                 .department(user.getDepartmentType().getValue())
-                .departmentSub(user.getDepartmentTypeSub() == null ? null : user.getDepartmentTypeSub().getValue())
+                .departmentSec(user.getDepartmentTypeSec() == null ? null : user.getDepartmentTypeSec().getValue())
                 .deptId(user.getDepartmentType().getId())
-                .deptIdSub(user.getDepartmentTypeSub() == null ? null: user.getDepartmentTypeSub().getId())
+                .deptIdSec(user.getDepartmentTypeSec() == null ? null: user.getDepartmentTypeSec().getId())
                 .nickName(user.getNickName())
                 .image(user.getImage())
                 .roles(user.getRoles())
