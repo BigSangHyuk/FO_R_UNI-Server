@@ -104,10 +104,10 @@ public class PostService {
         return convertToDto(required);
     }
 
-    public List<GetRequiredResponse> getByKeyword(Long userId, String keyword, Boolean classified) {
+    public List<GetRequiredResponse> getByKeyword(Long userId, String keyword) {
         String data = returnCategoryIdString(userId);
         List<String> categoryNames = convertToCategoryNames(data);
-        List<PostRequired> required = postRepository.findRequiredByKeyword(keyword, classified, categoryNames);
+        List<PostRequired> required = postRepository.findRequiredByKeyword(keyword, categoryNames);
         return convertToDto(required);
     }
 

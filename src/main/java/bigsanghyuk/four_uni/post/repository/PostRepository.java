@@ -40,11 +40,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             nativeQuery = true,
             value = "SELECT post_id as postId, category, title, SUBSTRING(content, 1, 100) as content, deadline, posted_at as postedAt FROM posts " +
                     "WHERE (title LIKE CONCAT('%', :keyword, '%') OR content LIKE CONCAT('%', :keyword, '%')) " +
-                    "AND is_classified = :classified " +
+                    "AND is_classified = false " +
                     "AND category in :category " +
                     "ORDER BY created_at DESC"
     )
-    List<PostRequired> findRequiredByKeyword(@Param("keyword") String keyword, @Param("classified") Boolean classified, @Param("category") List<String> categoryNames);
+    List<PostRequired> findRequiredByKeyword(@Param("keyword") String keyword, @Param("category") List<String> categoryNames);
 
     @Query(
             nativeQuery = true,

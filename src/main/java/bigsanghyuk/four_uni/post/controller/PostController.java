@@ -88,8 +88,8 @@ public class PostController {
 
     @Operation(summary = "키워드로 검색, 미분류 용도", description = "검색어 전달, 게시글 등록순 반환 -> 밑에 새로운 메소드 만들어서 미분류에만 사용할 듯")
     @GetMapping("/posts/unclassified/search")
-    public ResponseEntity<Results<List<GetRequiredResponse>>> getByKeyword(@RequestAttribute(name = "userId") Long userId, @RequestParam(name = "keyword") String keyword, @RequestParam(name = "classified") Boolean classified) {
-        List<GetRequiredResponse> postsRequired = postService.getByKeyword(userId, keyword, classified);
+    public ResponseEntity<Results<List<GetRequiredResponse>>> getByKeyword(@RequestAttribute(name = "userId") Long userId, @RequestParam(name = "keyword") String keyword) {
+        List<GetRequiredResponse> postsRequired = postService.getByKeyword(userId, keyword);
         return ResponseEntity.ok().body(new Results<>(postsRequired, postsRequired.size()));
     }
 
