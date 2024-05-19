@@ -59,8 +59,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             nativeQuery = true,
             value = "SELECT post_id as postId, category, title, deadline, posted_at as postedAt FROM posts " +
                     "WHERE (title LIKE CONCAT('%', :keyword, '%') OR content LIKE CONCAT('%', :keyword, '%')) " +
-                    "AND deadline IS NOT NULL AND category in :category " +
-                    "ORDER BY CASE WHEN deadline >= CURDATE() THEN 0 ELSE 1 END, deadline, created_at"
-    )   // 조회일자 기준 마감기한 임박순으로 정렬하되, 마감기한이 남은 글들을 0번째 그룹, 이미 지난 글들을 1번째 그룹 -> 기간 남은 글들이 먼저 나오고 그 뒤에 마감된 글 표시
+                    "AND deadline IS NOT NULL AND category in :category AND deadline >= CURDATE() " +
+                    "ORDER BY deadline, created_at"
+    )   // 조회일자 기준 마감기한 임박순으로 정렬
     List<PostRequired> findByKeywordDeadline(@Param("keyword") String keyword, @Param("category") List<String> categoryNames);
 }
